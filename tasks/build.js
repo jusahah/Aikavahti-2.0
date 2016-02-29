@@ -16,6 +16,7 @@ var destDir = projectDir.cwd('./build');
 
 var paths = {
     copyFromAppDir: [
+    '   ./views/**',
         './img/**',
         './fonts/**',
         './css/**',
@@ -79,7 +80,7 @@ var bundleApplication = function () {
         bundle(srcDir.path('background.js'), destDir.path('background.js')),
         bundle(srcDir.path('app.js'), destDir.path('app.js')),
         bundle(srcDir.path('transform.js'), destDir.path('transform.js')),
-
+        bundle(srcDir.path('mainprocess.js'), destDir.path('mainprocess.js')),
     ]);
 };
 

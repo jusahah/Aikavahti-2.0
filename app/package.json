@@ -8,6 +8,9 @@
   "copyright": "© 2016, your company here",
   "main": "background.js",
   "dependencies": {
-    "fs-jetpack": "^0.7.0"
+    "bluebird": "^3.3.3",
+    "fs-jetpack": "^0.7.0",
+    "lodash": "^4.5.1",
+    "t3js": "^2.1.0"
   }
 }
