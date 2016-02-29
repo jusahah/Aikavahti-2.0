@@ -12,6 +12,7 @@ import windowStateKeeper from './vendor/electron_boilerplate/window_state';
 import env from './env';
 
 var mainWindow;
+var transformWindow;
 
 // Preserver of the window size and position between app launches.
 var mainWindowState = windowStateKeeper('main', {
@@ -19,8 +20,16 @@ var mainWindowState = windowStateKeeper('main', {
     height: 600
 });
 
+/*
+    Noteworthy that this main process is simply for initializing/destructing other windows
+    Also it is the msg channel between main window and transform window.
+    No actual business logic should never reside in this main process!
+*/
 app.on('ready', function () {
 
+    /*
+    MAIN WINDOW INIT AND BIND 
+    */
     mainWindow = new BrowserWindow({
         x: mainWindowState.x,
         y: mainWindowState.y,
@@ -35,7 +44,7 @@ app.on('ready', function () {
     if (env.name === 'test') {
         mainWindow.loadURL('file://' + __dirname + '/spec.html');
     } else {
-        mainWindow.loadURL('file://' + __dirname + '/app.html');
+        mainWindow.loadURL('file://' + __dirname + '/index.html');
     }
 
     if (env.name !== 'production') {
@@ -44,8 +53,26 @@ app.on('ready', function () {
     }
 
     mainWindow.on('close', function () {
+        // When main window is closed, we need to shut down the app
+        // Also it may be good practise to shut down transform window before 
+        // shutting down the app (although it probably should not make any difference)
         mainWindowState.saveState(mainWindow);
+        transformWindow.close(); // Close it too so app runtime knows to close itself!
     });
+
+    /*
+    TRANSFORM WINDOW INIT AND BIND 
+    */
+    transformWindow = new BrowserWindow({
+        x: mainWindowState.x,
+        y: mainWindowState.y,
+        width: mainWindowState.width,
+        height: mainWindowState.height,
+        show: false
+    });
+
+    transformWindow.loadURL('file://' + __dirname + '/transform.html');
+
 });
 
 app.on('window-all-closed', function () {
