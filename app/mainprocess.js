@@ -7,6 +7,14 @@ import env from './env';
 var Promise = require('bluebird');
 var _ = require('lodash');
 
+var datalayer = require('./layers/data');
+var transformlayer = require('./layers/transform/transform');
+datalayer.changeCallback(function(allData) {
+	console.log("Change in data layer -> sending data to recompute");
+	console.log(allData);
+	transformlayer.recompute(allData, Box.Application.getService('derivedData').cacheComputedTransform);
+});
+
 // We get jQuery from global scope
 // Inject HTML templates to dom
 // IN PRODUCTION put these templates straight to dom in build-time!
@@ -43,6 +51,7 @@ Box.Application.addModule('valikko', function(context) {
 		onclick: function(event, element, elementType) {
 			console.log("CLICK IN VALIKKO: " + elementType);
 			if (elementType.split('-')[1] === 'route') {
+				console.log("is Rouite");
 				// Changing a route
 				Box.Application.broadcast('routechanged', elementType);
 				var linkEl = $(element);
@@ -79,13 +88,15 @@ Box.Application.addModule('front', function(context) {
 	}
 
 	var activate = function() {
+		console.log("Activate fron");
 		var derivedService  = context.getService('derivedData');
 		var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 		isHidden = false;
 
 		viewDataPromise.then(function(viewData) {
+			if (isHidden) return; // User already switched to another view			
+
 			// viewData is always object with transforNames being keys and data being values
-			if (isHidden) return; // User already switched to another view
 			$('#globalLoadingBanner').hide();
 			$el.empty().append("<h3>Front</h3>");
 			$el.show();
@@ -123,7 +134,7 @@ Box.Application.addModule('admin', function(context) {
 	var isHidden = true;
 	var $el = $(context.getElement());
 
-	var dataNeeded = ['oneToFive'];
+	var dataNeeded = ['plusTwo', 'timesThree'];
 
 	// Private stuff
 
@@ -140,10 +151,14 @@ Box.Application.addModule('admin', function(context) {
 		isHidden = false;
 
 		viewDataPromise.then(function(viewData) {
+			if (isHidden) return; // User already switched to another view			
+			console.log("View data");
+			console.log(viewData);
+
+			//var dataObj = context.getService('derivedData').easify(viewData);			
 			// viewData is always object with transforNames being keys and data being values
-			if (isHidden) return; // User already switched to another view
 			$('#globalLoadingBanner').hide();
-			$el.empty().append("<h3>" + viewData['oneToFive'].join(", ") + "</h3>");
+			$el.empty().append("<h3>" + viewData['timesThree'].join(", ") + "</h3>");
 			$el.show();
 		});
 		
@@ -177,6 +192,8 @@ Box.Application.addModule('admin', function(context) {
 
 Box.Application.addService('derivedData', function(application) {
 
+	var cache = {}; // name -> data
+	var cacheWaitingList = {}; // name -> array of waiters
 
 	return {
 		// Must return Promise!!!
@@ -198,11 +215,36 @@ Box.Application.addService('derivedData', function(application) {
 		},
 		// Must return Promise!!!
 		getDeriveds: function(listOfTransformNames) {
-
+			console.log("Get deriveds");
+			console.log(listOfTransformNames);
 			if (listOfTransformNames.length === 0) {
 				//Return resolved promise
 				return Promise.resolve({});
 			}
+			//var ret = {};
+			var proms = _.map(listOfTransformNames, function(name) {
+				// If item is in cache, return it straight away
+				if (cache.hasOwnProperty(name)) {
+					return Promise.resolve({name: name, data: cache[name]});
+				}
+				// Else its not yet there, so create listener
+				if (!cacheWaitingList.hasOwnProperty(name)) {
+					cacheWaitingList[name] = [];
+				}
+				
+				return new Promise(function(resolve, reject) {
+					cacheWaitingList[name].push(resolve);
+				});
+			
+			});
+
+			var promAll = Promise.all(proms);
+			var promEasified = promAll.then(function(viewData) {
+				return this.easify(viewData);
+			}.bind(this));
+			return promEasified;
+
+			/*
 
 			var prom = new Promise(function(resolve, reject) {
 				setTimeout(function() {
@@ -211,13 +253,39 @@ Box.Application.addService('derivedData', function(application) {
 						ret[name] = [1,2,3,4,5];
 					});
 					resolve(ret);
-				}, 500+Math.random()*1500);
+				}, 200+Math.random()*800);
 
 			});
 
 			return prom;
-		}
+			*/
+		},
+		easify: function(viewDataArray) {
+			//array -> object with transformNames as keys
+			var o = {};
+			_.each(viewDataArray, function(item) {
+				o[item.name] = item.data;
+			});
+			return o;
+		},
+		cacheComputedTransform: function(name, results) {
+			console.log("Cache computed transform in derivedData Service");
+			cache[name] = results;
+			console.log("Cache now");
+			console.log(JSON.stringify(cache));
+			if (cacheWaitingList.hasOwnProperty(name)) {
+				var waiters = cacheWaitingList[name];
+				_.each(waiters, function(waiter) {
+					waiter(results);
+				});
+			}
 
+			cacheWaitingList[name] = null;
+			delete cacheWaitingList[name];
+		},
+		flush: function() {
+
+		}
 	}
 });
 

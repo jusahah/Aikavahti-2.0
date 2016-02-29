@@ -7,6 +7,30 @@ import { app, BrowserWindow } from 'electron';
 import devHelper from './vendor/electron_boilerplate/dev_helper';
 import windowStateKeeper from './vendor/electron_boilerplate/window_state';
 
+const ipcMain = require('electron').ipcMain;
+
+// These simply forward data between main renderer and transform process
+ipcMain.on('computationrequest', function(event, data) {
+    console.log("Main process got computation req");
+    if (transformWindow) {
+        transformWindow.send('computationrequest', data); // Just forward it
+    }
+});
+
+ipcMain.on('computationresult', function(event, data) {
+    console.log("Main process got computation results!");
+    if (mainWindow) {
+        mainWindow.send('computationresult', data);
+    }
+});
+
+ipcMain.on('computationfailure', function(event, data) {
+    console.log("Main process got computation failure.");
+    if (mainWindow) {
+        mainWindow.send('computationfailure', data);
+    }
+});
+
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.
 import env from './env';
@@ -72,6 +96,8 @@ app.on('ready', function () {
     });
 
     transformWindow.loadURL('file://' + __dirname + '/transform.html');
+
+    transformWindow.openDevTools();
 
 });
 
