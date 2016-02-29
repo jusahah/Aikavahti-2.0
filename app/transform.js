@@ -22,8 +22,12 @@ function receiveComputationRequest(data) {
 	data = data.data; // Yes, oh yes.
 	var cachedResults = {}; // name -> results hashtable
 	var transformsList = transforms.slice();
-	console.log(transformsList);
+	var transformListLen = transformsList.length;
+	var dones = 0;
 	console.log("Start calc all");
+	function percentageDone() {
+		return Math.round(100*dones / transformListLen);
+	}
 	function calcOne(transformSelected) {
 
 		var next;
@@ -39,7 +43,8 @@ function receiveComputationRequest(data) {
 				var toBeSentData = transformSelected.prerequisite ? cachedResults[transformSelected.prerequisite] : data;
 				var results = next.transform(toBeSentData);
 				cachedResults[next.name] = results;
-				sendResults(next.name, results, batchID);
+				dones++;
+				sendResults(next.name, results, batchID, percentageDone());
 				setTimeout(calcOne, 0);
 			} else {
 				// Move the first element to last and try again
@@ -61,10 +66,10 @@ function receiveComputationRequest(data) {
 	*/
 }
 
-function sendResults(name, results, batchID) {
+function sendResults(name, results, batchID, percentageDone) {
 	console.log("RESULTS FOR: " + name);
 	console.log(results);
-	ipcTransformer.send('computationresult', {name: name, results: results, batchID: batchID});
+	ipcTransformer.send('computationresult', {name: name, results: results, batchID: batchID, percentageDone: percentageDone});
 }
 
 
