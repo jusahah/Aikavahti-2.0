@@ -10,15 +10,21 @@ var transforms = require('./transforms').list; // gets index.js
 
 var ipcTransformer = require('electron').ipcRenderer;
 
+var currentBatchID;
+
 ipcTransformer.on('computationrequest', function(event, data) {
 	console.log("Computation req in transformer!");
 	receiveComputationRequest(data);
 });
 
 function receiveComputationRequest(data) {
+	// data = {batchID: int, data: {...}}
+	console.log(data);
+	var schemaData = data.data.schema['_root_']; // To be passed to each transform as 2nd arg
 	console.log("Received computationrequest");
 	console.log(data);
 	var batchID = data.batchID;
+	currentBatchID = data.batchID;
 	data = data.data; // Yes, oh yes.
 	var cachedResults = {}; // name -> results hashtable
 	var transformsList = transforms.slice();
@@ -29,7 +35,10 @@ function receiveComputationRequest(data) {
 		return Math.round(100*dones / transformListLen);
 	}
 	function calcOne(transformSelected) {
-
+		if (batchID !== currentBatchID) {
+			console.warn("Higher batch ID detected - stopping previous calculation");
+			return;
+		}
 		var next;
 		if (transformsList.length !== 0) {
 			transformSelected = transformSelected || transformsList[0];
@@ -41,7 +50,7 @@ function receiveComputationRequest(data) {
 				console.log("RUNNING TRANSFORM: " + next.name);
 				console.log(next);
 				var toBeSentData = transformSelected.prerequisite ? cachedResults[transformSelected.prerequisite] : data;
-				var results = next.transform(toBeSentData);
+				var results = next.transform(toBeSentData, schemaData);
 				cachedResults[next.name] = results;
 				dones++;
 				sendResults(next.name, results, batchID, percentageDone());
