@@ -88,11 +88,11 @@ app.on('ready', function () {
     TRANSFORM WINDOW INIT AND BIND 
     */
     transformWindow = new BrowserWindow({
-        x: mainWindowState.x,
+        x: mainWindowState.x-800,
         y: mainWindowState.y,
         width: mainWindowState.width,
         height: mainWindowState.height,
-        show: false
+        show: true
     });
 
     transformWindow.loadURL('file://' + __dirname + '/transform.html');

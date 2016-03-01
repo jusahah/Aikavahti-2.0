@@ -7,7 +7,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = []; // empty means that this view can always render instantly (no need to wait on data)
+		var dataNeeded = ['thisMonthTotals']; // empty means that this view can always render instantly (no need to wait on data)
 		// Private stuff
 
 		var deactivate = function() {
@@ -30,7 +30,7 @@ module.exports = function(Box) {
 
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
-				$el.empty().append("<h3>Front</h3>");
+				$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
 				$el.show();
 			});
 			

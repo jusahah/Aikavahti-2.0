@@ -8,6 +8,7 @@ var file = __dirname + '/appdata.json';
 
 var appData = [1,2,3,4,5];
 var changeCb;
+var changeCbDisabled = false;
 
 var dataLayerSettings;
 
@@ -95,6 +96,12 @@ function generateSchemaID() {
 function writeToDiskIfNeeded() {
 	console.log("APP DATA NOW");
 	console.log(JSON.stringify(appData));
+	if (!changeCbDisabled) {
+		setTimeout(function() {
+			changeCb(appData);
+		}, 0);		
+	}
+
 	return new Promise(function(resolve, reject) {
 		if (appData.settings.data.writeToDiskAfterEveryUpdate) {
 			pushToDB(appData, function(err) {
@@ -190,6 +197,13 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 }
 
 function addEvent(eventData) {
+	// Here we do the "fivecation"
+	// This is done because allows easier adding of "artificial events" in transforms
+	// For example, overlapping can not happen as long as artificials use 0 and 9 as last digit.
+	var t = eventData.t + "";
+	t = t.substring(0, t.length-1);
+	eventData.t = parseInt(t + "5");
+
 	appData.events.push(eventData);
 	return writeToDiskIfNeeded();
 
@@ -249,6 +263,8 @@ function addSchemaItem(pathParts, schemaData) {
 }
 
 function deleteSchemaItem(pathParts, schemaData) {
+	// Unsupported as of now
+	throw "Deletion of schema item currently unsupported!";
 
 }
 
@@ -345,6 +361,17 @@ module.exports = {
 		loadToMemory();
 
 	},
+
+	disableChangeCb: function() {
+		changeCbDisabled = true;
+	},
+	enableChangeCb: function() {
+		changeCbDisabled = false;
+	},
+	broadcastChange: function() {
+		// Force change broadcast
+		changeCb(appData);
+	}
 
 
 }

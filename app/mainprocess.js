@@ -161,6 +161,32 @@ setTimeout(function() {
 		}
 	});
 	console.groupEnd();
-}, 1800);
+}, 1400);
+
+
+setTimeout(function() {
+	datalayer.disableChangeCb();
+	var ids = [1,2,3,11,12];
+	for (var i = 50; i >= 0; i--) {
+		console.group();
+		var id = ids[Math.floor(ids.length*Math.random())];
+		datalayer.dataCommandIn({
+			opType: 'new',
+			treePath: 'events',
+			data: {
+				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 128),
+				s: id
+			}
+		});
+		console.groupEnd();		
+	};
+
+	datalayer.enableChangeCb();
+
+}, 1600);
+
+setTimeout(function() {
+	datalayer.broadcastChange();
+}, 2800);
 
 

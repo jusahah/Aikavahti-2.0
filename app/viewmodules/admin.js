@@ -7,7 +7,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['plusTwo', 'timesThree'];
+		var dataNeeded = ['addDayChanges'];
 
 		// Private stuff
 
@@ -33,7 +33,7 @@ module.exports = function(Box) {
 				//var dataObj = context.getService('derivedData').easify(viewData);			
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
-				$el.empty().append("<h3>" + viewData['timesThree'].join(", ") + "</h3>");
+				$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
 				$el.show();
 			});
 			

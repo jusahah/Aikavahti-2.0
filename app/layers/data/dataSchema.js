@@ -12,7 +12,8 @@ var schemaItem = Joi.object().keys({
     id: Joi.number().integer(), // Schema item id int not yet generated!
     name: Joi.string().required().min(1).max(64), // Name
     color: Joi.string().required().hex(), // Color
-    parent: Joi.number().integer()
+    parent: Joi.number().integer(),
+    active: Joi.boolean()
 }); // Validate against Joi schema here
 
 var settingsItem = {
