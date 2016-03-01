@@ -9,6 +9,7 @@ var _ = require('lodash');
 
 var datalayer = require('./layers/data');
 var transformlayer = require('./layers/transform/transform');
+datalayer.init();
 datalayer.changeCallback(function(allData) {
 	console.log("Change in data layer -> sending data to recompute");
 	console.log(allData);
@@ -113,9 +114,53 @@ Box.Application.addModule('valikko', function(context) {
 });	
 
 
+// Start tests
+setTimeout(function() {
+	datalayer.dataCommandIn({
+		opType: 'change',
+		treePath: 'settings.data',
+		data: {
+			writeToDiskAfterEveryUpdate: false
+		}
+	})
+}, 1000);
 
 
+setTimeout(function() {
+	datalayer.dataCommandIn({
+		opType: 'change',
+		treePath: 'settings.data',
+		data: {
+			writeToDiskAfterEveryUpdate: true
+		}
+	})
+}, 4000);
 
+setTimeout(function() {
+	console.group();
+	datalayer.dataCommandIn({
+		opType: 'new',
+		treePath: 'schema.1.11',
+		data: {
+			name: 'PHP',
+			color: '6611ff'
+		}
+	})
+	console.groupEnd();
+}, 1200);
 
+setTimeout(function() {
+	console.group();
+	datalayer.dataCommandIn({
+		opType: 'change',
+		treePath: 'schema.1.12',
+		data: {
+			id: 12,
+			name: 'Web coding',
+			color: '6611ff'
+		}
+	});
+	console.groupEnd();
+}, 1800);
 
 
