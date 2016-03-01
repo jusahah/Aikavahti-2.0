@@ -7,7 +7,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['addDayChanges'];
+		var dataNeeded = ['durationsThisMonth'];
 
 		// Private stuff
 

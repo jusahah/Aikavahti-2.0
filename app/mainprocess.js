@@ -25,10 +25,11 @@ datalayer.changeCallback(function(allData) {
 $('#valikkoContainer').load('views/static/valikko.html');
 $('#frontContainer').load('views/mainContents/front.html');
 $('#adminContainer').load('views/mainContents/admin.html');
-
+$('#schemaviewerContainer').load('views/mainContents/schemaviewer.html');
 // View module registrations
 require('./viewmodules/admin')(Box); // Send Box in so view modules can bind themselves into it
 require('./viewmodules/front')(Box); // Same here
+require('./viewmodules/schemaViewer')(Box); // Same
 
 // Service registrations
 require('./services/derivedData')(Box);
@@ -174,7 +175,7 @@ setTimeout(function() {
 			opType: 'new',
 			treePath: 'events',
 			data: {
-				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 128),
+				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 28),
 				s: id
 			}
 		});
