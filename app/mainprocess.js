@@ -26,13 +26,17 @@ $('#valikkoContainer').load('views/static/valikko.html');
 $('#frontContainer').load('views/mainContents/front.html');
 $('#adminContainer').load('views/mainContents/admin.html');
 $('#schemaviewerContainer').load('views/mainContents/schemaviewer.html');
+$('#settingsContainer').load('views/mainContents/settings.html');
+
 // View module registrations
 require('./viewmodules/admin')(Box); // Send Box in so view modules can bind themselves into it
 require('./viewmodules/front')(Box); // Same here
 require('./viewmodules/schemaViewer')(Box); // Same
+require('./viewmodules/settings')(Box); // Same
 
 // Service registrations
 require('./services/derivedData')(Box);
+require('./services/settingsService')(Box, datalayer);
 
 
 // Too bad these fucking loads are so async that what the hell... we need to wait a bit
@@ -87,6 +91,7 @@ Box.Application.addModule('valikko', function(context) {
 				console.log("Route change clicked");
 				// Changing a route
 				Box.Application.broadcast('routechanged', elementType);
+				console.log("EL TYPE: " + elementType);
 				current = elementType;
 				var linkEl = $(element);
 				linkEl.addClass('active');

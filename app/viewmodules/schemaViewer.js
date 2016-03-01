@@ -103,6 +103,7 @@ module.exports = function(Box) {
 				console.log("CLICK IN SCHEMA VIEWER");
 			},
 			onmessage: function(name, data) {
+				console.log("ROUTE CHAGE RECEIVED IN schemaviewer");
 				if (name === 'routechanged') {
 
 					if (data.split('-')[0] === 'schemaviewer') {
