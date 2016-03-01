@@ -54,8 +54,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	}, 200);
 
 });
+
 // Valikko module
 // This is special view module in that its always visible and it controls other modules
+// It also governs most of the always-visible stuff on the site
 Box.Application.addModule('valikko', function(context) {
 
 	var current;

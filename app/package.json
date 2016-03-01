@@ -9,7 +9,9 @@
   "main": "background.js",
   "dependencies": {
     "bluebird": "^3.3.3",
+    "fs-extra": "^0.26.5",
     "fs-jetpack": "^0.7.0",
+    "jsonfile": "^2.2.3",
     "lodash": "^4.5.1",
     "t3js": "^2.1.0"
   }
