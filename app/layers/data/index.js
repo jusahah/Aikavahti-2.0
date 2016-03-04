@@ -93,10 +93,10 @@ function generateSchemaID() {
 	return parseInt(s);
 }
 
-function writeToDiskIfNeeded() {
+function writeToDiskIfNeeded(noChangeCbCall) {
 	console.log("APP DATA NOW");
-	console.log(JSON.stringify(appData));
-	if (!changeCbDisabled) {
+	//console.log(JSON.stringify(appData));
+	if (!changeCbDisabled && !noChangeCbCall) {
 		setTimeout(function() {
 			changeCb(appData);
 		}, 0);		
@@ -125,9 +125,10 @@ function modifySettings(path, data) {
 	_.each(parts, function(part) {
 		currTraversing = currTraversing[part];
 	});	
-	console.log(currTraversing);
+	console.log("Overwriting old settings data with new!");
+	//console.log(currTraversing);
 	currTraversing[last] = data;
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(true);
 }
 
 function modifySchemaItem(pathParts, updatedSchemaItem) {
@@ -190,10 +191,10 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 	theItem.name = updatedSchemaItem.name;
 	theItem.color = updatedSchemaItem.color;
 
-	console.log(JSON.stringify(appData));
+	//console.log(JSON.stringify(appData));
 
-	var diskPromise = writeToDiskIfNeeded();
-	return diskPromise;
+	return writeToDiskIfNeeded();
+
 }
 
 function addEvent(eventData) {
@@ -214,16 +215,16 @@ function addSchemaItem(pathParts, schemaData) {
 	pathParts.shift(); // Remove first which is 'schema'
 	var currentChildren = appData.schema['_root_'];
 	var last = pathParts.pop();
-	console.log(pathParts);
+	//console.log(pathParts);
 
 	// Hunt down the parent
 	_.each(pathParts, function(part) {
 		console.log("Current children");
-		console.log(JSON.stringify(currentChildren));
+		//console.log(JSON.stringify(currentChildren));
 		var found = false;
 		for(var i = 0, j = currentChildren.length; i < j; i++) {
 
-			console.log(currentChildren[i]);
+			//console.log(currentChildren[i]);
 			var child = currentChildren[i];
 			console.log("Comparing in schema traversal: " + child.id + " vs. " + part);
 			if (parseInt(child.id) === parseInt(part)) {
@@ -256,7 +257,7 @@ function addSchemaItem(pathParts, schemaData) {
 	schemaData.id = generateSchemaID();
 	parentItem.children.push(schemaData);
 	//appData.schema[schemaData.id] = schemaData;
-	console.log(JSON.stringify(appData));
+	//console.log(JSON.stringify(appData));
 
 	return writeToDiskIfNeeded();
 
@@ -264,7 +265,8 @@ function addSchemaItem(pathParts, schemaData) {
 
 function deleteSchemaItem(pathParts, schemaData) {
 	// Unsupported as of now
-	throw "Deletion of schema item currently unsupported!";
+	console.error("Deleting schema items currently unsupported - this may change in future versions of Aikavahti");
+	return Promise.reject('Schema items can not be deleted - unsupported operation');
 
 }
 
@@ -301,8 +303,10 @@ module.exports = {
 		var firstPath = pathParts[0];
 		var err = dataSchema.validate(dataCommand.treePath, dataCommand.data);
 		if (err) {
+
 			console.error("Validation failed in data layer dataCommandIn!");
 			console.log(err);
+			return Promise.reject(err);
 		}
 
 		// Data is good

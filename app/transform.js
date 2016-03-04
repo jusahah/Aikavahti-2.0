@@ -17,12 +17,125 @@ ipcTransformer.on('computationrequest', function(event, data) {
 	receiveComputationRequest(data);
 });
 
+function sortEvents(events) {
+	return events.sort(function(a, b) {
+		return b.t - a.t;
+	});
+}
+
+function durationalizeEvents(events) {
+
+	// events is sorted DESC by timestamp and day change stuff is added
+	
+	if (events.length === 0) {
+		return [];
+	}
+
+	var durations = [];
+	var currTime = Date.now();
+
+	for (var i = 0, j = events.length; i < j; i++) {
+		var event = events[i];
+		durations.push({
+			start: event.t,
+			end: currTime,
+			s: event.s,
+			d: currTime - event.t
+		});
+
+		currTime = event.t;
+	};
+
+	return durations;
+} 
+
+function addDayChanges(events) {
+
+	// events is sorted DESC by timestamp
+
+	// we change the order first
+
+	if (events.length === 0) {
+		return [];
+	}
+	var modifiedEvents = [];
+
+	var curr = events[0];
+	for (var i = 1, j = events.length - 1; i < j; i++) {
+		var event = events[i];
+		var dayChangeTimestamp = getDayChangeTimestamp(event.t, curr.t);
+		console.log("---Day change: " + dayChangeTimestamp);
+		if (dayChangeTimestamp !== 0) {
+			modifiedEvents.push({
+				s: curr.s,
+				t: dayChangeTimestamp+1
+				
+			});
+			modifiedEvents.push({
+				s: 0,
+				t: dayChangeTimestamp-1
+				
+			})
+
+		}
+		modifiedEvents.push(event);
+		curr = event;
+
+	};
+
+	return modifiedEvents;
+
+}
+
+function getDayChangeTimestamp(prev, next) {
+	console.log("prev " + prev + " vs. next " + next);
+	var d1 = new Date(prev);
+	var d2 = new Date(next);
+
+	console.log(d1.getDay() + " | " + d2.getDay());
+
+	if (d1.getDay() !== d2.getDay() || d1.getMonth() !== d2.getMonth()) {
+		var startOfDay = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+		return startOfDay.getTime();
+	}
+
+	return 0;
+}
+
+function normalizeSchemaTree(schemaTree) {
+
+	var table = {};
+	console.warn("Traverse start");
+
+	var traverse = function(branch) {
+		_.each(branch, function(child) {
+			console.log(child.name);
+			table[child.id] = child;
+			if (child.hasOwnProperty('children') && child.children.length > 0) {
+				traverse(child.children);
+			
+			}
+		});	
+
+		
+		
+	}
+
+	
+	
+	traverse(schemaTree);
+	console.log("TABLE IS");
+	console.log(table);
+	return table;
+
+}
+
 function receiveComputationRequest(data) {
 	// data = {batchID: int, data: {...}}
-	console.log(data);
-	var schemaData = data.data.schema['_root_']; // To be passed to each transform as 2nd arg
+	var schemaTree = data.data.schema['_root_']; // To be passed to each transform as 2nd arg
+	var schemaNormalizedTable = normalizeSchemaTree(schemaTree);
+	var settingsTree = data.data.settings;
 	console.log("Received computationrequest");
-	console.log(data);
 	var batchID = data.batchID;
 	currentBatchID = data.batchID;
 	data = data.data; // Yes, oh yes.
@@ -31,11 +144,18 @@ function receiveComputationRequest(data) {
 	var transformListLen = transformsList.length;
 	var dones = 0;
 	console.log("Start calc all");
+
+	var sortedEvents = sortEvents(data.events);
+	var dayChangesAdded = addDayChanges(sortedEvents);
+	var sortedDurations = durationalizeEvents(dayChangesAdded);
+
 	function percentageDone() {
 		return Math.round(100*dones / transformListLen);
 	}
+	/*
 	function calcOne(transformSelected) {
 		if (batchID !== currentBatchID) {
+			// We abort current calculations and move to higher batch ID one
 			console.warn("Higher batch ID detected - stopping previous calculation");
 			return;
 		}
@@ -64,6 +184,31 @@ function receiveComputationRequest(data) {
 
 		}
 	}
+	*/
+
+	function calcOne() {
+		if (batchID !== currentBatchID) {
+			// We abort current calculations and move to higher batch ID one
+			console.warn("Higher batch ID detected - stopping previous calculation");
+			return;
+		}
+		
+		if (transformsList.length !== 0) {
+			var transformSelected = transformsList.pop();
+			var results;	
+			try {
+				results = transformSelected.transform(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, schemaNormalizedTable, settingsTree);	
+			} catch (e) {
+				results = null;
+			}
+			dones++;
+			sendResults(transformSelected.name, results, batchID, percentageDone());
+			setTimeout(calcOne, 0);
+		} else {
+			console.warn("Transformations completed");
+		}
+					
+	}
 
 	calcOne(); // Start the timeout loop	
 	/*
@@ -77,7 +222,6 @@ function receiveComputationRequest(data) {
 
 function sendResults(name, results, batchID, percentageDone) {
 	console.log("RESULTS FOR: " + name);
-	console.log(results);
 	ipcTransformer.send('computationresult', {name: name, results: results, batchID: batchID, percentageDone: percentageDone});
 }
 

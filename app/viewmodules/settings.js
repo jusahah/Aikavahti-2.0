@@ -34,11 +34,38 @@ module.exports = function(Box) {
 				//var dataObj = context.getService('derivedData').easify(viewData);			
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
-				$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
+				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
+				setSettingsDataToView(viewData);
 				$el.show();
 			});
 			
 		}
+
+
+		// Specific to this module
+		var gatherAndSendSettings = function() {
+			// Gather data from settings form
+			var settingsObj = {};
+			settingsObj.onlineBackup = $el.find('#onlineBackup_el').val() === '1';
+			settingsObj.writeToDiskAfterEveryUpdate = $el.find('#writeToDiskAfterEveryUpdate_el').val() === '1';
+			settingsObj.backupKey = $el.find('#backupKey_el').val();
+			// Send settings object to next guy
+			var settingsService = context.getService('settingsService');
+			settingsService.setSettings(settingsObj);
+
+		}
+
+		var setSettingsDataToView = function(viewData) {
+			// Bind data to form fields
+			console.log(viewData.data);
+			console.log(viewData.data.writeToDiskAfterEveryUpdate);
+			$el.find('#onlineBackup_el').val(viewData.internet.onlineBackup ? "1" : "0");
+			$el.find('#writeToDiskAfterEveryUpdate_el').val(viewData.data.writeToDiskAfterEveryUpdate ? "1" : "0");
+			$el.find('#backupKey_el').val(viewData.internet.backupKey);
+
+		}
+
+
 
 
 		
@@ -47,7 +74,12 @@ module.exports = function(Box) {
 		return {
 			messages: ['routechanged'],
 			onclick: function(event, element, elementType) {
+				event.preventDefault();
+				console.error("EVENT TARGET");
+				console.error(event.target);
 				console.log("CLICK IN SETTINGS");
+
+				if (elementType === 'savesettings') gatherAndSendSettings();
 			},
 			onmessage: function(name, data) {
 				console.log("ON MESSAGE IN SETTINGS");

@@ -88,7 +88,7 @@ app.on('ready', function () {
     TRANSFORM WINDOW INIT AND BIND 
     */
     transformWindow = new BrowserWindow({
-        x: mainWindowState.x-800,
+        x: mainWindowState.x-1200,
         y: mainWindowState.y,
         width: mainWindowState.width,
         height: mainWindowState.height,

@@ -30,7 +30,7 @@ module.exports = function(Box) {
 
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
-				$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
+				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
 				$el.show();
 			});
 			

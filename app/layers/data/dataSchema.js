@@ -22,6 +22,7 @@ var settingsItem = {
 	}), // Validate against Joi schema here
 	internet: Joi.object().keys({
 	    onlineBackup: Joi.boolean(),
+	    backupKey: Joi.string().max(32).empty('')
 	}) // Validate against Joi schema here
 }
 
