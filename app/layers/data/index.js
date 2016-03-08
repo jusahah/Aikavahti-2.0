@@ -48,6 +48,11 @@ function getInitialDataObject() {
 			},
 			internet: {
 				onlineBackup: false
+			},
+			view: {
+				eventsOnlyToLeaves: true,
+				userSelectedEventsShow: false,
+				userSelectedEvents: [],
 			}
 		}
 	};
@@ -197,6 +202,25 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 
 }
 
+function ensureSchemaIDExists(id) {
+	var found = false;
+	var firstLevelArray = appData.schema['_root_'];
+	var searchSubtree = function(branch) {
+		if (found) return;
+		if (parseInt(branch.id) === id) {
+			found = true;
+		} 
+
+		if (branch.hasOwnProperty('children') && branch.children && branch.children.length > 0) {
+			_.each(branch.children, searchSubtree);
+		}
+
+	}
+	_.each(firstLevelArray, searchSubtree);
+	console.log("ensureSchemaIDExists: " + found);
+	return found;
+}
+
 function addEvent(eventData) {
 	// Here we do the "fivecation"
 	// This is done because allows easier adding of "artificial events" in transforms
@@ -205,7 +229,14 @@ function addEvent(eventData) {
 	t = t.substring(0, t.length-1);
 	eventData.t = parseInt(t + "5");
 
+	if (!ensureSchemaIDExists(parseInt(eventData.s))) {
+		return Promise.reject('New event fail! Schema ID does not exist in datalayer!');
+	}
+
 	appData.events.push(eventData);
+
+	// If we need to inform some web API event hook this would be pretty good place to do it
+
 	return writeToDiskIfNeeded();
 
 }
@@ -270,6 +301,21 @@ function deleteSchemaItem(pathParts, schemaData) {
 
 }
 
+function modifyOneSetting(path, newValue) {
+	var parts = path.split('.');
+	var last  = parts.pop();
+	var currTraversing = appData;
+	_.each(parts, function(part) {
+		currTraversing = currTraversing[part];
+	});	
+	console.log("Overwriting old settings data with new!");
+	//console.log(currTraversing);
+	console.log(currTraversing);
+	currTraversing[last] = newValue;
+
+	return writeToDiskIfNeeded(true);
+}
+
 
 
 module.exports = {
@@ -299,19 +345,24 @@ module.exports = {
 		// do changes etc. whatever is need
 
 		// Note that for event timestamp is already inserted!
-		var pathParts = dataCommand.treePath.split('.');
-		var firstPath = pathParts[0];
-		var err = dataSchema.validate(dataCommand.treePath, dataCommand.data);
-		if (err) {
+		if (dataCommand.opType !== 'changeOne') {
+			var pathParts = dataCommand.treePath.split('.');
+			var firstPath = pathParts[0];
+			var err = dataSchema.validate(dataCommand.treePath, dataCommand.data);
+			if (err) {
 
-			console.error("Validation failed in data layer dataCommandIn!");
-			console.log(err);
-			return Promise.reject(err);
-		}
+				console.error("Validation failed in data layer dataCommandIn!");
+				console.log(err);
+				return Promise.reject(err);
+			}			
+		} 
+
 
 		// Data is good
+		if (dataCommand.opType === 'changeOne') {
+			return modifyOneSetting(dataCommand.treePath, dataCommand.data);
 
-		if (dataCommand.opType === 'change') {
+		} else if (dataCommand.opType === 'change') {
 			// Note that events can not be modified - only deleted and created
 			if (firstPath === 'schema') {
 				return modifySchemaItem(pathParts, dataCommand.data);

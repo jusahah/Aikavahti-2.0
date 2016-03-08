@@ -17,9 +17,9 @@ module.exports = {
 		{name: 'todayEventsWithSchemas', require('./base/todayEventsWithSchemas'), prerequisite: null},
 		{name: 'frontviewdata', transform: require('/frontview'), prerequisite: 'todayEventsWithSchemas'},
 	*/
-		{name: 'frontViewData', transform: require('./frontViewData'), prerequisite: null}	
-
-
+		{name: 'frontViewData', transform: require('./frontViewData'), prerequisite: null},
+		{name: 'decorateSchemaWithDurationsThisMonth', transform: require('./decorateSchemaWithDurationsThisMonth'), prerequisite: null},	
+		{name: 'eventList', transform: require('./eventList'), prerequisite: null},
 	]
 
 };

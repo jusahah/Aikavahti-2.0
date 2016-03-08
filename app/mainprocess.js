@@ -27,17 +27,18 @@ $('#frontContainer').load('views/mainContents/front.html');
 $('#adminContainer').load('views/mainContents/admin.html');
 $('#schemaviewerContainer').load('views/mainContents/schemaviewer.html');
 $('#settingsContainer').load('views/mainContents/settings.html');
+$('#manageContainer').load('views/mainContents/manage.html');
 
 // View module registrations
 require('./viewmodules/admin')(Box); // Send Box in so view modules can bind themselves into it
 require('./viewmodules/front')(Box); // Same here
 require('./viewmodules/schemaViewer')(Box); // Same
 require('./viewmodules/settings')(Box); // Same
-
+require('./viewmodules/manage')(Box); // Same
 // Service registrations
-require('./services/derivedData')(Box);
+require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);
-
+require('./services/eventService')(Box, datalayer);
 
 // Too bad these fucking loads are so async that what the hell... we need to wait a bit
 
@@ -100,6 +101,9 @@ Box.Application.addModule('valikko', function(context) {
 				// Start loading banner
 				// View itself is responsible of hiding it when its ready
 				$('#globalLoadingBanner').show();
+			} else if (elementType === 'forceflush') {
+				console.warn("Artificial cache flush");
+				context.getService('derivedData').forceDataRecomputation();
 			}
 
 		},
@@ -111,6 +115,10 @@ Box.Application.addModule('valikko', function(context) {
 				console.warn("Progress update in valikko");
 				console.log(data);
 				updateProgressBar(data);
+			} else if (name === 'newacticity_showall') {
+				var ss = context.getService('settingsService');
+				
+
 			}
 		}
 

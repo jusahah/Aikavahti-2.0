@@ -145,6 +145,8 @@ function receiveComputationRequest(data) {
 	var dones = 0;
 	console.log("Start calc all");
 
+	var calcStartTime = Date.now();
+
 	var sortedEvents = sortEvents(data.events);
 	var dayChangesAdded = addDayChanges(sortedEvents);
 	var sortedDurations = durationalizeEvents(dayChangesAdded);
@@ -197,12 +199,15 @@ function receiveComputationRequest(data) {
 			var transformSelected = transformsList.pop();
 			var results;	
 			try {
+				console.warn("CURREN TRANSFORMATION: " + transformSelected.name);
 				results = transformSelected.transform(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, schemaNormalizedTable, settingsTree);	
 			} catch (e) {
+				console.error("-------------------__ERROR ERROR -----------------");
+				console.log(e);
 				results = null;
 			}
 			dones++;
-			sendResults(transformSelected.name, results, batchID, percentageDone());
+			sendResults(transformSelected.name, results, batchID, percentageDone(), calcStartTime);
 			setTimeout(calcOne, 0);
 		} else {
 			console.warn("Transformations completed");
@@ -220,9 +225,9 @@ function receiveComputationRequest(data) {
 	*/
 }
 
-function sendResults(name, results, batchID, percentageDone) {
+function sendResults(name, results, batchID, percentageDone, calcTime) {
 	console.log("RESULTS FOR: " + name);
-	ipcTransformer.send('computationresult', {name: name, results: results, batchID: batchID, percentageDone: percentageDone});
+	ipcTransformer.send('computationresult', {calcTime: calcTime, name: name, results: results, batchID: batchID, percentageDone: percentageDone});
 }
 
 

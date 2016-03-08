@@ -33,7 +33,8 @@ module.exports = function(Box) {
 				//var dataObj = context.getService('derivedData').easify(viewData);			
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
-				$el.empty().append(buildHTMLFromTree(viewData.decorateSchemaWithDurationsThisMonth.schema['_root_']));
+				//$el.empty().append(JSON.stringify(viewData));
+				$el.empty().append(buildHTMLFromTree(viewData.decorateSchemaWithDurationsThisMonth));
 				$el.show();
 			});
 			
@@ -59,7 +60,7 @@ module.exports = function(Box) {
 			if (coloredTree && coloredTree.length !== 0) {
 				_.each(coloredTree, function(branch) {
 					console.log("BRANCH: " + branch.name + " with depth " + depth);
-					subHTML += createOneElement(branch.name, branch.totalsInThisMonth, branch.color, depth);
+					subHTML += createOneElement(branch.name, branch.totalTime, branch.color, depth);
 					subHTML += buildUnspecified(branch.hisOwnTotals, branch.color, depth+1);
 					if (branch.hasOwnProperty('children')) {
 						subHTML += buildSubtree(branch.children, depth+1);

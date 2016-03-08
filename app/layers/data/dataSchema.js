@@ -32,6 +32,7 @@ var dataSchema = {
 	settings: settingsItem
 };
 
+
 module.exports = {
 	// returns: on successful validation -> false, on error -> error
 	validate: function(objectType, data) {
@@ -49,7 +50,6 @@ module.exports = {
 
 		return validationError;
 
-	},
-
+	}
 
 }

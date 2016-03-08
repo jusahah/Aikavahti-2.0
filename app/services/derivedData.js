@@ -1,8 +1,9 @@
-module.exports = function(Box) {
+module.exports = function(Box, datalayer) {
 	Box.Application.addService('derivedData', function(application) {
 
 		var cache = {}; // name -> data
 		var cacheWaitingList = {}; // name -> array of waiters
+		var latestCalcTime;
 
 		return {
 			// Must return Promise!!!
@@ -79,7 +80,8 @@ module.exports = function(Box) {
 				return o;
 			},
 			// Returns void
-			cacheComputedTransform: function(name, results, percentageDone) {
+			cacheComputedTransform: function(name, results, percentageDone, calcTime) {
+				latestCalcTime = calcTime;
 				console.log("% done: " + percentageDone);
 				console.log("Cache computed transform in derivedData Service");
 				cache[name] = results;
@@ -104,6 +106,10 @@ module.exports = function(Box) {
 				cache = {};
 				Box.Application.broadcast('cachewasflushed'); // Forces any active views to reask for deriveds
 
+			},
+			forceDataRecomputation: function() {
+				datalayer.broadcastChange();
+				this.flush();
 			}
 		}
 	});

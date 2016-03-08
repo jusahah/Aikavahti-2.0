@@ -18,7 +18,7 @@
 								data-widget-sortable="false"
 				
 								-->
-								<header style="background-color: #66feca;">
+								<header>
 									<span class="widget-icon"> <i class="fa fa-comments"></i> </span>
 									<h2>Default Tabs with border </h2>
 				
@@ -35,16 +35,16 @@
 									<!-- end widget edit box -->
 				
 									<!-- widget content -->
-									<div class="widget-body">
+									<div class="widget-body" id="currentevent_wrapper">
 				
 										<p>
-											 Aloitettu:<strong> klo 12.05</strong> <span style="float: right;">Kesto:<strong> 6 tuntia 25 minuuttia 13 sekuntia </strong></span>
+											 Aloitettu: <span id="currentevent_started" style="font-weight: bold;">---</span> <span style="float: right;">Kesto: <span id="currentevent_duration" style="font-weight: bold;"> 6 tuntia 25 minuuttia 13 sekuntia </span></span>
 										</p>
 										<hr class="simple">
 				
 										<div id="myTabContent1" class="tab-content">
-											<div class="well well-lg" id="s1"  style="background-color: #66feca;">
-												<h1 style="text-align: center;">Tennis</h1>
+											<div class="well well-lg" id="currentevent_panel" style="background-color: #66feca;">
+												<h1 id="currentevent_name" style="text-align: center;">Tennis</h1>
 											</div>
 
 										</div>
@@ -57,8 +57,58 @@
 				</div>
 		</div>
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="jarviswidget" id="wid-id-0" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-custombutton="false" data-widget-sortable="false">
+								<!-- widget options:
+								usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
 
-						<div class="well well-sm" id="event-container">
+								data-widget-colorbutton="false"
+								data-widget-editbutton="false"
+								data-widget-togglebutton="false"
+								data-widget-deletebutton="false"
+								data-widget-fullscreenbutton="false"
+								data-widget-custombutton="false"
+								data-widget-collapsed="true"
+								data-widget-sortable="false"
+
+								-->
+								<header>
+									<span class="widget-icon"> <i class="fa fa-hand-o-up"></i> </span>
+									<h2>Aloita uusi aktiviteetti!</h2>
+									<button class="btn dropdown-toggle btn-xs btn-primary" style="float: right; margin: 4px;" data-type="newactivity_showall">
+												Kaikki
+											</button>
+									<button class="btn dropdown-toggle btn-xs btn-warning" style="float: right; margin: 4px;" data-type="newactivity_showleaves">
+												Vain päätepisteet
+											</button>
+								</header>
+
+								<!-- widget div-->
+								<div>
+
+									<!-- widget edit box -->
+									<div class="jarviswidget-editbox">
+										<!-- This area used as dropdown edit box -->
+
+									</div>
+									<!-- end widget edit box -->
+
+									<!-- widget content -->
+									<div class="widget-body" id="newactivity_buttons">
+
+										<button href="javascript:void(0);" class="btn">Default</button>
+
+									</div>
+									<!-- end widget content -->
+
+								</div>
+								<!-- end widget div -->
+
+							</div>
+	</div>
+							
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+						<div class="well well-sm" id="lastten_wrapper">
 							<form>
 								<fieldset>
 									<legend>
