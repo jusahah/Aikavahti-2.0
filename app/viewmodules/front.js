@@ -186,7 +186,8 @@ module.exports = function(Box) {
 			},
 			onmessage: function(name, data) {
 				if (name === 'routechanged') {
-					if (data.split('-')[0] === 'front') {
+					var route = data.route;
+					if (route.split('-')[0] === 'front') {
 						activate();
 					} else {
 						deactivate();

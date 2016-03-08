@@ -106,8 +106,8 @@ module.exports = function(Box) {
 			onmessage: function(name, data) {
 				console.log("ROUTE CHAGE RECEIVED IN schemaviewer");
 				if (name === 'routechanged') {
-
-					if (data.split('-')[0] === 'schemaviewer') {
+					var route = data.route;
+					if (route.split('-')[0] === 'schemaviewer') {
 
 						activate();
 					} else {

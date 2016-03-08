@@ -309,7 +309,7 @@ function deleteEvent(data) {
 	var events = appData.events;
 
 	var i = _.findIndex(events, function(event) {
-		return event.t === timestamp && event.s === schemaID;
+		return parseInt(event.t) === timestamp && parseInt(event.s) === schemaID;
 	});
 
 	if (i === -1) {

@@ -28,6 +28,8 @@ $('#adminContainer').load('views/mainContents/admin.html');
 $('#schemaviewerContainer').load('views/mainContents/schemaviewer.html');
 $('#settingsContainer').load('views/mainContents/settings.html');
 $('#manageContainer').load('views/mainContents/manage.html');
+$('#statsContainer').load('views/mainContents/stats.html');
+
 
 // View module registrations
 require('./viewmodules/admin')(Box); // Send Box in so view modules can bind themselves into it
@@ -35,6 +37,8 @@ require('./viewmodules/front')(Box); // Same here
 require('./viewmodules/schemaViewer')(Box); // Same
 require('./viewmodules/settings')(Box); // Same
 require('./viewmodules/manage')(Box); // Same
+require('./viewmodules/stats')(Box); // Same
+
 // Service registrations
 require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);
@@ -73,7 +77,7 @@ Box.Application.addModule('valikko', function(context) {
 
 	var reshowCurrentView = function() {
 		if (current) {
-			Box.Application.broadcast('routechanged', current);
+			Box.Application.broadcast('routechanged', {route: current, payload: null});
 			$('#globalLoadingBanner').show();
 		}
 	}
@@ -90,8 +94,9 @@ Box.Application.addModule('valikko', function(context) {
 			console.log("CLICK IN VALIKKO: " + elementType);
 			if (elementType.split('-')[1] === 'route') {
 				console.log("Route change clicked");
+				var payload = $(element).data('payload');
 				// Changing a route
-				Box.Application.broadcast('routechanged', elementType);
+				Box.Application.broadcast('routechanged', {route: elementType, payload: payload});
 				console.log("EL TYPE: " + elementType);
 				current = elementType;
 				var linkEl = $(element);
@@ -177,18 +182,29 @@ setTimeout(function() {
 	console.groupEnd();
 }, 1400);
 
+var dates = [
+	'03-04-2016 21:59',
+	'03-04-2016 22:05',
+	'03-05-2016 08:19',
+	'03-07-2016 11:00',
+	'03-07-2016 11:15',
+	'03-07-2016 23:55',
+	'03-08-2016 08:08',
+];
+
 
 setTimeout(function() {
 	datalayer.disableChangeCb();
 	var ids = [1,2,3,11,12];
-	for (var i = 50; i >= 0; i--) {
+	for (var i = dates.length-1; i >= 0; i--) {
 		console.group();
 		var id = ids[Math.floor(ids.length*Math.random())];
 		datalayer.dataCommandIn({
 			opType: 'new',
 			treePath: 'events',
 			data: {
-				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 28),
+				//t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 48),
+				t: moment(dates.pop()).valueOf(),
 				s: id
 			}
 		});

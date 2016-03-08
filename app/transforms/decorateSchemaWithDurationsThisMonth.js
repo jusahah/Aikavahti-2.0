@@ -74,8 +74,17 @@ function totalTimePerSchemaIDSinceTimestamp(sortedDurations, monthStartTimestamp
 	var o = {};
 
 	for (var i = 0, j = sortedDurations.length; i < j; i++) {
+		var initialActivity = 0;
 		var duration = sortedDurations[i];
-		if (duration.start < monthStartTimestamp) break; // We are done here
+		if (duration.start < monthStartTimestamp) {
+			initialActivity = duration.s;
+			var initialDuration = duration.end - monthStartTimestamp;
+			if (!o.hasOwnProperty(duration.s)) {
+				o[duration.s] = 0;
+			}
+			o[duration.s] += initialDuration;			
+			break; // We are done here
+		}
 
 		if (!o.hasOwnProperty(duration.s)) {
 			o[duration.s] = 0;
@@ -91,6 +100,8 @@ function totalTimePerSchemaIDSinceTimestamp(sortedDurations, monthStartTimestamp
 function getStartOfMonthTimestamp() {
 	var d = new Date();
 
-	var dStart = new Date(d.getFullYear(), d.getMonth(), 0);
+	var dStart = new Date(d.getFullYear(), d.getMonth());
+	console.error("Month start timestamp");
+	console.log(dStart);
 	return dStart.getTime();
 }

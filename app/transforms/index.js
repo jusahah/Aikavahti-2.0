@@ -21,6 +21,9 @@ module.exports = {
 		{name: 'decorateSchemaWithDurationsThisMonth', transform: require('./decorateSchemaWithDurationsThisMonth'), prerequisite: null},	
 		{name: 'eventList', transform: require('./eventList'), prerequisite: null},
 		{name: 'schemaTree', transform: require('./schemaTree'), prerequisite: null},
+		{name: 'sortedDurations', transform: require('./sortedDurations'), prerequisite: null},
+		{name: 'schemaItems', transform: require('./schemaItems'), prerequisite: null},
+
 	]
 
 };

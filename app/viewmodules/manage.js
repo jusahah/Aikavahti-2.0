@@ -1,4 +1,5 @@
 // Admin page module
+var _ = require('lodash');
 var tinycolor = require('tinycolor2');
 var moment = require('moment');
 
@@ -11,18 +12,21 @@ module.exports = function(Box) {
 
 		var dataNeeded = ['eventList', 'schemaTree'];
 
+		var showLast30 = true;
+
 		// Private stuff
 
 		var deactivate = function() {
+			showLast30 = true;
 			if (!isHidden) {
 				isHidden = true;
 				$el.hide();
 			}
 		}
 
-		var activate = function() {
+		var activate = function(preventHide) {
 			// hide right away in case we are reactivating view that is currently visible
-			$el.hide();			
+			if (!preventHide) $el.hide();			
 			console.log("Activate in manage module");
 			var derivedService  = context.getService('derivedData');
 			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
@@ -46,6 +50,14 @@ module.exports = function(Box) {
 			//$el.empty().append(JSON.stringify(eventList));
 			$body = $el.find('#managetimeline_body');
 			var html = '';
+
+			// Filter event list
+			if (showLast30) {
+				var timestamp = moment().subtract(30, 'days').valueOf();
+				eventList = _.takeWhile(eventList, function(event) {
+					return event.t > timestamp;
+				});
+			}
 
 			_.each(eventList, function(eventWithSchemaData) {
 				var color = eventWithSchemaData.color || '554455';
@@ -152,6 +164,10 @@ module.exports = function(Box) {
 
 		}
 
+		var reloadTable = function() {
+			activate(true);
+		}
+
 		
 
 		// Public API
@@ -167,13 +183,19 @@ module.exports = function(Box) {
 				else if (elementType === 'deleteactivity') {
 					var timestampPlusSchemaID = $(element).data('payload');
 					sendDeleteRequestForEvent(timestampPlusSchemaID);
+				} else if(elementType === 'activities_showall') {
+					showLast30 = false;
+					reloadTable();
+				} else if (elementType === 'activities_show30') {
+					showLast30 = true;
+					reloadTable();
 				}
 			},
 			onmessage: function(name, data) {
 				console.log("ON MESSAGE IN manage");
 				if (name === 'routechanged') {
-
-					if (data.split('-')[0] === 'manage') {
+					var route = data.route;
+					if (route.split('-')[0] === 'manage') {
 						console.log("CAUGHT IN manage");
 
 						activate();

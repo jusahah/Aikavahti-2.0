@@ -6,8 +6,11 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 	console.error("Transformer running: frontViewData");
 	console.log("DATA RECEIVED IN TRANSFORMER");
+	console.warn("RAW EVENTS SORTED");
 	console.log(JSON.stringify(sortedEvents));
+	console.warn("DAY CHANGES ADDED");
 	console.log(JSON.stringify(dayChangesAdded));
+	console.warn("DURATIONS");
 	console.log(JSON.stringify(sortedDurations));
 	console.log(JSON.stringify(schemaTree));
 	console.log(normalizedSchemaTable);

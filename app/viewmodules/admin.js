@@ -50,8 +50,8 @@ module.exports = function(Box) {
 			},
 			onmessage: function(name, data) {
 				if (name === 'routechanged') {
-
-					if (data.split('-')[0] === 'admin') {
+					var route = data.route;
+					if (route.split('-')[0] === 'admin') {
 
 						activate();
 					} else {

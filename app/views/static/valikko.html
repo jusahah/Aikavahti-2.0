@@ -9,8 +9,25 @@
 					<li data-type="front-route">
 						<a><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent">Reaaliaikanäkymä</span></a>	
 					</li>
-					<li data-type="admin-route">
+					<li>
 						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Tilastot</span></a>
+						<ul>
+							<li data-type="stats-route" data-payload="today">
+								<a>Tänään</a>
+							</li>
+							<li data-type="stats-route" data-payload="week">
+								<a>Kuluva viikko</a>
+							</li>
+							<li data-type="stats-route" data-payload="month">
+								<a>Kuluva kuukausi</a>
+							</li>	
+							<li data-type="stats-route" data-payload="year"> 
+								<a>Kuluva vuosi</a>
+							</li>		
+							<li data-type="stats-route" data-payload="custom">
+								<a>Hae aikaväliltä</a>
+							</li>																		
+						</ul>
 					</li>
 					<li data-type="schemaviewer-route">
 						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Skeema</span></a>
@@ -22,10 +39,7 @@
 						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Hallinnoi</span></a>
 						<ul>
 							<li data-type="manage-route">
-								<a>Poista aikajanalta</a>
-							</li>
-							<li data-type="addtotimeline-route">
-								<a>Lisää aikajanalle</a>
+								<a>Muokkaa aikajanaa</a>
 							</li>
 							<li data-type="csvexport-route">
 								<a>Lataa CSV-tiedostona</a>

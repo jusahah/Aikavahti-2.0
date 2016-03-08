@@ -5,6 +5,7 @@ import { greet } from './hello_world/hello_world'; // code authored by you in th
 import env from './env';
 
 var _ = require('lodash');
+var moment = require('moment');
 
 var transforms = require('./transforms').list; // gets index.js
 
@@ -53,7 +54,7 @@ function addDayChanges(events) {
 
 	// events is sorted DESC by timestamp
 
-	// we change the order first
+
 
 	if (events.length === 0) {
 		return [];
@@ -61,19 +62,24 @@ function addDayChanges(events) {
 	var modifiedEvents = [];
 
 	var curr = events[0];
-	for (var i = 1, j = events.length - 1; i < j; i++) {
+	modifiedEvents.push(curr);
+	for (var i = 1, j = events.length - 1; i <= j; i++) {
+		console.log("--->" + moment(events[i].t).format('DD.MM.YYYY HH:mm:ss'));
 		var event = events[i];
+		event.human = moment(event.t).format('DD.MM.YYYY HH:mm:ss');
 		var dayChangeTimestamp = getDayChangeTimestamp(event.t, curr.t);
 		console.log("---Day change: " + dayChangeTimestamp);
 		if (dayChangeTimestamp !== 0) {
 			modifiedEvents.push({
-				s: curr.s,
-				t: dayChangeTimestamp+1
+				s: event.s,
+				t: dayChangeTimestamp+1,
+				human: moment(dayChangeTimestamp+1).format('DD.MM.YYYY HH:mm:ss')
 				
 			});
 			modifiedEvents.push({
 				s: 0,
-				t: dayChangeTimestamp-1
+				t: dayChangeTimestamp-1,
+				human: moment(dayChangeTimestamp-1).format('DD.MM.YYYY HH:mm:ss')
 				
 			})
 
@@ -82,6 +88,9 @@ function addDayChanges(events) {
 		curr = event;
 
 	};
+
+	console.warn("DAY CHANGES ADDED");
+	console.log(JSON.stringify(modifiedEvents));
 
 	return modifiedEvents;
 

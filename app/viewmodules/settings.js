@@ -84,8 +84,8 @@ module.exports = function(Box) {
 			onmessage: function(name, data) {
 				console.log("ON MESSAGE IN SETTINGS");
 				if (name === 'routechanged') {
-
-					if (data.split('-')[0] === 'settings') {
+					var route = data.route;
+					if (route.split('-')[0] === 'settings') {
 						console.log("CAUGHT IN SETTINGS");
 
 						activate();
