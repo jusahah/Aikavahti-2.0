@@ -301,6 +301,26 @@ function deleteSchemaItem(pathParts, schemaData) {
 
 }
 
+function deleteEvent(data) {
+	var schemaID = parseInt(data.s);
+	var timestamp = parseInt(data.t);
+
+	// We just have to find it and splice
+	var events = appData.events;
+
+	var i = _.findIndex(events, function(event) {
+		return event.t === timestamp && event.s === schemaID;
+	});
+
+	if (i === -1) {
+		return Promise.reject('Event not found and could not be deleted!');
+	}
+
+	events.splice(i, 1); // Deletion
+	return writeToDiskIfNeeded();
+
+}
+
 function modifyOneSetting(path, newValue) {
 	var parts = path.split('.');
 	var last  = parts.pop();

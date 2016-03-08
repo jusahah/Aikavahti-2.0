@@ -20,6 +20,7 @@ module.exports = {
 		{name: 'frontViewData', transform: require('./frontViewData'), prerequisite: null},
 		{name: 'decorateSchemaWithDurationsThisMonth', transform: require('./decorateSchemaWithDurationsThisMonth'), prerequisite: null},	
 		{name: 'eventList', transform: require('./eventList'), prerequisite: null},
+		{name: 'schemaTree', transform: require('./schemaTree'), prerequisite: null},
 	]
 
 };

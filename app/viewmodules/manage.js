@@ -1,4 +1,6 @@
 // Admin page module
+var tinycolor = require('tinycolor2');
+var moment = require('moment');
 
 module.exports = function(Box) {
 
@@ -7,7 +9,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['eventList'];
+		var dataNeeded = ['eventList', 'schemaTree'];
 
 		// Private stuff
 
@@ -32,7 +34,7 @@ module.exports = function(Box) {
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
 				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
-				bindToView(viewData.eventList);
+				bindToView(viewData.eventList, viewData.schemaTree);
 				$el.show();
 			});
 			
@@ -40,11 +42,115 @@ module.exports = function(Box) {
 		}
 
 
-		var bindToView = function(eventList) {
-			$el.empty().append(JSON.stringify(eventList));
+		var bindToView = function(eventList, schemaTree) {
+			//$el.empty().append(JSON.stringify(eventList));
+			$body = $el.find('#managetimeline_body');
+			var html = '';
+
+			_.each(eventList, function(eventWithSchemaData) {
+				var color = eventWithSchemaData.color || '554455';
+				var tc = tinycolor(color);
+				var textcolor = tc.isDark() ? 'fff' : '222'; 
+				html += '<tr>';
+				html += '<td style="color: #' + textcolor+ '; background-color: #' + color + ';">' + eventWithSchemaData.name + '</td>';
+				html += '<td>' + beautifyTimestamp(eventWithSchemaData.t) + '</td>';
+				html += '<td>' + dateString(eventWithSchemaData.t) + '</td>';
+				html += '<td>' + teaserOfNotes(eventWithSchemaData.notes) + '</td>';
+				html += '<td><a data-notes="' +eventWithSchemaData.notes+ '" data-type="deleteactivity" data-payload="' + eventWithSchemaData.t + '_' + eventWithSchemaData.s + '" class="btn btn-danger">Poista</a></td>';
+				html += '</tr>';
+			});
+
+			$body.empty().append(html);
+
+
+			// Add activity part
+
+			$select = $el.find('#activitytoadd');
+			$select.empty().append(buildHTMLFromTree(schemaTree));
+
+
+		}
+
+		function buildHTMLFromTree(schemaTree) {
+			var baseMargin = 0;
+			var html = '';
+			var depth = 1;
+
+			html = buildSubtree(schemaTree, depth);
+
+			return html;
+
+
+		}
+
+		function buildSubtree(schemaTree, depth) {
+
+			var subHTML = '';
+
+			if (schemaTree && schemaTree.length !== 0) {
+				_.each(schemaTree, function(branch) {
+					console.log("BRANCH: " + branch.name + " with depth " + depth);
+					subHTML += createOneElement(branch, depth);
+					//subHTML += buildUnspecified(branch.hisOwnTotals, branch.color, depth+1);
+					if (branch.hasOwnProperty('children')) {
+						subHTML += buildSubtree(branch.children, depth+1);
+					}
+					
+				});
+
+			};
+
+			return subHTML;
+		}
+
+		function createOneElement(schemaItem, depth) {
+
+			depth = depth < 1 ? depth : depth - 1;
+
+			return "<option value='" + schemaItem.id + "'>" + _.repeat('...', depth) + schemaItem.name + "</option>";
 		}
 
 
+		var beautifyTimestamp = function(timestamp) {
+			var d = new Date(timestamp);
+			var tunnit = d.getHours() < 10 ? "0" + d.getHours() : d.getHours();
+			var mins   = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
+
+			return tunnit + "." + mins;
+		}
+
+		var dateString = function(timestamp) {
+			var d = moment(timestamp);
+			return d.format('MMMM Do YYYY');
+
+		}
+
+		var teaserOfNotes = function(notes) {
+			var notes = notes || '';
+			return _.truncate(notes, {'length': 16});
+
+		}
+
+
+		var gatherAndAddActivity = function() {
+			var date = $el.find('#activitydate').val();
+			var time = $el.find('#activitytime').val();
+			var activityID = $el.find('#activitytoadd').val();
+
+			var es = context.getService('eventService');
+			es.newEventCustomDateTime(date, time, activityID);
+		}
+
+		var sendDeleteRequestForEvent = function(timestampPlusSchemaID) {
+
+			var parts = timestampPlusSchemaID.split('_');
+			var ts = parts[0];
+			var schemaID = parts[1];
+
+			var es = context.getService('eventService');
+			es.deleteEvent(ts, schemaID);			
+
+		}
 
 		
 
@@ -57,7 +163,11 @@ module.exports = function(Box) {
 				console.error(event.target);
 				console.log("CLICK IN manage");
 
-				if (elementType === 'savesettings') gatherAndSendSettings();
+				if (elementType === 'addactivity') gatherAndAddActivity();
+				else if (elementType === 'deleteactivity') {
+					var timestampPlusSchemaID = $(element).data('payload');
+					sendDeleteRequestForEvent(timestampPlusSchemaID);
+				}
 			},
 			onmessage: function(name, data) {
 				console.log("ON MESSAGE IN manage");
