@@ -3,6 +3,9 @@ var util = require('util');
 var _ = require('lodash');
 
 var dataSchema = require('./dataSchema');
+
+// Coloring
+var colorAssigner = require('./colorassigner');
  
 var file = __dirname + '/appdata.json';
 
@@ -229,7 +232,7 @@ function addEvent(eventData) {
 	t = t.substring(0, t.length-1);
 	eventData.t = parseInt(t + "5");
 
-	if (!ensureSchemaIDExists(parseInt(eventData.s))) {
+	if (parseInt(eventData.s) !== 0 && !ensureSchemaIDExists(parseInt(eventData.s))) {
 		return Promise.reject('New event fail! Schema ID does not exist in datalayer!');
 	}
 
@@ -336,6 +339,16 @@ function modifyOneSetting(path, newValue) {
 	return writeToDiskIfNeeded(true);
 }
 
+function recolorSchema() {
+	console.warn("DATA LAYER: Recoloring...");
+	colorAssigner(appData.schema['_root_']);
+			console.error("DATA TREE IN READY");
+	console.log(appData.schema['_root_']);
+	console.log(JSON.stringify(appData.schema['_root_']));
+	return writeToDiskIfNeeded();
+
+}
+
 
 
 module.exports = {
@@ -365,7 +378,7 @@ module.exports = {
 		// do changes etc. whatever is need
 
 		// Note that for event timestamp is already inserted!
-		if (dataCommand.opType !== 'changeOne') {
+		if (dataCommand.opType !== 'changeOne' && dataCommand.opType !== 'general') {
 			var pathParts = dataCommand.treePath.split('.');
 			var firstPath = pathParts[0];
 			var err = dataSchema.validate(dataCommand.treePath, dataCommand.data);
@@ -379,7 +392,12 @@ module.exports = {
 
 
 		// Data is good
-		if (dataCommand.opType === 'changeOne') {
+		if (dataCommand.opType === 'general') {
+			if (dataCommand.data === 'recolor') {
+				return recolorSchema();
+			}
+		}
+		else if (dataCommand.opType === 'changeOne') {
 			return modifyOneSetting(dataCommand.treePath, dataCommand.data);
 
 		} else if (dataCommand.opType === 'change') {

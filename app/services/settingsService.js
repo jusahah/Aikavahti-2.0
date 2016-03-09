@@ -32,6 +32,9 @@ module.exports = function(Box, datalayer) {
 			changeShowLeavesSettings: function(newValue) {
 				if (newValue !== true && newValue !== false) return Promise.reject('Incorrect settings value');
 				return datalayer.dataCommandIn({opType: 'changeOne', treePath: 'settings.view.eventsOnlyToLeaves', data: newValue});
+			},
+			recolorSchema: function() {
+				return datalayer.dataCommandIn({opType: 'general', data: 'recolor'});
 			}
 		}
 

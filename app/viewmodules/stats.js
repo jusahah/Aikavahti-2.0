@@ -226,6 +226,9 @@ module.exports = function(Box) {
 			var html = "<tr>"
 			var padding = depth*INNERPADDING;
 			color = color || '554455';
+			if (color.charAt(0) === '#') {
+				color = color.substr(1);
+			}
 			var tc = tinycolor(color);
 			var textcolor = tc.isDark() ? 'fff' : '222'; 
 			var ownText = onlyOwn ? 'own' : 'all';			

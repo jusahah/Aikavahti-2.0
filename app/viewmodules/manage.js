@@ -61,10 +61,14 @@ module.exports = function(Box) {
 
 			_.each(eventList, function(eventWithSchemaData) {
 				var color = eventWithSchemaData.color || '554455';
+				if (color.charAt(0) === '#') {
+					color = color.substr(1);
+				}				
 				var tc = tinycolor(color);
 				var textcolor = tc.isDark() ? 'fff' : '222'; 
+				var name = parseInt(eventWithSchemaData.s) === 0 ? '(poissa)' : eventWithSchemaData.name; 
 				html += '<tr>';
-				html += '<td style="color: #' + textcolor+ '; background-color: #' + color + ';">' + eventWithSchemaData.name + '</td>';
+				html += '<td style="color: #' + textcolor+ '; background-color: #' + color + ';">' + name + '</td>';
 				html += '<td>' + beautifyTimestamp(eventWithSchemaData.t) + '</td>';
 				html += '<td>' + dateString(eventWithSchemaData.t) + '</td>';
 				html += '<td>' + teaserOfNotes(eventWithSchemaData.notes) + '</td>';
@@ -98,6 +102,8 @@ module.exports = function(Box) {
 		function buildSubtree(schemaTree, depth) {
 
 			var subHTML = '';
+
+			subHTML += '<option value="0">' + '(poissa)' + "</option>";
 
 			if (schemaTree && schemaTree.length !== 0) {
 				_.each(schemaTree, function(branch) {

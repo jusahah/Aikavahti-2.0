@@ -11,7 +11,30 @@ module.exports = function(Box) {
 		var dataNeeded = ['frontViewData']; // empty means that this view can always render instantly (no need to wait on data)
 		// Private stuff
 
+		var currentNow = null;
+		var loopTimerHandle = null;
+
+		var loopTimer = function() {
+			if (loopTimerHandle) {
+				return;
+			}
+
+			loopTimerHandle = setInterval(function() {
+				console.warn("LOOPING !");
+				$currentPanelWrapper.find('#currentevent_duration').empty().append(beautifyDuration(Date.now() - currentNow.start));
+
+			}, 1010);
+		} 
+
+		var stopLoopTimer = function() {
+			if (loopTimerHandle) {
+				clearInterval(loopTimerHandle);
+				loopTimerHandle = null;
+			}
+		}
+
 		var deactivate = function() {
+			stopLoopTimer();
 			if (!isHidden) {
 				isHidden = true;
 				$el.hide();
@@ -34,10 +57,13 @@ module.exports = function(Box) {
 				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
 				bindToView(viewData.frontViewData);
 				$el.show();
+				loopTimer();
 			});
 			
 
 		}
+
+
 
 		var bindToView = function(data) {
 			if (!data) return;
@@ -45,6 +71,7 @@ module.exports = function(Box) {
 			console.log(data);
 
 			var current = data.current;
+			currentNow = current;
 			var lastTen = data.lastTen;
 
 			// Current stuff
@@ -52,7 +79,15 @@ module.exports = function(Box) {
 			$currentPanel = $currentPanelWrapper.find('#currentevent_panel');
 
 			$currentPanel.css('background-color', current.color);
-			$currentPanel.find('#currentevent_name').empty().append(current.name);
+			var currName = $currentPanel.find('#currentevent_name');
+			var color = current.color || '554455';
+			if (color.charAt(0) === '#') {
+				color = color.substr(1);
+			}
+			var tc = tinycolor(color);
+			var textcolor = tc.isDark() ? 'fff' : '222'; 
+			$currentPanel.css('color', '#' + textcolor);			
+			currName.empty().append(current.name);
 
 			$currentPanelWrapper.find('#currentevent_started').empty().append(beautifyTimestamp(current.start));
 			$currentPanelWrapper.find('#currentevent_duration').empty().append(beautifyDuration(Date.now() - current.start));
@@ -111,6 +146,9 @@ module.exports = function(Box) {
 
 			_.each(schemaItems, function(item) {
 				var color = item.color || '554455';
+				if (color.charAt(0) === '#') {
+					color = color.substr(1);
+				}				
 				var tc = tinycolor(color);
 				var textcolor = tc.isDark() ? 'fff' : '222'; 
 				html += '<button style="margin: 4px; font-size: 16px; color: #' + textcolor + '; background-color: #' + color + ';" data-type="changeactivity" data-payload="' + item.id + '" class="btn btn-large">' + item.name + '</button>'
@@ -125,10 +163,18 @@ module.exports = function(Box) {
 			console.log(schemaItem);
 			var started = beautifyTimestamp(schemaItem.start);
 			var ended   = beautifyTimestamp(schemaItem.end);
+			console.error("SCHEMA ITEM");
+			console.log(JSON.stringify(schemaItem));
+			var name = schemaItem.id ? schemaItem.name : '(poissa)'; 
 
 			var li = '<li>';
 			var color = schemaItem.color || '554455';
-			li += '<span style="position: relative; background-color:#' + color + ';" class="txt-color-white" data-description="' + ended + '-' + started + '" data-icon="fa-time">' + schemaItem.name + '<i class="fa fa-warning" style="position: absolute; font-size: 8px; bottom: 2px; right: 2px;"></i></span>';
+			if (color.charAt(0) === '#') {
+				color = color.substr(1);
+			}				
+			var tc = tinycolor(color);
+			var textcolor = tc.isDark() ? 'txt-color-white' : 'txt-color-black'; 			
+			li += '<span style="position: relative; background-color:#' + color + ';" class="' + textcolor + '" data-description="' + ended + '-' + started + '" data-icon="fa-time">' + name + '<i class="fa fa-warning" style="position: absolute; font-size: 8px; bottom: 2px; right: 2px;"></i></span>';
 			li += '</li>';
 
 

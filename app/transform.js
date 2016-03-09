@@ -148,6 +148,8 @@ function normalizeSchemaTree(schemaTree) {
 }
 
 function receiveComputationRequest(data) {
+
+
 	// data = {batchID: int, data: {...}}
 	var schemaTree = data.data.schema['_root_']; // To be passed to each transform as 2nd arg
 	var schemaNormalizedTable = normalizeSchemaTree(schemaTree);
@@ -248,6 +250,10 @@ function sendResults(name, results, batchID, percentageDone, calcTime) {
 	console.log("RESULTS FOR: " + name);
 	console.log(results);
 	ipcTransformer.send('computationresult', {calcTime: calcTime, name: name, results: results, batchID: batchID, percentageDone: percentageDone});
+	var k = 8;
+	for (var i = 50 * 1000 * 1000; i >= 0; i--) {
+		k += i;
+	};
 }
 
 

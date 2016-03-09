@@ -37,6 +37,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 	});
 
+
 	return dateToCumulativeTimePerSchemaId;
 
 

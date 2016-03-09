@@ -83,6 +83,13 @@ Box.Application.addModule('valikko', function(context) {
 	}
 
 	var updateProgressBar = function(percentageDone) {
+		console.error("PERC DONE: " + percentageDone);
+		if (percentageDone !== 100) {
+			computeProgressBar.parent().addClass('active');
+		} else {
+			console.log("Removing active");
+			computeProgressBar.parent().removeClass('active');
+		}
 		computeProgressBar.css('width', percentageDone + "%");
 		computeProgressBar.empty().append(percentageDone + "%");
 	}
