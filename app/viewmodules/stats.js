@@ -172,6 +172,8 @@ module.exports = function(Box) {
 			var tree = decorateSchemaTree(schemaIDToDuration, schemaTree);
 
 			$el.find('#statstable_body').empty().append(buildHTMLFromTree(tree));
+			$el.find("#activities_table_sortable").trigger("update"); 
+
 
 		}
 		function buildHTMLFromTree(coloredTree) {
@@ -232,8 +234,8 @@ module.exports = function(Box) {
 			var tc = tinycolor(color);
 			var textcolor = tc.isDark() ? 'fff' : '222'; 
 			var ownText = onlyOwn ? 'own' : 'all';			
-			html += "<td style='padding-left:" + padding + "px;'><button data-type='loadIndividual' data-payload='" + id + "_" + ownText + "' data-toggle='modal' data-target='#individualStatsModal' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
-			html += "<td data-totals=" + totals + ">" + beautifiedTime + "</td>";
+			html += "<td data-sort='" + name + "' style='padding-left:" + padding + "px;'><button data-type='loadIndividual' data-payload='" + id + "_" + ownText + "' data-toggle='modal' data-target='#individualStatsModal' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
+			html += "<td data-sort=" + totals + " data-totals=" + totals + ">" + beautifiedTime + "</td>";
 			html += "</tr>";
 			return html;
 		}
@@ -409,12 +411,14 @@ module.exports = function(Box) {
 
 		var buildIndividualStatsHTML = function(dayArray) {
 			var html = '';
+			
 
 			for (var i = 0, j = dayArray.length; i < j; i++) {
 				var day = dayArray[i];
+				var m = moment(day.date, 'DD-MM-YYYY');
 				html += '<tr>';
-				html += '<td>' + moment(day.date, 'DD-MM-YYYY').format('DD.MM.YYYY') + '</td>';
-				html += '<td>' + beautifyTime(day.t) + '</td>';
+				html += '<td data-sort="'+ m.format('YYYY-MM-DD') + '">' + m.format('DD.MM.YYYY (ddd)') + '</td>';
+				html += '<td data-sort=' + day.t + '>' + beautifyTime(day.t) + '</td>';
 				html += '<td>' + getTimeBar(day.t) + '</td>';
 				html += '<tr>';
 			};
@@ -466,6 +470,7 @@ module.exports = function(Box) {
 			console.log(dayArrayWithTotalTime);	
 
 			$el.find('#individual_statstable_body').empty().append(buildIndividualStatsHTML(dayArrayWithTotalTime));
+			$el.find('#individual_statstable').trigger('update');
 
 			schemaItem = viewDataCached.schemaItems[schemaID];
 			var titleString = schemaItem ? schemaItem.name : '---';

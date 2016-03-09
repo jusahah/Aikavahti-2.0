@@ -32,15 +32,17 @@
 										
 										<div class="table-responsive">
 										
-											<table class="table table-bordered">
+											<table class="table table-bordered tablesorter" id="activities_table_sortable">
 												<thead>
 													<tr>
-														<th>Aktiviteetti</th>
-														<th>Kokonaisaika</th>
+														<th>Aktiviteetti<i class="fa-sort" style="float: right;"></i> </th>
+														<th>Kokonaisaika<i class="fa-sort" style="float: right;"></i></th>
 													</tr>
 												</thead>
 												<tbody id="statstable_body">
-
+												<tr>
+												<td>4</td><td>4</td>
+												</tr>
 												</tbody>
 											</table>
 											
@@ -68,15 +70,16 @@
 										
 										<div class="table-responsive">
 										
-											<table class="table table-bordered">
+											<table class="table table-bordered tablesorter" id="individual_statstable">
 												<thead>
 													<tr>
-														<th>Päivä</th>
-														<th>Kokonaisaika</th>
-														<th>Visualisointi</th>
+														<th>Päivä<i class="fa-sort" style="float: right;"></i> </th>
+														<th>Kokonaisaika<i class="fa-sort" style="float: right;"></i> </th>
+														<th>Visualisointi </th>
 													</tr>
 												</thead>
 												<tbody id="individual_statstable_body">
+
 
 												</tbody>
 											</table>
@@ -92,15 +95,38 @@
 						</div>
 					</div>
 				</div>
+				</div>
 
 </div>
 
-
 <script>
 
-$("#sparkline").sparkline([5,6,7,9,9,5,3,2,2,4,6,7], {
-    type: 'line'});
+$(document).ready(function() { 
+	console.error("TABLE SORTED INITS");
+     
+    // call the tablesorter plugin 
+			$("#activities_table_sortable").tablesorter({
+				textExtraction: function(node) { 
+				    // extract data from markup and return it 
+				    var sortingCr = $(node).data('sort');
+				    return sortingCr;
+				} 
+
+			}); 
+
+			$('#individual_statstable').tablesorter({
+				textExtraction: function(node) { 
+				    // extract data from markup and return it 
+				    var sortingCr = $(node).data('sort');
+				    return sortingCr;
+				} 
+
+			}); 
+}); 
 
 </script>
+
+
+
 			
 		
