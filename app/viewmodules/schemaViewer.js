@@ -10,7 +10,9 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['schemaTree'];
+		var dataNeeded = ['schemaTree', 'schemaItems'];
+
+		var viewDataCached;
 
 		var INNERPADDING = 16;
 
@@ -34,6 +36,8 @@ module.exports = function(Box) {
 				if (isHidden) return; // User already switched to another view			
 				console.log("View data");
 				console.log(viewData);
+
+				viewDataCached = viewData;
 
 				//var dataObj = context.getService('derivedData').easify(viewData);			
 				// viewData is always object with transforNames being keys and data being values
@@ -149,7 +153,8 @@ module.exports = function(Box) {
 			var textcolor = tc.isDark() ? 'fff' : '222'; 
 			var ownText = name;		
 			html += "<td style='padding-left:" + padding + "px;'><button data-type='schemaItemInSchemaViewer' data-payload='" + id + "_" + ownText + "' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
-			html += "<td></td><td></td>";
+			html += "<td><button data-type='addAsSubgroup data-payload='" + id + "' class='btn btn-default'>Uusi alaryhmä</td>";
+			html += "<td><button data-type='editSchemaItem' data-payload='" + id + "' class='btn btn-warning' data-toggle='modal' data-target='#schemaItemModal'>Väritä</td>";
 			html += "</tr>";
 			return html;
 		}
@@ -170,6 +175,30 @@ module.exports = function(Box) {
 			var ss = context.getService('settingsService');
 			ss.recolorSchema();
 		}
+
+		function loadEditSchemaItemModal(schemaID) {
+			var modalBody = $el.find('#schemaItemModalBody');
+			var inputColor = modalBody.find('#pickschemecolor');
+			var saveButton = $el.find('#saveSchemaItemChanges');
+			var schemaItem = viewDataCached.schemaItems[schemaID];
+			console.warn("FILLING EDIT SCHEMA ITEM MODAL!: " + schemaItem.color);
+			inputColor.spectrum('set', '#' + schemaItem.color);
+			saveButton.data('payload', schemaID);
+		}
+
+		function gatherAndSaveSchemaChanges(schemaID) {
+			var modalBody = $el.find('#schemaItemModalBody');
+			var inputColor = modalBody.find('#pickschemecolor');
+			var color = inputColor.spectrum('get');
+			console.log("COLOR NOW");
+			console.log(color);
+			console.log(color.toHexString());
+			var ss = context.getService('settingsService');
+			ss.updateSchemaItem(schemaID, {
+				color: color.toHexString().substr(1) // Drop the leading #
+			});
+		}
+
 		
 
 		// Public API
@@ -177,9 +206,17 @@ module.exports = function(Box) {
 			messages: ['routechanged'],
 			onclick: function(event, element, elementType) {
 				console.log("CLICK IN SCHEMA VIEWER");
+				event.preventDefault();
 				if (elementType === 'recolorschema') {
 					console.warn("RECOLOR REQUEST");
 					recolorRequest();
+				} else if (elementType === 'editSchemaItem') {
+					loadEditSchemaItemModal($(element).data('payload'));
+				} else if (elementType === 'addAsSubgroup') {
+					addAsSubgroup($(element).data('payload'));
+				} else if (elementType === 'saveSchemaItemChanges') {
+					console.warn("SAVING SCHEMA ITEM CHANGES: " + $(element).data('payload'));
+					gatherAndSaveSchemaChanges($(element).data('payload'));
 				}
 			},
 			onmessage: function(name, data) {

@@ -13,6 +13,7 @@ var schemaItem = Joi.object().keys({
     name: Joi.string().required().min(1).max(64), // Name
     color: Joi.string().required().hex(), // Color
     parent: Joi.number().integer(),
+    children: Joi.optional(),
     active: Joi.boolean()
 }); // Validate against Joi schema here
 
@@ -50,6 +51,14 @@ module.exports = {
 
 		return validationError;
 
+	},
+	validateSchemaItem: function(item) {
+		var validationError = null;
+		Joi.validate(item, schemaItem, function(err, value) {
+			if (err) validationError = err;
+		});
+
+		return validationError;
 	}
 
 }

@@ -78,14 +78,16 @@ module.exports = function(Box) {
 			$currentPanelWrapper = $el.find('#currentevent_wrapper');
 			$currentPanel = $currentPanelWrapper.find('#currentevent_panel');
 
-			$currentPanel.css('background-color', current.color);
+			
 			var currName = $currentPanel.find('#currentevent_name');
 			var color = current.color || '554455';
 			if (color.charAt(0) === '#') {
 				color = color.substr(1);
 			}
+			console.warn("COLOR IN FRONT: " + color);
 			var tc = tinycolor(color);
 			var textcolor = tc.isDark() ? 'fff' : '222'; 
+			$currentPanel.css('background-color', '#' + color);
 			$currentPanel.css('color', '#' + textcolor);			
 			currName.empty().append(current.name);
 

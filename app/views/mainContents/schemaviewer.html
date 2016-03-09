@@ -112,6 +112,58 @@
 				
 			</div>
 
+			<div class="modal fade" id="schemaItemModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title" id="individual_stats_title"></h4>
+								
+							</div>
+							<div class="modal-body" id="schemaItemModalBody">
+								<div class="widget-body no-padding">
+									
+									<form id="settings-form" class="smart-form" novalidate="novalidate">
+										<header>
+											Valitse väri
+										</header>
+
+
+										<fieldset>
+										<div class="form-group">
+											<input type="text" id="pickschemecolor">							
+										</div>
+
+										</fieldset>
+
+						
+									</form>
+								</div>
+							<div class="modal-footer">
+								<button id="saveSchemaItemChanges" class='btn btn-success' data-dismiss="modal" data-type="saveSchemaItemChanges" data-payload="">Tallenna</button>
+								<button type="button" class="btn btn-danger" data-dismiss="modal">
+									Sulje tallentamatta
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				</div>
+
+
 
 				<!-- end widget grid -->
-</div>				
+</div>	
+
+
+<script>
+$(function() {
+	$("#pickschemecolor").spectrum({
+    	color: "#f00"
+	});
+});
+
+</script>			

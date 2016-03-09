@@ -102,6 +102,12 @@ module.exports = function(dataTree, settings) {
 
 	var defaultColors = ['#F26F15', '#2095F2', '#88EF3C', '#EF104B'];
 
+	defaultColors = _.map(defaultColors, function(color) {
+		var tc = tinycolor(color);
+		tc = tc.spin(20 - Math.floor(Math.random()*40));
+		return tc.toHexString();
+	})
+
 	// Make sure settings are all right
 	settings = settings || {};
 	settings.childrenPropertyName = settings.childrenPropertyName || 'children';

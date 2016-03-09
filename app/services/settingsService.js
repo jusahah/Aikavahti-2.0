@@ -35,6 +35,12 @@ module.exports = function(Box, datalayer) {
 			},
 			recolorSchema: function() {
 				return datalayer.dataCommandIn({opType: 'general', data: 'recolor'});
+			},
+			updateSchemaItem: function(schemaID, schemaUpdatedFields) {
+				return datalayer.dataCommandIn({opType: 'changeSchemaItem', data: {
+					id: schemaID,
+					fields: schemaUpdatedFields
+				}});
 			}
 		}
 

@@ -224,6 +224,25 @@ function ensureSchemaIDExists(id) {
 	return found;
 }
 
+function getSchemaItemIfExists(id) {
+	var found = null;
+	var firstLevelArray = appData.schema['_root_'];
+	var searchSubtree = function(branch) {
+		if (found) return;
+		if (parseInt(branch.id) === id) {
+			found = branch;
+		} 
+
+		if (branch.hasOwnProperty('children') && branch.children && branch.children.length > 0) {
+			_.each(branch.children, searchSubtree);
+		}
+
+	}
+	_.each(firstLevelArray, searchSubtree);
+	console.log("getSchemaItemIfExists: " + found);
+	return found;
+}
+
 function addEvent(eventData) {
 	// Here we do the "fivecation"
 	// This is done because allows easier adding of "artificial events" in transforms
@@ -349,6 +368,39 @@ function recolorSchema() {
 
 }
 
+function updateSchemaItem(data) {
+	console.warn("UPDATING SCHEMA ITEM IN DATA LAYER");
+	console.log(data);
+	var id = data.id;
+	var fields = data.fields;
+
+	var name = fields.name;
+	var color = fields.color;
+
+	var item = getSchemaItemIfExists(id);
+
+	if (!item) {
+		return Promise.reject('Schema item not found with ID: ' + id);
+	}
+
+	var clonedItem = _.assign({}, item);
+	clonedItem.color = color ? color : clonedItem.color;
+	clonedItem.name = name ? name : clonedItem.name;
+
+	var err = dataSchema.validateSchemaItem(clonedItem);
+
+	if (err) {
+		console.error(err);
+		return Promise.reject(err);
+	}
+	// No errors so update real schema object
+	item.color = color ? color : item.color;
+	item.name  = name ? name : item.name;
+
+	return writeToDiskIfNeeded();
+
+}
+
 
 
 module.exports = {
@@ -378,7 +430,7 @@ module.exports = {
 		// do changes etc. whatever is need
 
 		// Note that for event timestamp is already inserted!
-		if (dataCommand.opType !== 'changeOne' && dataCommand.opType !== 'general') {
+		if (dataCommand.opType !== 'changeOne' && dataCommand.opType !== 'general' && dataCommand.opType !== 'changeSchemaItem') {
 			var pathParts = dataCommand.treePath.split('.');
 			var firstPath = pathParts[0];
 			var err = dataSchema.validate(dataCommand.treePath, dataCommand.data);
@@ -389,10 +441,14 @@ module.exports = {
 				return Promise.reject(err);
 			}			
 		} 
-
-
 		// Data is good
-		if (dataCommand.opType === 'general') {
+
+
+		if (dataCommand.opType === 'changeSchemaItem') {
+			return updateSchemaItem(dataCommand.data);
+
+		}
+		else if (dataCommand.opType === 'general') {
 			if (dataCommand.data === 'recolor') {
 				return recolorSchema();
 			}
