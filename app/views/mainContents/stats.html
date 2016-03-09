@@ -50,8 +50,59 @@
 
 								</div>
 								<!-- end widget div -->
-
+										<button class="btn btn-primary btn-lg" data-type="loadIndividual" data-payload="1_all" data-toggle="modal" data-target="#individualStatsModal">
+											Launch demo modal
+										</button>
 							</div>
+
+				<div class="modal fade" id="individualStatsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title" id="individual_stats_title"></h4>
+							</div>
+							<div class="modal-body" id="individual_stats_body">
+									<div class="widget-body">
+										<p id="individual_stats_subtitle"> </p>
+										
+										<div class="table-responsive">
+										
+											<table class="table table-bordered">
+												<thead>
+													<tr>
+														<th>Päivä</th>
+														<th>Kokonaisaika</th>
+														<th>Visualisointi</th>
+													</tr>
+												</thead>
+												<tbody id="individual_statstable_body">
+
+												</tbody>
+											</table>
+											
+										</div>
+									</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">
+									Sulje
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
 </div>
 
+
+<script>
+
+$("#sparkline").sparkline([5,6,7,9,9,5,3,2,2,4,6,7], {
+    type: 'line'});
+
+</script>
+			
 		

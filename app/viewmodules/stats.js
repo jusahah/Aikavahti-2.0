@@ -10,7 +10,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 		// This module must do lot of work on the UI thread
-		var dataNeeded = ['sortedDurations', 'schemaItems', 'schemaTree'];
+		var dataNeeded = ['sortedDurations', 'schemaItems', 'schemaTree', 'dayByDayPerSchemaId'];
 
 		var currentPayload = null;
 		var startTs= Date.now() - 4 * 86400 * 1000;
@@ -20,6 +20,8 @@ module.exports = function(Box) {
 		var INNERPADDING = 16;
 
 		var showMode = 'all';
+
+		var viewDataCached;
 
 		// Private stuff
 
@@ -40,7 +42,9 @@ module.exports = function(Box) {
 			isHidden = false;
 
 			viewDataPromise.then(function(viewData) {
-				if (isHidden) return; // User already switched to another view			
+				if (isHidden) return; // User already switched to another view	
+
+				viewDataCached = viewData;		
 
 				// Build stats
 				//$el.empty().append(JSON.stringify(viewData.schemaTree));
@@ -190,8 +194,8 @@ module.exports = function(Box) {
 				_.each(coloredTree, function(branch) {
 					console.log("BRANCH: " + branch.name + " with depth " + depth);
 					if (showMode !== 'leaves' || (!branch.hasOwnProperty('children') || branch.children.length === 0)) {
-						subHTML += createOneElement(branch.name, branch.totalTime, branch.color, depth);
-						subHTML += createOneElement('(' + branch.name + ')', branch.hisOwnTotals, branch.color, depth+1);						
+						subHTML += createOneElement(branch.id, false, branch.name, branch.totalTime, branch.color, depth);
+						subHTML += createOneElement(branch.id, true, '(' + branch.name + ')', branch.hisOwnTotals, branch.color, depth+1);						
 					}
 
 					if (branch.hasOwnProperty('children') && showMode !== 'roots') {
@@ -217,14 +221,15 @@ module.exports = function(Box) {
 			return "<div style='background-color: #" + color + "; margin-left: " + (depth * 20) + "px';>" + name + " | " + beautifiedTime + "</div>";
 		}
 	*/
-		function createOneElement(name, totals, color, depth) {
+		function createOneElement(id, onlyOwn, name, totals, color, depth) {
 			var beautifiedTime = beautifyTime(totals);
 			var html = "<tr>"
 			var padding = depth*INNERPADDING;
 			color = color || '554455';
 			var tc = tinycolor(color);
-			var textcolor = tc.isDark() ? 'fff' : '222'; 			
-			html += "<td style='padding-left:" + padding + "px;'><button class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
+			var textcolor = tc.isDark() ? 'fff' : '222'; 
+			var ownText = onlyOwn ? 'own' : 'all';			
+			html += "<td style='padding-left:" + padding + "px;'><button data-type='loadIndividual' data-payload='" + id + "_" + ownText + "' data-toggle='modal' data-target='#individualStatsModal' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
 			html += "<td data-totals=" + totals + ">" + beautifiedTime + "</td>";
 			html += "</tr>";
 			return html;
@@ -366,6 +371,145 @@ module.exports = function(Box) {
 			activate(true);
 		}
 
+		var loadDataToIndividualStatsModal = function(schemaID, onlyOwn) {
+			if (currentPayload === 'today') {
+				loadTodayModal(schemaID, onlyOwn);
+			}
+			else {
+				loadTimespanModal(schemaID, onlyOwn);
+			}
+		}
+
+		var resolveAllChildrenOfSchemaId = function(schemaID) {
+			console.log("RESOLVING KIDS FOR SCHEMA ID: " + schemaID);
+			var schemaItem = viewDataCached.schemaItems[schemaID];
+			console.log(schemaItem);
+			if (schemaItem && schemaItem.hasOwnProperty('children') && schemaItem.children.length !== 0) {
+				var kids = _.map(schemaItem.children, resolveAllChildrenOfSchemaId);
+				kids.push(schemaID);
+				return _.flattenDeep(kids);
+			}
+
+			return [schemaID];
+		}
+
+		var getTimeBar = function(timeInMs) {
+			var bar = '';
+			var perc = Math.round(timeInMs / (86400 * 1000) * 100);
+
+			console.error("TIME: " + timeInMs + ", PERC: " + perc);
+			bar += '<div class="progress progress-xs">'
+			bar += '<div class="progress-bar bg-color-blue" role="progressbar" style="width:' + perc + '%;"></div'
+			bar += '</div'
+			return bar;			
+		}
+
+		var buildIndividualStatsHTML = function(dayArray) {
+			var html = '';
+
+			for (var i = 0, j = dayArray.length; i < j; i++) {
+				var day = dayArray[i];
+				html += '<tr>';
+				html += '<td>' + moment(day.date, 'DD-MM-YYYY').format('DD.MM.YYYY') + '</td>';
+				html += '<td>' + beautifyTime(day.t) + '</td>';
+				html += '<td>' + getTimeBar(day.t) + '</td>';
+				html += '<tr>';
+			};
+
+			return html;
+		}
+
+		var loadTimespanModal = function(schemaID, onlyOwn) {
+
+			console.log("LOADING TIME SPAN MODAL");
+			console.log(schemaID + " | " + onlyOwn);
+
+			console.log(viewDataCached.schemaItems);
+
+			var allIDsToBeTotaled = [];
+			var kids = [schemaID];
+
+			if (!onlyOwn) {
+				kids = resolveAllChildrenOfSchemaId(schemaID);
+				kids = _.flattenDeep(kids);
+			} 
+
+			console.log("KIDS ARE: " + JSON.stringify(kids));
+			allIDsToBeTotaled = _.concat(allIDsToBeTotaled, kids);
+			console.log("ALL IDS ARE: " + JSON.stringify(allIDsToBeTotaled));
+			var dayArr = getDayArrayForGivenPayload();	
+
+			var dayArrayWithTotalTime = [];
+			var data = viewDataCached.dayByDayPerSchemaId;
+
+			_.each(dayArr, function(dateString) {
+				if (!data.hasOwnProperty(dateString)) {
+					dayArrayWithTotalTime.push({date: dateString, t: 0});
+					return;
+				}
+
+				var sum = 0;
+				var dayData = data[dateString];
+
+				_.each(kids, function(kid) {
+					if (dayData.hasOwnProperty(kid)) {
+						sum += dayData[kid];
+					}
+				});
+
+				dayArrayWithTotalTime.push({date: dateString, t: sum});
+			});
+			console.warn("DAY ARRAY WITH TOTAL TIME");
+			console.log(dayArrayWithTotalTime);	
+
+			$el.find('#individual_statstable_body').empty().append(buildIndividualStatsHTML(dayArrayWithTotalTime));
+
+			schemaItem = viewDataCached.schemaItems[schemaID];
+			var titleString = schemaItem ? schemaItem.name : '---';
+			if (onlyOwn) titleString += " (vain omat)";
+			var subTitleString = !onlyOwn ? "Alaryhmiin kuuluvat aktiviteetit mukana tilastossa!" : "Alaryhmiin kuuluvat aktiviteetit EIVÄT ole mukana!";
+
+			$el.find('#individual_stats_title').empty().append(titleString);
+			$el.find('#individual_stats_subtitle').empty().append(subTitleString);
+
+
+
+		}
+
+
+		var getMonday = function(d) {
+				  d = new Date(d);
+				  var day = d.getDay(),
+				      diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+				  return new Date(d.setDate(diff));
+		}
+				
+		var getDayArrayForGivenPayload = function() {
+
+			var arr = [];
+			var d = new Date();
+
+			var limitTs = d;
+
+			if (currentPayload === 'week') {
+				limitTs = getMonday(d);
+				console.log("Week limit: " + limitTs);
+			} else if (currentPayload === 'month') {
+				limitTs = new Date(d.getFullYear(), d.getMonth(), 1);
+			} else if (currentPayload === 'year') {
+				limitTs = new Date(d.getFullYear(), 0, 1);				
+			}
+
+
+			while (limitTs <= d) {
+				arr.push(moment(d).format('DD-MM-YYYY'));
+				d -= 86400 * 1000;
+			}
+			console.warn("DAY ARRAY");
+			console.log(JSON.stringify(arr));
+			return arr;
+
+		}
 		
 
 		// Public API
@@ -393,6 +537,12 @@ module.exports = function(Box) {
 					showMode = 'leaves';
 					INNERPADDING = 0;
 					reloadTable();
+				} else if (elementType === 'loadIndividual') {
+					var payload = $(element).data('payload');
+					var parts = payload.split('_');
+					var schemaID = parts[0];
+					var onlyOwn = parts[1] === 'own';
+					loadDataToIndividualStatsModal(schemaID, onlyOwn);
 				}
 			},
 			onmessage: function(name, data) {

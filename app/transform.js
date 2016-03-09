@@ -111,6 +111,13 @@ function getDayChangeTimestamp(prev, next) {
 	return 0;
 }
 
+function normalizeChildrenToIDs(childrenArray) {
+	childrenArray = childrenArray || [];
+	return _.map(childrenArray, function(child) {
+		return child.id;
+	})
+}
+
 function normalizeSchemaTree(schemaTree) {
 
 	var table = {};
@@ -119,7 +126,8 @@ function normalizeSchemaTree(schemaTree) {
 	var traverse = function(branch) {
 		_.each(branch, function(child) {
 			console.log(child.name);
-			table[child.id] = child;
+			table[child.id] = _.assign({}, child);
+			table[child.id].children = normalizeChildrenToIDs(child.children);
 			if (child.hasOwnProperty('children') && child.children.length > 0) {
 				traverse(child.children);
 			
@@ -143,6 +151,8 @@ function receiveComputationRequest(data) {
 	// data = {batchID: int, data: {...}}
 	var schemaTree = data.data.schema['_root_']; // To be passed to each transform as 2nd arg
 	var schemaNormalizedTable = normalizeSchemaTree(schemaTree);
+	console.warn("normalizeSchemaTable");
+	console.log(JSON.stringify(schemaNormalizedTable));
 	var settingsTree = data.data.settings;
 	console.log("Received computationrequest");
 	var batchID = data.batchID;
@@ -236,6 +246,7 @@ function receiveComputationRequest(data) {
 
 function sendResults(name, results, batchID, percentageDone, calcTime) {
 	console.log("RESULTS FOR: " + name);
+	console.log(results);
 	ipcTransformer.send('computationresult', {calcTime: calcTime, name: name, results: results, batchID: batchID, percentageDone: percentageDone});
 }
 

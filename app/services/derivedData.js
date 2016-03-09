@@ -81,6 +81,8 @@ module.exports = function(Box, datalayer) {
 			},
 			// Returns void
 			cacheComputedTransform: function(name, results, percentageDone, calcTime) {
+				console.warn("RESULTS IN: " + name);
+				console.log(results);
 				latestCalcTime = calcTime;
 				console.log("% done: " + percentageDone);
 				console.log("Cache computed transform in derivedData Service");

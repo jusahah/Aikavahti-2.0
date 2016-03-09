@@ -23,6 +23,7 @@ module.exports = {
 		{name: 'schemaTree', transform: require('./schemaTree'), prerequisite: null},
 		{name: 'sortedDurations', transform: require('./sortedDurations'), prerequisite: null},
 		{name: 'schemaItems', transform: require('./schemaItems'), prerequisite: null},
+		{name: 'dayByDayPerSchemaId', transform: require('./dayByDayPerSchemaId'), prerequisite: null},
 
 	]
 
