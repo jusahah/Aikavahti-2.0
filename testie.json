@@ -1,0 +1,85 @@
+{
+  "aikavahtiTimestamp": 1457594505427,
+  "data": {
+    "events": [
+      {
+        "t": 1457417280005,
+        "s": 12
+      },
+      {
+        "t": 1457387700005,
+        "s": 12
+      },
+      {
+        "t": 1457342100005,
+        "s": 12
+      },
+      {
+        "t": 1457341200005,
+        "s": 3
+      },
+      {
+        "t": 1457158740005,
+        "s": 1
+      },
+      {
+        "t": 1457121900005,
+        "s": 3
+      },
+      {
+        "t": 1457121540005,
+        "s": 1
+      }
+    ],
+    "schema": {
+      "_root_": [
+        {
+          "name": "Work",
+          "id": 1,
+          "children": [
+            {
+              "name": "Coding",
+              "id": 11,
+              "children": [
+                {
+                  "name": "PHP",
+                  "color": "6611ff",
+                  "id": 14575944898821
+                }
+              ]
+            },
+            {
+              "name": "Web coding",
+              "id": 12,
+              "color": "6611ff"
+            }
+          ]
+        },
+        {
+          "name": "Study",
+          "id": 2,
+          "children": []
+        },
+        {
+          "name": "Leisure",
+          "id": 3,
+          "children": []
+        }
+      ]
+    },
+    "triggers": {},
+    "settings": {
+      "data": {
+        "writeToDiskAfterEveryUpdate": true
+      },
+      "internet": {
+        "onlineBackup": false
+      },
+      "view": {
+        "eventsOnlyToLeaves": true,
+        "userSelectedEventsShow": false,
+        "userSelectedEvents": []
+      }
+    }
+  }
+}

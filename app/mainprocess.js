@@ -7,9 +7,13 @@ import env from './env';
 var Promise = require('bluebird');
 var _ = require('lodash');
 
+
+// Global state here
+var showFirstTimeMsg;
+
 var datalayer = require('./layers/data');
 var transformlayer = require('./layers/transform/transform');
-datalayer.init();
+showFirstTimeMsg = datalayer.init();
 datalayer.changeCallback(function(allData) {
 	console.log("Change in data layer -> sending data to recompute");
 	console.log(allData);
@@ -29,6 +33,10 @@ $('#schemaviewerContainer').load('views/mainContents/schemaviewer.html');
 $('#settingsContainer').load('views/mainContents/settings.html');
 $('#manageContainer').load('views/mainContents/manage.html');
 $('#statsContainer').load('views/mainContents/stats.html');
+$('#initializationContainer').load('views/static/initialization.html');
+$('#importContainer').load('views/mainContents/import.html');
+
+$('#resetContainer').load('views/static/resetConfirm.html');
 
 
 // View module registrations
@@ -38,12 +46,16 @@ require('./viewmodules/schemaViewer')(Box); // Same
 require('./viewmodules/settings')(Box); // Same
 require('./viewmodules/manage')(Box); // Same
 require('./viewmodules/stats')(Box); // Same
+require('./viewmodules/initialization')(Box); // Same
+require('./viewmodules/reset')(Box); // Same
+
+require('./viewmodules/import')(Box); // Same
 
 // Service registrations
 require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);
 require('./services/eventService')(Box, datalayer);
-
+require('./services/adminService')(Box, datalayer);
 // Too bad these fucking loads are so async that what the hell... we need to wait a bit
 
 console.log('Loaded environment variables:', env);
@@ -61,6 +73,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			debug: true
 		});
 		console.log("BOX INITED");
+
+		if (showFirstTimeMsg) {
+			console.log("FIRST TIME");
+			Box.Application.broadcast('showInitializationScreen');
+		}
 
 	}, 200);
 
@@ -99,6 +116,7 @@ Box.Application.addModule('valikko', function(context) {
 		messages: ['cachewasflushed', 'computationprogressupdate'],
 		onclick: function(event, element, elementType) {
 			console.log("CLICK IN VALIKKO: " + elementType);
+
 			if (elementType.split('-')[1] === 'route') {
 				console.log("Route change clicked");
 				var payload = $(element).data('payload');
@@ -116,8 +134,9 @@ Box.Application.addModule('valikko', function(context) {
 			} else if (elementType === 'forceflush') {
 				console.warn("Artificial cache flush");
 				context.getService('derivedData').forceDataRecomputation();
+			} else if (elementType === 'resetrequest') {
+				Box.Application.broadcast('resetrequest');
 			}
-
 		},
 		onmessage: function(name, data) {
 			if (name === 'cachewasflushed') {
@@ -138,6 +157,8 @@ Box.Application.addModule('valikko', function(context) {
 	};
 
 });	
+
+
 
 
 // Start tests

@@ -61,17 +61,25 @@ function getInitialDataObject() {
 	};
 }
 
-function createFileIfNotExist() {
+function resetProgramState() {
+	appData = getInitialDataObject();
+	return writeToDiskIfNeeded();
 
+}
+
+function createFileIfNotExist() {
+	var notExist = false;
 	try {
 		var stats = fs.statSync(file);
 	} catch (e) {
+		notExist = true;
 		console.warn("---Creating data file---");
 		fs.createFileSync(file);
 		fs.writeJsonSync(file, getInitialDataObject());
 	}
 	// FFor now just write each time from fresh
 	fs.writeJsonSync(file, getInitialDataObject());
+	return notExist;
 }
 
 function loadToMemory() {
@@ -401,6 +409,56 @@ function updateSchemaItem(data) {
 
 }
 
+function importFromFile(file) {
+	try {
+		var data = fs.readJsonSync(file);
+		console.warn("IMPORT IMPORT IMPORT!!!!");
+		console.log(data);
+	} catch(e) {
+		console.error("IMPORT FAILURE!!!!");
+		console.log(e);
+		return Promise.reject('Import failed');
+	}	
+
+	if (!data.hasOwnProperty('aikavahtiTimestamp')) {
+		return Promise.reject('Import failed - JSON did not contain aikavahtiTimestamp-property');
+	}
+
+	// All is fine
+	appData = data.data;
+	return writeToDiskIfNeeded();
+}
+
+function exportToFile(file) {
+	return new Promise(function(resolve, reject) {
+		console.warn("Push to EXPORT file: " + file);
+		var exportData = {
+			aikavahtiTimestamp: Date.now(),
+			data: appData
+		};
+		fs.writeJson(file, exportData, function(err) {
+			if (err) {
+				return reject(err);
+			}
+			return resolve();
+		});
+	});	
+}
+
+function adminCommand(operation, data) {
+	if (operation === 'export') {
+		var file = data;
+		return exportToFile(file);
+	}
+	else if (operation === 'import') {
+		var file = data;
+		return importFromFile(file);
+		// This can be done sync as user is 
+	} else if (operation === 'reset') {
+		return resetProgramState();
+	}
+}
+
 
 
 module.exports = {
@@ -420,6 +478,10 @@ module.exports = {
 	},
 	// Returns promise!
 	dataCommandIn: function(dataCommand) {
+
+		if (dataCommand.opType === 'admin') {
+			return adminCommand(dataCommand.op, dataCommand.data);
+		}
 		/*
 		dataCommand = {
 			opType: change/new/delete
@@ -506,8 +568,10 @@ module.exports = {
 
 	init: function(cb) {
 		if (cb) this.changeCallback(cb);
-		createFileIfNotExist();
+		var didExist = createFileIfNotExist();
 		loadToMemory();
+		//return true;
+		return didExist;
 
 	},
 

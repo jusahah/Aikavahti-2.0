@@ -92,7 +92,9 @@ module.exports = function(Box) {
 			var html = '';
 			var depth = 1;
 
-			html = buildSubtree(schemaTree, depth);
+			html += '<option value="0">' + '(poissa)' + "</option>";
+
+			html += buildSubtree(schemaTree, depth);
 
 			return html;
 
@@ -103,7 +105,7 @@ module.exports = function(Box) {
 
 			var subHTML = '';
 
-			subHTML += '<option value="0">' + '(poissa)' + "</option>";
+			
 
 			if (schemaTree && schemaTree.length !== 0) {
 				_.each(schemaTree, function(branch) {
