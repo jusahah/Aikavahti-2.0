@@ -20,10 +20,21 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 	// Current
 	var currentEvent = sortedEvents[0];
-	var currentSchemaItemCopy = getCopyOfSchemaItem(currentEvent.s, normalizedSchemaTable);
+	var currentSchemaItemCopy;
+	if (!currentEvent) {
+		currentSchemaItemCopy = {
+			start: Date.now(),
+			notes: 'Tervetuloa Aikavahti-ohjelman pariin!',
+			name: '(poissa)',
+			id: 0
+		};
+	} else {
+		currentSchemaItemCopy = getCopyOfSchemaItem(currentEvent.s, normalizedSchemaTable);
+		currentSchemaItemCopy.start = currentEvent.t;
+		currentSchemaItemCopy.notes = currentEvent.notes;
+	}
 
-	currentSchemaItemCopy.start = currentEvent.t;
-	currentSchemaItemCopy.notes = currentEvent.notes;
+
 	frontView.current = currentSchemaItemCopy;
 
 	// Last ten

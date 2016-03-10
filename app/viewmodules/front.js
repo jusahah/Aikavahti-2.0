@@ -51,6 +51,9 @@ module.exports = function(Box) {
 			isHidden = false;
 
 			viewDataPromise.then(function(viewData) {
+				console.log("VIEW DATA RECEIVED IN FRONT: ");
+				console.log(viewData);
+				console.log("Is Hidden?" + isHidden);
 				if (isHidden) return; // User already switched to another view			
 
 				// viewData is always object with transforNames being keys and data being values

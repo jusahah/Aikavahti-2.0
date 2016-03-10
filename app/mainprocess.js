@@ -13,7 +13,7 @@ var showFirstTimeMsg;
 
 var datalayer = require('./layers/data');
 var transformlayer = require('./layers/transform/transform');
-showFirstTimeMsg = datalayer.init();
+
 datalayer.changeCallback(function(allData) {
 	console.log("Change in data layer -> sending data to recompute");
 	console.log(allData);
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			debug: true
 		});
 		console.log("BOX INITED");
-
+		var showFirstTimeMsg = datalayer.init();
 		if (showFirstTimeMsg) {
 			console.log("FIRST TIME");
 			Box.Application.broadcast('showInitializationScreen');
@@ -160,7 +160,7 @@ Box.Application.addModule('valikko', function(context) {
 
 
 
-
+/*
 // Start tests
 setTimeout(function() {
 	datalayer.dataCommandIn({
@@ -246,5 +246,5 @@ setTimeout(function() {
 setTimeout(function() {
 	datalayer.broadcastChange();
 }, 2800);
-
+*/
 

@@ -35,12 +35,9 @@ function getInitialDataObject() {
 		events: [],
 		schema: {
 			_root_: [
-				{name: 'Work', id: 1, children: [
-					{name: 'Coding', id: 11},
-					{name: 'Selling', id: 12}
-				]},
-				{name: 'Study', id: 2, children: []},
-				{name: 'Leisure', id: 3, children: []}
+				{name: 'Työ', id: 1, children: []},
+				{name: 'Opinnot', id: 2, children: []},
+				{name: 'Vapaa-aika', id: 3, children: []}
 			]
 		},
 		triggers: {},
@@ -92,6 +89,12 @@ function loadToMemory() {
 	
 	console.log(data);
 	appData = data;
+	
+	if (!changeCbDisabled) {
+		setTimeout(function() {
+			changeCb(appData);
+		}, 0);		
+	}	
 
 
 }
@@ -481,6 +484,28 @@ function updateNotes(timestamp, notes) {
 
 }
 
+function addSchemaItemToParent(parentID, name, color) {
+	var item = getSchemaItemIfExists(parentID);
+
+	if (!item) {
+		return Promise.reject('Creation failed! Parent schema item not found with ID: ' + id);
+	}	
+
+	if (!item.hasOwnProperty('children')) {
+		item.children = [];
+	}
+
+	var schemaData = {
+		name: name,
+		color: color,
+		id: generateSchemaID()
+	}
+
+	item.children.push(schemaData);
+
+	return writeToDiskIfNeeded();
+}
+
 
 
 module.exports = {
@@ -507,6 +532,17 @@ module.exports = {
 
 		if (dataCommand.opType === 'savenotes') {
 			return updateNotes(dataCommand.data.t, dataCommand.data.notes);
+		}
+
+		if (dataCommand.opType === 'newSchemaItem') {
+			var err = dataSchema.validateSchemaItem(dataCommand.data);
+
+			if (err) {
+				console.error("SCHEMA item Validation failed in data layer dataCommandIn!");
+				return Promise.reject(err);
+			}
+
+			return addSchemaItemToParent(dataCommand.data.parent, dataCommand.data.name, dataCommand.data.color);
 		}
 		/*
 		dataCommand = {

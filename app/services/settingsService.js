@@ -41,6 +41,13 @@ module.exports = function(Box, datalayer) {
 					id: schemaID,
 					fields: schemaUpdatedFields
 				}});
+			},
+			createSchemaItem: function(parentID, name) {
+				return datalayer.dataCommandIn({opType: 'newSchemaItem', data: {
+					parent: parentID,
+					name: name,
+					color: '6622ee',
+				}});
 			}
 		}
 

@@ -153,7 +153,7 @@ module.exports = function(Box) {
 			var textcolor = tc.isDark() ? 'fff' : '222'; 
 			var ownText = name;		
 			html += "<td style='padding-left:" + padding + "px;'><button data-type='schemaItemInSchemaViewer' data-payload='" + id + "_" + ownText + "' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
-			html += "<td><button data-type='addAsSubgroup' data-payload='" + id + "' class='btn btn-default'>Uusi alaryhmä</td>";
+			html += "<td><button data-type='addAsSubgroup' data-payload='" + id + "' class='btn btn-default' data-toggle='modal' data-target='#addsubgroupModal'>Uusi alaryhmä</td>";
 			html += "<td><button data-type='editSchemaItem' data-payload='" + id + "' class='btn btn-warning' data-toggle='modal' data-target='#schemaItemModal'>Väritä</td>";
 			html += "<td><button data-type='deleteSchemaItem' data-payload='" + id + "' class='btn btn-danger' data-toggle='modal' data-target='#deleteSchemaItemModal'>Poista</td>";			html += "</tr>";
 			return html;
@@ -200,6 +200,34 @@ module.exports = function(Box) {
 		}
 
 		function addAsSubgroup(schemaID) {
+			console.log("OPENING ADD SUBGROUP MODAL: " + schemaID);
+			var modal = $el.find('#addsubgroupModal');
+			modal.data('schemaid', schemaID);
+			var schemaItem = viewDataCached.schemaItems[schemaID];
+			modal.find('#supergroupname').empty().append(schemaItem.name);
+
+
+		}
+
+		function gatherSubgroupCreate() {
+			var modal = $el.find('#addsubgroupModal');
+			var schemaID = modal.data('schemaid');
+
+			if (!schemaID || schemaID === '') {
+				console.error('Schema creation fail - no parent group ID');
+				return;
+			}
+
+			var name = modal.find('#activityname_el').val();
+
+			if (!name || name === '') {
+				console.error('Schema creation fail - no name');
+				return;
+			}
+
+			var ss = context.getService('settingsService');
+			var prom = ss.createSchemaItem(schemaID, name);
+
 
 		}
 
@@ -221,6 +249,10 @@ module.exports = function(Box) {
 				} else if (elementType === 'saveSchemaItemChanges') {
 					console.warn("SAVING SCHEMA ITEM CHANGES: " + $(element).data('payload'));
 					gatherAndSaveSchemaChanges($(element).data('payload'));
+				} else if (elementType === 'createsubgroup') {
+					console.warn("CREATING NEW SCHEMA ITEM");
+					gatherSubgroupCreate();
+
 				}
 			},
 			onmessage: function(name, data) {
