@@ -46,6 +46,8 @@
 											<div class="well well-lg" id="currentevent_panel" style="background-color: #66feca;">
 												<h1 id="currentevent_name" style="text-align: center;">Tennis</h1>
 											</div>
+											<hr>
+											<button id="addnotes" data-type="addnotes" data-payload="current" class="btn btn-default" data-toggle="modal" data-target="#notesModal">Kirjoita muistiinpano</button>
 
 										</div>
 				
@@ -78,7 +80,7 @@
 												Kaikki
 											</button>
 									<button class="btn dropdown-toggle btn-xs btn-warning" style="float: right; margin: 4px;" data-type="newactivity_showleaves">
-												Vain päätepisteet
+												Vain alin taso
 											</button>
 								</header>
 
@@ -137,4 +139,79 @@
 </div>	
 
 				<!-- end widget grid -->
+
+				<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title" id="notes_modal_title"></h4>
+							</div>
+							<div class="modal-body" id="notes_body">
+									<div class="widget-body no-padding">
+
+
+										
+										<form id="settings-form" class="smart-form" novalidate="novalidate">
+	
+											<fieldset>
+												<div class="row">
+													
+													<section class="col">
+										
+													<label class="label">Kirjoita muistiinpano alle (max. 512 merkkiä)</label>
+													<label class="textarea">	
+													<textarea id="notearea" data-eventtimestamp="0" class="custom-scroll" rows="4" style="font-size: 12px;"></textarea>							
+													</label>
+	
+													</section>
+												</div>
+
+
+											</fieldset>							
+
+	
+										</form>
+									</div>
+							<div class="modal-footer">
+								<button type="button" data-type="savenotes" class="btn btn-primary" data-dismiss="modal">
+									Tallenna
+								</button>								
+								<button type="button" class="btn btn-default" data-dismiss="modal">
+									Peruuta
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				</div>	
+
+
+				<div class="modal fade" id="quickNoteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+
+							<div class="modal-body">
+									<div class="widget-body">
+									<div class="row">
+													
+										<section class="col">
+											<p id="quickNoteModal_text" style="margin-left: 16px;"></p>
+										</section>
+									</div>
+									</div>
+							<div class="modal-footer">						
+								<button type="button" class="btn btn-default" data-dismiss="modal">
+									Sulje
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				</div>	
+
 </div>				

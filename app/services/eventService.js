@@ -50,7 +50,17 @@ module.exports = function(Box, datalayer) {
 						s: schemaID,
 						t: timestamp
 					}					
-				})
+				});
+			},
+			saveNotes: function(timestamp, notes) {
+				return datalayer.dataCommandIn({
+					opType: 'savenotes', 
+					treePath: 'events', 
+					data: {
+						t: timestamp,
+						notes: notes
+					}					
+				});				
 			}
 		}
 

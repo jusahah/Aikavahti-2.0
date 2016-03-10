@@ -39,6 +39,7 @@ function durationalizeEvents(events) {
 		var event = events[i];
 		durations.push({
 			start: event.t,
+			notes: event.notes,
 			end: currTime,
 			s: event.s,
 			d: currTime - event.t
@@ -251,7 +252,7 @@ function sendResults(name, results, batchID, percentageDone, calcTime) {
 	console.log(results);
 	ipcTransformer.send('computationresult', {calcTime: calcTime, name: name, results: results, batchID: batchID, percentageDone: percentageDone});
 	var k = 8;
-	for (var i = 50 * 1000 * 1000; i >= 0; i--) {
+	for (var i = 0 * 1000 * 1000; i >= 0; i--) {
 		k += i;
 	};
 }

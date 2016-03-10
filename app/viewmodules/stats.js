@@ -41,6 +41,9 @@ module.exports = function(Box) {
 			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 			isHidden = false;
 
+			// Update show mode stuff
+			updateShowMode();
+
 			viewDataPromise.then(function(viewData) {
 				if (isHidden) return; // User already switched to another view	
 
@@ -60,6 +63,15 @@ module.exports = function(Box) {
 
 		}
 
+		var updateShowMode = function() {
+			$el.find('#showroots').removeClass('btn-warning').addClass('btn-default');
+			$el.find('#showleaves').removeClass('btn-warning').addClass('btn-default');
+			$el.find('#showall').removeClass('btn-warning').addClass('btn-default');
+
+			$el.find('#show' + showMode).removeClass('btn-default').addClass('btn-warning');
+
+		}
+
 		var decorateSchemaTree = function(decorations, schemaTree) {
 
 			console.log("DECS");
@@ -74,9 +86,12 @@ module.exports = function(Box) {
 					child.hisOwnTotals = 0;
 				}
 				if (child.children && child.children.length > 0) {
+					child.leaf = false;
 					_.each(child.children, function(subChild) {
 						sum += decorateChild(decorations, subChild);
 					});
+				} else {
+					child.leaf = true;
 				}
 				console.log("CHILD " + child.id + " GETS: " + sum);
 				child.totalTime = sum;
@@ -197,7 +212,9 @@ module.exports = function(Box) {
 					console.log("BRANCH: " + branch.name + " with depth " + depth);
 					if (showMode !== 'leaves' || (!branch.hasOwnProperty('children') || branch.children.length === 0)) {
 						subHTML += createOneElement(branch.id, false, branch.name, branch.totalTime, branch.color, depth);
-						subHTML += createOneElement(branch.id, true, '(' + branch.name + ')', branch.hisOwnTotals, branch.color, depth+1);						
+						if (!branch.leaf) {
+							subHTML += createOneElement(branch.id, true, '' + branch.name + ' (omat)', branch.hisOwnTotals, branch.color, depth+1);						
+						}
 					}
 
 					if (branch.hasOwnProperty('children') && showMode !== 'roots') {
@@ -226,7 +243,7 @@ module.exports = function(Box) {
 		function createOneElement(id, onlyOwn, name, totals, color, depth) {
 			var beautifiedTime = beautifyTime(totals);
 			var html = "<tr>"
-			var padding = depth*INNERPADDING;
+			var padding = depth*INNERPADDING + 16;
 			color = color || '554455';
 			if (color.charAt(0) === '#') {
 				color = color.substr(1);
@@ -416,11 +433,21 @@ module.exports = function(Box) {
 			for (var i = 0, j = dayArray.length; i < j; i++) {
 				var day = dayArray[i];
 				var m = moment(day.date, 'DD-MM-YYYY');
-				html += '<tr>';
-				html += '<td data-sort="'+ m.format('YYYY-MM-DD') + '">' + m.format('DD.MM.YYYY (ddd)') + '</td>';
+				var weekDay = m.isoWeekday();
+				var weekStart = '';
+				var highlight = '';
+				if (weekDay === 1) {
+					var newWeek = m.isoWeek();
+					weekStart = "<span style='float: right; font-size: 10px; color: #333;'>(vko " + newWeek + ")</span>"; 
+					highlight = 'warning';
+				}
+
+				
+				html += '<tr class="'  + highlight + '">';
+				html += '<td data-sort="'+ m.format('YYYY-MM-DD') + '">' + m.format('DD.MM.YYYY (ddd)') + '' + weekStart + '</td>';
 				html += '<td data-sort=' + day.t + '>' + beautifyTime(day.t) + '</td>';
 				html += '<td>' + getTimeBar(day.t) + '</td>';
-				html += '<tr>';
+				html += '</tr>';
 			};
 
 			return html;

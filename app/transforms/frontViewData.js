@@ -23,6 +23,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 	var currentSchemaItemCopy = getCopyOfSchemaItem(currentEvent.s, normalizedSchemaTable);
 
 	currentSchemaItemCopy.start = currentEvent.t;
+	currentSchemaItemCopy.notes = currentEvent.notes;
 	frontView.current = currentSchemaItemCopy;
 
 	// Last ten
@@ -36,6 +37,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 		var current = getCopyOfSchemaItem(e.s, normalizedSchemaTable);
 		current.start = e.start;
 		current.end   = e.end;
+		current.notes = e.notes;
 
 		frontView.lastTen.push(current);
 	};
@@ -43,6 +45,10 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 	// Change activity buttons data
 	frontView.schemaItems = schemaTreeToArray(schemaTree, false);
 	frontView.schemaLeaves = schemaTreeToArray(schemaTree, true);
+
+	if (frontView.lastTen.length > 0) {
+		frontView.lastTen.shift(); // drop the first as we dont want it
+	}
 
 
 	return frontView;

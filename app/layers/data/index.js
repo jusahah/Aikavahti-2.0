@@ -459,6 +459,28 @@ function adminCommand(operation, data) {
 	}
 }
 
+function updateNotes(timestamp, notes) {
+	console.warn("UPDATING NOTES: " + notes + ", " + timestamp);
+	notes = _.escape(notes);
+	notes = _.truncate(notes, {length: 512});
+	timestamp = parseInt(timestamp);
+
+	var events = appData.events;
+
+	var i = _.findIndex(events, function(event) {
+		return parseInt(event.t) === timestamp;
+	});
+
+	if (i === -1) {
+		return Promise.reject('Event not found and could not be updated!');
+	}	
+
+	events[i].notes = notes;
+
+	return writeToDiskIfNeeded();
+
+}
+
 
 
 module.exports = {
@@ -481,6 +503,10 @@ module.exports = {
 
 		if (dataCommand.opType === 'admin') {
 			return adminCommand(dataCommand.op, dataCommand.data);
+		}
+
+		if (dataCommand.opType === 'savenotes') {
+			return updateNotes(dataCommand.data.t, dataCommand.data.notes);
 		}
 		/*
 		dataCommand = {

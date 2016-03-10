@@ -153,9 +153,9 @@ module.exports = function(Box) {
 			var textcolor = tc.isDark() ? 'fff' : '222'; 
 			var ownText = name;		
 			html += "<td style='padding-left:" + padding + "px;'><button data-type='schemaItemInSchemaViewer' data-payload='" + id + "_" + ownText + "' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
-			html += "<td><button data-type='addAsSubgroup data-payload='" + id + "' class='btn btn-default'>Uusi alaryhmä</td>";
+			html += "<td><button data-type='addAsSubgroup' data-payload='" + id + "' class='btn btn-default'>Uusi alaryhmä</td>";
 			html += "<td><button data-type='editSchemaItem' data-payload='" + id + "' class='btn btn-warning' data-toggle='modal' data-target='#schemaItemModal'>Väritä</td>";
-			html += "</tr>";
+			html += "<td><button data-type='deleteSchemaItem' data-payload='" + id + "' class='btn btn-danger' data-toggle='modal' data-target='#deleteSchemaItemModal'>Poista</td>";			html += "</tr>";
 			return html;
 		}
 
@@ -197,6 +197,10 @@ module.exports = function(Box) {
 			ss.updateSchemaItem(schemaID, {
 				color: color.toHexString().substr(1) // Drop the leading #
 			});
+		}
+
+		function addAsSubgroup(schemaID) {
+
 		}
 
 		

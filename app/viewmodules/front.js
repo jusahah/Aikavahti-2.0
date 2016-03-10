@@ -1,5 +1,6 @@
 // Main front page module
 var tinycolor = require('tinycolor2');
+var moment = require('moment');
 
 module.exports = function(Box) {
 	Box.Application.addModule('front', function(context) {
@@ -99,9 +100,14 @@ module.exports = function(Box) {
 			$lastTenUL = $lastTenWrapper.find('ul');
 			$lastTenUL.empty();
 
+			var todayStartTimestamp = getTodayStartTimestamp();
+
 			_.each(lastTen, function(oneLast) {
 				console.log("APPENDING ONE");
-				$lastTenUL.append(getLastTenLI(oneLast));
+				if (oneLast.start >= todayStartTimestamp) {
+					$lastTenUL.append(getLastTenLI(oneLast));
+				}
+				
 			});
 
 
@@ -129,6 +135,14 @@ module.exports = function(Box) {
 
 
 			
+		}
+
+		var getTodayStartTimestamp = function() {
+
+			var now = new Date();
+			return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+
 		}
 
 		var filterUserSelectedButtons = function(schemaItems, userSelecteds) {
@@ -175,8 +189,18 @@ module.exports = function(Box) {
 				color = color.substr(1);
 			}				
 			var tc = tinycolor(color);
+
+			var notes = '';
+			var toggleText = '';
+			var icon = '';
+			if (schemaItem.notes && schemaItem.notes !== '') {
+				notes = schemaItem.notes;
+				toggleText = 'data-toggle="modal" data-target="#quickNoteModal"  data-type="openEventInfo" data-payload="' + notes + '"'; 
+				icon = '<i class="fa fa-warning" style="position: absolute; font-size: 8px; bottom: 2px; right: 2px;"></i>';	
+			}
+			
 			var textcolor = tc.isDark() ? 'txt-color-white' : 'txt-color-black'; 			
-			li += '<span style="position: relative; background-color:#' + color + ';" class="' + textcolor + '" data-description="' + ended + '-' + started + '" data-icon="fa-time">' + name + '<i class="fa fa-warning" style="position: absolute; font-size: 8px; bottom: 2px; right: 2px;"></i></span>';
+			li += '<span ' + toggleText + ' style="position: relative; background-color:#' + color + ';" class="' + textcolor + '" data-description="' + ended + '-' + started + '" data-icon="fa-time">' + name + icon + '</span>';
 			li += '</li>';
 
 
@@ -217,6 +241,52 @@ module.exports = function(Box) {
 			es.newEvent(schemaID);
 		}
 		
+		function populateAddNotesModal() {
+
+			var name = currentNow.name;
+			var startString = beautifyTimestamp(currentNow.start);
+			var area = $el.find('#notearea');
+			area.val('');
+			console.log("EDITING TEXT AREA: " + currentNow.start);
+			area.data('eventtimestamp', currentNow.start);
+
+			$el.find('#notes_modal_title').empty().append(name + " (" + startString + " --> )");
+			if (currentNow.hasOwnProperty('notes')) {
+				area.val(currentNow.notes);
+				
+			}
+		}
+
+		function saveNotes() {
+			var area = $el.find('#notearea');
+			var eventtimestamp = area.data('eventtimestamp');
+
+			if (!eventtimestamp || eventtimestamp === '') {
+				console.error('Event timestamp missing for some reason - can not save notes!');
+				return;
+			}
+
+			var notes = area.val();
+
+			if (notes.length > 512) {
+				console.error('Too long string in notes area');
+				return;
+			}
+
+
+			var es  = context.getService('eventService');
+			var prom = es.saveNotes(eventtimestamp, notes);
+
+
+
+
+		}
+
+		function populateQuickNoteModal(notes) {
+			console.log("POPULATING NOTE MODAL: " + notes);
+			$el.find('#quickNoteModal_text').empty().append(notes);
+
+		}
 
 		// Public API
 		return {
@@ -230,6 +300,15 @@ module.exports = function(Box) {
 				} else if (elementType === 'changeactivity') {
 					var schemaID = $(element).data('payload');
 					newActivityClicked(schemaID);
+				} else if (elementType === 'addnotes') {
+					populateAddNotesModal();
+				} else if (elementType === 'savenotes') {
+					saveNotes();
+				} else if (elementType === 'openEventInfo') {
+					var notes = $(element).data('payload');
+					if (notes && notes !== '') {
+						populateQuickNoteModal(notes);
+					}
 				}
 			},
 			onmessage: function(name, data) {
