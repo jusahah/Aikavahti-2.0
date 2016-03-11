@@ -18,6 +18,12 @@ ipcTransformer.on('computationrequest', function(event, data) {
 	receiveComputationRequest(data);
 });
 
+function filterActivitiesAway(eventsAndSignals) {
+	return _.filter(eventsAndSignals, function(eventOrSignal) {
+		return eventOrSignal.signal;
+	});
+}
+
 function filterSignalsAway(eventsAndSignals) {
 	return _.filter(eventsAndSignals, function(eventOrSignal) {
 		return !eventOrSignal.signal;
@@ -179,6 +185,7 @@ function receiveComputationRequest(data) {
 
 	var sortedSignalsAndEvents = sortEvents(data.events);
 	var noSignals    = filterSignalsAway(data.events);
+	//var onlySignals  = filterActivitiesAway(data.events);
 	var sortedEvents = sortEvents(noSignals);
 	var dayChangesAdded = addDayChanges(sortedEvents);
 	var sortedDurations = durationalizeEvents(dayChangesAdded);

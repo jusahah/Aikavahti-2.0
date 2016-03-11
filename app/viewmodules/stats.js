@@ -10,7 +10,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 		// This module must do lot of work on the UI thread
-		var dataNeeded = ['sortedDurations', 'schemaItems', 'schemaTree', 'dayByDayPerSchemaId'];
+		var dataNeeded = ['sortedDurations', 'schemaItems', 'schemaTree', 'dayByDayPerSchemaId', 'dayByDayCountPerSignalId'];
 
 		var currentPayload = null;
 		var startTs= Date.now() - 4 * 86400 * 1000;
