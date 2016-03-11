@@ -3,6 +3,9 @@ var _ = require('lodash');
 var tinycolor = require('tinycolor2');
 var moment = require('moment');
 
+
+var SIGNALCOLOR = '777777';
+
 module.exports = function(Box) {
 
 	Box.Application.addModule('stats', function(context) {
@@ -10,7 +13,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 		// This module must do lot of work on the UI thread
-		var dataNeeded = ['sortedDurations', 'schemaItems', 'schemaTree', 'dayByDayPerSchemaId', 'dayByDayCountPerSignalId'];
+		var dataNeeded = ['sortedDurations', 'schemaItems', 'schemaTree', 'dayByDayPerSchemaId', 'eventsAndSignalsList', 'signalsTable', 'dayByDayCountPerSignalId'];
 
 		var currentPayload = null;
 		var startTs= Date.now() - 4 * 86400 * 1000;
@@ -53,6 +56,7 @@ module.exports = function(Box) {
 				//$el.empty().append(JSON.stringify(viewData.schemaTree));
 
 				buildStatView(viewData.sortedDurations, viewData.schemaItems, viewData.schemaTree);
+				buildSignalTable(viewData.signalsTable, viewData.eventsAndSignalsList, viewData.dayByDayCountPerSignalId);
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
 				//$el.empty().append("<h3>STATS: " + JSON.stringify(viewData) + "</h3>");
@@ -160,6 +164,90 @@ module.exports = function(Box) {
 
 			return o;
 		}
+
+		var signalCountsSinceAndBeforeTimestamp = function(eventsAndSignalsList, start, end) {
+			var o = {};
+			var signalsWithin = _.filter(eventsAndSignalsList, function(eventOrSignal) {
+				if (!eventOrSignal.signal) return false;
+				return eventOrSignal.t >= start && eventOrSignal.t <= end;
+			});
+
+			if (signalsWithin.length < 1) {
+				return {};
+			}
+
+			_.each(signalsWithin, function(signal) {
+				if (!o.hasOwnProperty(signal.s)) {
+					o[signal.s] = 1;
+				} else {
+					o[signal.s] += 1;
+				}
+			});
+			console.log("SIGNAL COUNTS PER ID");
+			console.log(JSON.stringify(o));
+			return o;
+
+
+		}
+
+		var decorateSignalTable = function(signalTable, signalIDToDuration) {
+			var copyTable = {};
+			_.forOwn(signalTable, function(signal, id) {
+				copyTable[id] = {
+					name: signal.name,
+					id: signal.id,
+					count: signalIDToDuration[id] || 0
+				}
+			});
+
+			return copyTable;
+		}
+
+		var buildSignalHTML = function(decoratedSignalTable) {
+			var html = '';
+
+			_.forOwn(decoratedSignalTable, function(signal, id) {
+				html += '<tr>';
+				html += '<td data-sort=' + signal.name + '><button data-type="loadIndividualSignal" data-payload="' + id + '" data-toggle="modal" data-target="#individualSignalStatsModal" class="btn" style="width: 100%; text-align: left; background-color: #' + SIGNALCOLOR + '; color: white;">' + signal.name + '</button></td>';
+				html += '<td data-sort=' + signal.count + '>' + signal.count + '</td>';
+				html += '</tr>';
+			});
+
+			return html;
+		}
+
+		var buildSignalTable = function(signalsTable, eventsAndSignalsList, dayByDayCountPerSignalId) {
+			var d = new Date();
+			var startTs;
+			if (currentPayload === 'today') {
+				startTs = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+			} else if (currentPayload === 'week') {
+				// Straight from Stackoverflow
+				var getMonday = function(d) {
+				  d = new Date(d);
+				  var day = d.getDay(),
+				      diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+				  return new Date(d.setDate(diff));
+				}
+				d = getMonday(d);	
+				startTs = new Date(d.getFullYear(), d.getMonth(), d.getDate());						
+			} else if (currentPayload === 'month') {
+				startTs = new Date(d.getFullYear(), d.getMonth(), 1);				
+			} else if (currentPayload === 'year') {
+				startTs = new Date(d.getFullYear(), 0, 1);
+			}
+
+			var endTs = Date.now() + 1000;
+			var signalIDToDuration = signalCountsSinceAndBeforeTimestamp(eventsAndSignalsList, startTs, endTs);
+			var decoratedSignalTable = decorateSignalTable(signalsTable, signalIDToDuration);
+			console.log("DECOR SIGNAL TABLE");
+			console.log(decoratedSignalTable);
+
+			$el.find('#signals_table_body').empty().append(buildSignalHTML(decoratedSignalTable));
+			$el.find("#signals_table_sortable").trigger("update"); 
+
+		}
+
 		var buildStatView = function(sortedDurations, schemaItems, schemaTree) {
 			var d = new Date();
 			if (currentPayload === 'today') {
@@ -300,10 +388,14 @@ module.exports = function(Box) {
 			$body.empty().append(html);
 
 
+
 			// Add activity part
 
 			$select = $el.find('#activitytoadd');
 			$select.empty().append(buildHTMLFromTree(schemaTree));
+
+
+
 
 
 		}
@@ -402,6 +494,28 @@ module.exports = function(Box) {
 			}
 		}
 
+		var loadDataToIndividualSignalStatsModal = function(signalID) {
+			var dayArr = getDayArrayForGivenPayload();
+			var dayArrayWithTotalCount = [];
+			var data = viewDataCached.dayByDayCountPerSignalId;
+
+			_.each(dayArr, function(dateString) {
+
+				if (!data.hasOwnProperty(dateString) || !data[dateString].hasOwnProperty(signalID)) {
+					dayArrayWithTotalCount.push({date: dateString, count: 0});
+					return;
+				}
+
+				dayArrayWithTotalCount.push({date: dateString, count: data[dateString][signalID]});
+
+			});	
+
+			$el.find('#individual_signalstatstable_body').empty().append(buildIndividualSignalStatsHTML(dayArrayWithTotalCount));
+			$el.find('#individual_signalstatstable').trigger('update');
+			var signalItem = viewDataCached.signalsTable[signalID];
+			$el.find('#individual_signalstats_title').empty().append(signalItem ? signalItem.name : '---');
+		}
+
 		var resolveAllChildrenOfSchemaId = function(schemaID) {
 			console.log("RESOLVING KIDS FOR SCHEMA ID: " + schemaID);
 			var schemaItem = viewDataCached.schemaItems[schemaID];
@@ -424,6 +538,31 @@ module.exports = function(Box) {
 			bar += '<div class="progress-bar bg-color-blue" role="progressbar" style="width:' + perc + '%;"></div'
 			bar += '</div'
 			return bar;			
+		}
+
+		var buildIndividualSignalStatsHTML = function(dayArray) {
+			var html = '';
+			for (var i = 0, j = dayArray.length; i < j; i++) {
+				var day = dayArray[i];
+				var m = moment(day.date, 'DD-MM-YYYY');
+				var weekDay = m.isoWeekday();
+				var weekStart = '';
+				var highlight = '';
+				if (weekDay === 1) {
+					var newWeek = m.isoWeek();
+					weekStart = "<span style='float: right; font-size: 10px; color: #333;'>(vko " + newWeek + ")</span>"; 
+					highlight = 'warning';
+				}
+
+				
+				html += '<tr class="'  + highlight + '">';
+				html += '<td data-sort="'+ m.format('YYYY-MM-DD') + '">' + m.format('DD.MM.YYYY (ddd)') + '' + weekStart + '</td>';
+				html += '<td data-sort=' + day.count + '>' + day.count + '</td>';
+				html += '</tr>';
+			};
+
+			return html;
+
 		}
 
 		var buildIndividualStatsHTML = function(dayArray) {
@@ -498,8 +637,8 @@ module.exports = function(Box) {
 
 			$el.find('#individual_statstable_body').empty().append(buildIndividualStatsHTML(dayArrayWithTotalTime));
 			$el.find('#individual_statstable').trigger('update');
-
-			schemaItem = viewDataCached.schemaItems[schemaID];
+			// Changed here by adding var in front of schemaItem
+			var schemaItem = viewDataCached.schemaItems[schemaID];
 			var titleString = schemaItem ? schemaItem.name : '---';
 			if (onlyOwn) titleString += " (vain omat)";
 			var subTitleString = !onlyOwn ? "Alaryhmiin kuuluvat aktiviteetit mukana tilastossa!" : "Alaryhmiin kuuluvat aktiviteetit EIVÄT ole mukana!";
@@ -578,6 +717,9 @@ module.exports = function(Box) {
 					var schemaID = parts[0];
 					var onlyOwn = parts[1] === 'own';
 					loadDataToIndividualStatsModal(schemaID, onlyOwn);
+				} else if (elementType === 'loadIndividualSignal') {
+					var signalID = $(element).data('payload');
+					loadDataToIndividualSignalStatsModal(signalID);
 				}
 			},
 			onmessage: function(name, data) {
