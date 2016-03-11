@@ -155,7 +155,7 @@ module.exports = function(Box) {
 			html += "<td style='padding-left:" + padding + "px;'><button data-type='schemaItemInSchemaViewer' data-payload='" + id + "_" + ownText + "' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
 			html += "<td><button data-type='addAsSubgroup' data-payload='" + id + "' class='btn btn-default' data-toggle='modal' data-target='#addsubgroupModal'>Uusi alaryhmä</td>";
 			html += "<td><button data-type='editSchemaItem' data-payload='" + id + "' class='btn btn-warning' data-toggle='modal' data-target='#schemaItemModal'>Väritä</td>";
-			html += "<td><button data-type='deleteSchemaItem' data-payload='" + id + "' class='btn btn-danger' data-toggle='modal' data-target='#deleteSchemaItemModal'>Poista</td>";			html += "</tr>";
+			html += "<td><button data-type='editSchemaItemName' data-payload='" + id + "' class='btn btn-primary' data-toggle='modal' data-target='#editSchemaItemNameModal'>Muokkaa</td>";			html += "</tr>";
 			return html;
 		}
 
@@ -231,6 +231,30 @@ module.exports = function(Box) {
 
 		}
 
+		function populateEditNameModal(schemaID) {
+			console.log("Populating edit name modal: " + schemaID);
+			var item = viewDataCached.schemaItems[schemaID];
+
+			$el.find('#newschemaitemname_el').val(item.name);
+			$el.find('#editSchemaItemNameModal').data('schemaid', schemaID);
+		}
+
+		function gatherAndSendEditSchemaName() {
+
+			var schemaID = $el.find('#editSchemaItemNameModal').data('schemaid');
+			if (!schemaID || schemaID == '0') {
+				return;
+			}
+			console.warn("Updating schema item name");
+			var newName = $el.find('#newschemaitemname_el').val();
+			console.log("New name: " + newName);
+			var ss = context.getService('settingsService');
+			ss.updateSchemaItem(schemaID, {name: newName});
+
+		}
+
+
+
 		
 
 		// Public API
@@ -244,6 +268,8 @@ module.exports = function(Box) {
 					recolorRequest();
 				} else if (elementType === 'editSchemaItem') {
 					loadEditSchemaItemModal($(element).data('payload'));
+				} else if (elementType === 'editSchemaItemName') {
+					populateEditNameModal($(element).data('payload'));
 				} else if (elementType === 'addAsSubgroup') {
 					addAsSubgroup($(element).data('payload'));
 				} else if (elementType === 'saveSchemaItemChanges') {
@@ -252,7 +278,8 @@ module.exports = function(Box) {
 				} else if (elementType === 'createsubgroup') {
 					console.warn("CREATING NEW SCHEMA ITEM");
 					gatherSubgroupCreate();
-
+				} else if (elementType === 'submitNewSchemaItemName') {
+					gatherAndSendEditSchemaName();
 				}
 			},
 			onmessage: function(name, data) {

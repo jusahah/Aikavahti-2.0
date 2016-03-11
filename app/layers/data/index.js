@@ -35,9 +35,9 @@ function getInitialDataObject() {
 		events: [],
 		schema: {
 			_root_: [
-				{name: 'Työ', id: 1, children: []},
-				{name: 'Opinnot', id: 2, children: []},
-				{name: 'Vapaa-aika', id: 3, children: []}
+				{color: '884455', name: 'Työ', id: 1, children: []},
+				{color: '559955', name: 'Opinnot', id: 2, children: []},
+				{color: '554488', name: 'Vapaa-aika', id: 3, children: []}
 			]
 		},
 		triggers: {},
@@ -475,6 +475,8 @@ function updateSchemaItem(data) {
 	var clonedItem = _.assign({}, item);
 	clonedItem.color = color ? color : clonedItem.color;
 	clonedItem.name = name ? name : clonedItem.name;
+
+	console.log("Changed schema item clone: " + JSON.stringify(clonedItem));
 
 	var err = dataSchema.validateSchemaItem(clonedItem);
 

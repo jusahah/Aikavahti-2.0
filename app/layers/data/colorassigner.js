@@ -69,7 +69,7 @@ function useAllColorScale(dataTree, baseColor, settings, randomizer) {
 	for (var i = 0; i < branchFactor; i++) {
 		var branch = dataTree[i];
 		console.log(randomizer);
-		branch.color = randomizer.randomize(tinycolor(colors.pop())).toHexString();
+		branch.color = randomizer.randomize(tinycolor(colors.pop())).toHexString().substr(1);
 	console.log("OLLOR: " + branch.color);
 
 		if (branch.children && branch.children.length !== 0) {
@@ -85,7 +85,7 @@ function useAllColorScale(dataTree, baseColor, settings, randomizer) {
 
 function useAllColorScaleToItem(branch, baseColor, settings, randomizer) {
 	var tc = tinycolor(baseColor);
-	branch.color = tc.toHexString();
+	branch.color = tc.toHexString().substr(1);
 	console.log("OLLOR: " + branch.color);
 	if (branch.children) useAllColorScale(branch.children, baseColor, settings, randomizer);
 
