@@ -15,7 +15,7 @@
 				-->
 				<header>
 					<span class="widget-icon"> <i class="fa fa-edit"></i> </span>
-					<h2>Lisää aktiviteetti aikajanalle</h2>				
+					<h2>Lisää tapahtuma aikajanalle</h2>				
 					
 				</header>
 
@@ -34,12 +34,19 @@
 						
 						<form id="order-form" class="smart-form" novalidate="novalidate">
 							<header>
-								Valitse aktiviteetti, syötä päivämäärä ja kellonaika
+								Valitse aktiviteetti/signaali, syötä päivämäärä ja kellonaika
 							</header>
 
 
 							<fieldset>
 								<div class="row">
+									<section class="col col-6">
+										<label class="select">
+											<select name="selecttype" id="typetoadd">
+												<option value="signal">Signaali</option>
+												<option value="activity">Aktiviteetti</option>
+											</select> <i></i> </label>
+									</section>								
 									<section class="col col-6">
 										<label class="select">
 											<select name="selectactivity" id="activitytoadd">
@@ -126,7 +133,8 @@
 											<table class="table table-bordered">
 												<thead>
 													<tr>
-														<th>Aktiviteetti</th>
+														<th>Tyyppi</th>
+														<th>Nimi</th>
 														<th>Kellonaika</th>
 														<th>Päivämäärä</th>
 														<th>Muistiinpanot</th>

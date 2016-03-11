@@ -18,6 +18,12 @@ ipcTransformer.on('computationrequest', function(event, data) {
 	receiveComputationRequest(data);
 });
 
+function filterSignalsAway(eventsAndSignals) {
+	return _.filter(eventsAndSignals, function(eventOrSignal) {
+		return !eventOrSignal.signal;
+	});
+}
+
 function sortEvents(events) {
 	return events.sort(function(a, b) {
 		return b.t - a.t;
@@ -150,7 +156,7 @@ function normalizeSchemaTree(schemaTree) {
 
 function receiveComputationRequest(data) {
 
-
+	var signalsArr = data.data.signals;
 	// data = {batchID: int, data: {...}}
 	var schemaTree = data.data.schema['_root_']; // To be passed to each transform as 2nd arg
 	var schemaNormalizedTable = normalizeSchemaTree(schemaTree);
@@ -166,10 +172,14 @@ function receiveComputationRequest(data) {
 	var transformListLen = transformsList.length;
 	var dones = 0;
 	console.log("Start calc all");
+	console.warn("--------------- RAW EVENTS ------------");
+	console.log(JSON.stringify(data.events));
 
 	var calcStartTime = Date.now();
 
-	var sortedEvents = sortEvents(data.events);
+	var sortedSignalsAndEvents = sortEvents(data.events);
+	var noSignals    = filterSignalsAway(data.events);
+	var sortedEvents = sortEvents(noSignals);
 	var dayChangesAdded = addDayChanges(sortedEvents);
 	var sortedDurations = durationalizeEvents(dayChangesAdded);
 
@@ -222,7 +232,7 @@ function receiveComputationRequest(data) {
 			var results;	
 			try {
 				console.warn("CURREN TRANSFORMATION: " + transformSelected.name);
-				results = transformSelected.transform(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, schemaNormalizedTable, settingsTree);	
+				results = transformSelected.transform(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, schemaNormalizedTable, settingsTree, signalsArr, sortedSignalsAndEvents);	
 			} catch (e) {
 				console.error("-------------------__ERROR ERROR -----------------");
 				console.log(e);

@@ -5,7 +5,8 @@ var Promise = require('bluebird');
 var eventItem = Joi.object().keys({
     s: Joi.number().integer(), // Schema item id
     t: Joi.number().integer(), // Timestamp
-    notes: Joi.string().max(1024)
+    notes: Joi.string().max(1024),
+    signal: Joi.boolean()
 }); // Validate against Joi schema here
 
 var schemaItem = Joi.object().keys({
@@ -16,6 +17,11 @@ var schemaItem = Joi.object().keys({
     children: Joi.optional(),
     active: Joi.boolean()
 }); // Validate against Joi schema here
+
+var signalItem = Joi.object().keys({
+	id: Joi.number().integer(),
+	name: Joi.string().required().min(1).max(64),
+});
 
 var settingsItem = {
 	data: Joi.object().keys({
@@ -59,6 +65,22 @@ module.exports = {
 		});
 
 		return validationError;
+	},
+	validateSignalItem: function(item) {
+		var validationError = null;
+		Joi.validate(item, signalItem, function(err, value) {
+			if (err) validationError = err;
+		});
+
+		return validationError;		
+	},
+	validateEvent: function(item) {
+		var validationError = null;
+		Joi.validate(item, eventItem, function(err, value) {
+			if (err) validationError = err;
+		});
+
+		return validationError;			
 	}
 
 }

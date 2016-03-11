@@ -35,7 +35,7 @@ $('#manageContainer').load('views/mainContents/manage.html');
 $('#statsContainer').load('views/mainContents/stats.html');
 $('#initializationContainer').load('views/static/initialization.html');
 $('#importContainer').load('views/mainContents/import.html');
-
+$('#signalsContainer').load('views/mainContents/signals.html');
 $('#resetContainer').load('views/static/resetConfirm.html');
 
 
@@ -48,7 +48,7 @@ require('./viewmodules/manage')(Box); // Same
 require('./viewmodules/stats')(Box); // Same
 require('./viewmodules/initialization')(Box); // Same
 require('./viewmodules/reset')(Box); // Same
-
+require('./viewmodules/signals')(Box); // Same
 require('./viewmodules/import')(Box); // Same
 
 // Service registrations

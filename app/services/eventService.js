@@ -13,7 +13,35 @@ module.exports = function(Box, datalayer) {
 		}
 
 		return {
+			newSignal: function(signalID) {
+				console.warn("NEW SIGNAL IN EVENT SERVICE");
+				var timestamp = Date.now();
+				return datalayer.dataCommandIn({
+					opType: 'newSignal', 
+					data: {
+						s: parseInt(signalID),
+						t: timestamp,
+						signal: true
+					}
+				});				
 
+			},
+
+			newSignalCustomDateTime: function(dateString, timeString, signalID) {
+				var ts = parseDateAndTimeToTimestamp(dateString, timeString);
+				if (!ts) {
+					return Promise.reject('DateTime validation error in signal creation!');
+				}
+				return datalayer.dataCommandIn({
+					opType: 'newSignal', 
+					data: {
+						s: parseInt(signalID),
+						t: ts,
+						signal: true
+					}
+				});				
+
+			},			
 			newEvent: function(schemaID) {
 				var timestamp = Date.now();
 				return datalayer.dataCommandIn({
@@ -21,7 +49,8 @@ module.exports = function(Box, datalayer) {
 					treePath: 'events', 
 					data: {
 						s: schemaID,
-						t: timestamp
+						t: timestamp,
+						signal: false
 					}
 				});
 			},
@@ -36,7 +65,8 @@ module.exports = function(Box, datalayer) {
 					treePath: 'events', 
 					data: {
 						s: schemaID,
-						t: ts
+						t: ts,
+						signal: false
 					}
 				});
 

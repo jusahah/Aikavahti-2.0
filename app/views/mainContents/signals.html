@@ -1,0 +1,127 @@
+<div>
+							<div class="jarviswidget jarviswidget-color-blueDark" id="wid-id-0" data-widget-editbutton="false">
+
+								<header>
+									<span class="widget-icon"> <i class="fa fa-table"></i> </span>
+									<h2>Signaalit</h2>										
+								</header>
+
+	
+								<div>
+
+									<!-- widget edit box -->
+									<div class="jarviswidget-editbox">
+										<!-- This area used as dropdown edit box -->
+
+									</div>
+									<!-- end widget edit box -->
+
+									<!-- widget content -->
+									<div class="widget-body">
+										<p>Voit oikean laidan painikkeita käyttämällä lisätä ja poistaa aktiviteetteja
+										aikajanallesi. </p>
+										
+										<div class="table-responsive">
+										
+											<table class="table table-bordered">
+												<thead>
+													<tr>
+														<th>Signaali</th>
+														<th>Poista</th>
+													</tr>
+												</thead>
+												<tbody id="signalstable_body">
+
+												</tbody>
+											</table>
+											
+										</div>
+
+										<hr>
+
+										<button type="button" class="btn btn-success" data-toggle="modal" data-target="#createSignalModal">
+											Luo uusi
+										</button>
+
+
+									</div>
+									<!-- end widget content -->
+
+								</div>
+								<!-- end widget div -->
+
+
+							</div>
+
+			<div class="modal fade" id="deletesignalModal" data-payload="0" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title" id="individual_stats_title">Vahvista signaalin poisto: <span id="signalname"></span></h4>
+								
+								
+							</div>
+							<div class="modal-body" id="deleteSignalItemModalBody">
+								<p>HUOM! Toimenpide poistaa tätä signaalia koskevat signaalitapahtumat aikajanaltasi!</p>
+							<div class="modal-footer">
+								<button id="confirmdeletesignal" class='btn btn-danger' data-dismiss="modal" data-type="confirmsignaldeletion" data-payload="">Vahvista poisto</button>
+								<button type="button" class="btn btn-danger" data-dismiss="modal">
+									Peruuta
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				</div>
+
+			<div class="modal fade" id="createSignalModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title" id="individual_stats_title">Uuden signaalin luonti</h4>
+								
+							</div>
+							<div class="modal-body" id="signalCreationBody">
+								<div class="widget-body no-padding">
+									
+									<div id="newsignal-form" class="smart-form" novalidate="novalidate">
+			
+
+
+										<fieldset>
+												
+													<label class="input">
+														<input type="text" name="newsignalname" id="newsignalname_el" placeholder="Syötä signaalin nimi">
+													</label>
+																			
+
+
+										</fieldset>
+
+						
+									</div>
+								</div>
+							<div class="modal-footer">
+								<button id="submitNewSignal" class='btn btn-success' data-dismiss="modal" data-type="submitNewSignal" data-payload="">Luo</button>
+								<button type="button" class="btn btn-danger" data-dismiss="modal">
+									Peruuta
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				</div>
+
+
+
+</div>	
+
+		

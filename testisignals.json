@@ -1,0 +1,90 @@
+{
+  "aikavahtiTimestamp": 1457683253846,
+  "data": {
+    "events": [
+      {
+        "s": 14576831725041,
+        "t": 1457683175465,
+        "signal": true
+      },
+      {
+        "s": 2,
+        "t": 1457683176205,
+        "signal": false
+      },
+      {
+        "s": 1,
+        "t": 1457683177045,
+        "signal": false
+      },
+      {
+        "s": 9999,
+        "t": 1457683177875,
+        "signal": true
+      },
+      {
+        "s": 3,
+        "t": 1457683178805,
+        "signal": false
+      },
+      {
+        "s": 14576831725041,
+        "t": 1457683179545,
+        "signal": true
+      },
+      {
+        "s": 2,
+        "t": 1457683180875,
+        "signal": false
+      },
+      {
+        "s": "1",
+        "t": 1457415000005,
+        "signal": false
+      }
+    ],
+    "schema": {
+      "_root_": [
+        {
+          "name": "Työ",
+          "id": 1,
+          "children": []
+        },
+        {
+          "name": "Opinnot",
+          "id": 2,
+          "children": []
+        },
+        {
+          "name": "Vapaa-aika",
+          "id": 3,
+          "children": []
+        }
+      ]
+    },
+    "triggers": {},
+    "signals": [
+      {
+        "name": "Kahvi",
+        "id": 9999
+      },
+      {
+        "name": "Tee",
+        "id": 14576831725041
+      }
+    ],
+    "settings": {
+      "data": {
+        "writeToDiskAfterEveryUpdate": true
+      },
+      "internet": {
+        "onlineBackup": false
+      },
+      "view": {
+        "eventsOnlyToLeaves": true,
+        "userSelectedEventsShow": false,
+        "userSelectedEvents": []
+      }
+    }
+  }
+}

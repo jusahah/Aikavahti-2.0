@@ -20,10 +20,12 @@ module.exports = {
 		{name: 'frontViewData', transform: require('./frontViewData'), prerequisite: null},
 		{name: 'decorateSchemaWithDurationsThisMonth', transform: require('./decorateSchemaWithDurationsThisMonth'), prerequisite: null},	
 		{name: 'eventList', transform: require('./eventList'), prerequisite: null},
+		{name: 'eventsAndSignalsList', transform: require('./eventsAndSignalsList'), prerequisite: null},
 		{name: 'schemaTree', transform: require('./schemaTree'), prerequisite: null},
 		{name: 'sortedDurations', transform: require('./sortedDurations'), prerequisite: null},
 		{name: 'schemaItems', transform: require('./schemaItems'), prerequisite: null},
 		{name: 'dayByDayPerSchemaId', transform: require('./dayByDayPerSchemaId'), prerequisite: null},
+		{name: 'signalsTable', transform: require('./signalsTable'), prerequisite: null},
 
 	]
 

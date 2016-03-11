@@ -48,6 +48,12 @@ module.exports = function(Box, datalayer) {
 					name: name,
 					color: '6622ee',
 				}});
+			},
+			createSignalItem: function(name) {
+				return datalayer.dataCommandIn({opType: 'newSignalItem', data: name});
+			},
+			deleteSignalItem: function(signalID) {
+				return datalayer.dataCommandIn({opType: 'deleteSignalItem', data: signalID});
 			}
 		}
 

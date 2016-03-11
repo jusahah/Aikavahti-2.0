@@ -41,6 +41,9 @@ function getInitialDataObject() {
 			]
 		},
 		triggers: {},
+		signals: [
+			{name: 'Kahvi', id: 9999},
+		],
 		settings: {
 			data: {
 				writeToDiskAfterEveryUpdate: true
@@ -216,6 +219,61 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 
 }
 
+function removeSignalEvents(signalID) {
+	console.warn("-----------REMOVE SIGNAL EVENTS FOR: " + signalID);
+	var events = _.filter(appData.events, function(event) {
+		return !(event.signal && event.s === signalID);
+	});
+
+	appData.events = events;
+}
+
+function checkSignalItemNameClash(name) {
+	var i = _.findIndex(appData.signals, function(signal) {
+		return signal.name === name;
+	});
+
+	return i !== -1;
+}
+
+function addSignalItem(name) {
+
+	if (checkSignalItemNameClash(name)) return Promise.reject('Signal item with provided name already exists: ' + name);
+
+	var signalItemData = {
+		name: name,
+		id: generateSchemaID()
+	}
+
+	appData.signals.push(signalItemData);
+	return writeToDiskIfNeeded();
+
+}
+
+function deleteSignalItem(id) {
+
+	var i = _.findIndex(appData.signals, function(signal) {
+		return signal.id === id;
+	});
+
+	if (i === -1) return Promise.reject('Signal item deletion failed - item not found');
+
+	// Remove events wit this signal id
+	removeSignalEvents(id);
+	// Remove signal item
+	appData.signals.splice(i, 1);
+	return writeToDiskIfNeeded();
+}
+
+function ensureSignalIDExists(id) {
+	id = parseInt(id);
+	var i = _.findIndex(appData.signals, function(signal) {
+		return signal.id === id;
+	});
+
+	return i !== -1;
+}
+
 function ensureSchemaIDExists(id) {
 	var found = false;
 	var firstLevelArray = appData.schema['_root_'];
@@ -252,6 +310,26 @@ function getSchemaItemIfExists(id) {
 	_.each(firstLevelArray, searchSubtree);
 	console.log("getSchemaItemIfExists: " + found);
 	return found;
+}
+
+function addSignalEvent(eventData) {
+	// Here we do the "fivecation"
+	// This is done because allows easier adding of "artificial events" in transforms
+	// For example, overlapping can not happen as long as artificials use 0 and 9 as last digit.
+	var t = eventData.t + "";
+	t = t.substring(0, t.length-1);
+	eventData.t = parseInt(t + "5");
+
+	if (parseInt(eventData.s) !== 0 && !ensureSignalIDExists(parseInt(eventData.s))) {
+		return Promise.reject('New event fail! Signal ID does not exist in datalayer!');
+	}
+
+	appData.events.push(eventData);
+
+	// If we need to inform some web API event hook this would be pretty good place to do it
+
+	return writeToDiskIfNeeded();
+
 }
 
 function addEvent(eventData) {
@@ -544,6 +622,30 @@ module.exports = {
 
 			return addSchemaItemToParent(dataCommand.data.parent, dataCommand.data.name, dataCommand.data.color);
 		}
+
+		if (dataCommand.opType === 'deleteSignalItem') {
+			var signalID = dataCommand.data;
+			return deleteSignalItem(signalID);
+		}
+
+		if (dataCommand.opType === 'newSignalItem') {
+			var name = dataCommand.data;
+			name = _.escape(name);
+			name = _.truncate(name, {length: 64});
+
+			return addSignalItem(name);
+		}		
+
+		if (dataCommand.opType === 'newSignal') {
+			var err = dataSchema.validateEvent(dataCommand.data);
+
+			if (err) {
+				console.error("Event (signal) validation failed in data layer dataCommandIn!");
+				return Promise.reject(err);
+			}
+
+			return addSignalEvent(dataCommand.data);			
+		}
 		/*
 		dataCommand = {
 			opType: change/new/delete
@@ -633,6 +735,7 @@ module.exports = {
 		var didExist = createFileIfNotExist();
 		loadToMemory();
 		//return true;
+		return false;
 		return didExist;
 
 	},

@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, normalizedSchemaTable, settingsTree) {
+module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, normalizedSchemaTable, settingsTree, signalsArray) {
 
 	// Arguments should not be modified!!
 
@@ -56,6 +56,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 	// Change activity buttons data
 	frontView.schemaItems = schemaTreeToArray(schemaTree, false);
 	frontView.schemaLeaves = schemaTreeToArray(schemaTree, true);
+	frontView.signalsArray = signalsArray;
 
 	if (frontView.lastTen.length > 0) {
 		frontView.lastTen.shift(); // drop the first as we dont want it

@@ -3,6 +3,8 @@ var _ = require('lodash');
 var tinycolor = require('tinycolor2');
 var moment = require('moment');
 
+var SIGNALCOLOR = '777777';
+
 module.exports = function(Box) {
 
 	Box.Application.addModule('manage', function(context) {
@@ -10,9 +12,13 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['eventList', 'schemaTree'];
+		var dataNeeded = ['eventList', 'eventsAndSignalsList', 'schemaTree', 'signalsTable'];
 
 		var showLast30 = true;
+
+		var viewDataCached;
+
+		var typeOfEvent = 'signal';
 
 		// Private stuff
 
@@ -33,12 +39,13 @@ module.exports = function(Box) {
 			isHidden = false;
 
 			viewDataPromise.then(function(viewData) {
-				if (isHidden) return; // User already switched to another view			
+				if (isHidden) return; // User already switched to another view	
+				viewDataCached = viewData;		
 
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
 				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
-				bindToView(viewData.eventList, viewData.schemaTree);
+				bindToView(viewData.eventsAndSignalsList, viewData.schemaTree, viewData.signalsTable);
 				$el.show();
 			});
 			
@@ -46,7 +53,7 @@ module.exports = function(Box) {
 		}
 
 
-		var bindToView = function(eventList, schemaTree) {
+		var bindToView = function(eventList, schemaTree, signalsTable) {
 			//$el.empty().append(JSON.stringify(eventList));
 			$body = $el.find('#managetimeline_body');
 			var html = '';
@@ -66,8 +73,12 @@ module.exports = function(Box) {
 				}				
 				var tc = tinycolor(color);
 				var textcolor = tc.isDark() ? 'fff' : '222'; 
+				var typename = eventWithSchemaData.signal ? 'Signaali' : 'Aktiviteetti'; 
+				var styleText = eventWithSchemaData.signal ? 'style="color: #222; background-color: #' + 'eee' + ';"' : '';
+				color = eventWithSchemaData.signal ? SIGNALCOLOR : color;
 				var name = parseInt(eventWithSchemaData.s) === 0 ? '(poissa)' : eventWithSchemaData.name; 
-				html += '<tr>';
+				html += '<tr ' + styleText + '>';
+				html += '<td>' + typename + '</td>';
 				html += '<td style="color: #' + textcolor+ '; background-color: #' + color + ';">' + name + '</td>';
 				html += '<td>' + beautifyTimestamp(eventWithSchemaData.t) + '</td>';
 				html += '<td>' + dateString(eventWithSchemaData.t) + '</td>';
@@ -80,11 +91,28 @@ module.exports = function(Box) {
 
 
 			// Add activity part
-
+			typeOfEvent = $el.find('#typetoadd').val();
+			console.log("TYPE OF EVENT NOW: " + typeOfEvent);
 			$select = $el.find('#activitytoadd');
-			$select.empty().append(buildHTMLFromTree(schemaTree));
+			if (typeOfEvent === 'activity') {
+				$select.empty().append(buildHTMLFromTree(schemaTree));
+			} else if (typeOfEvent === 'signal') {
+				console.warn("BUILDING SIGNAL TABLE");
+				$select.empty().append(buildHTMLFromSignalTable(signalsTable));
+			}
+			
 
 
+		}
+
+		function buildHTMLFromSignalTable(signalsTable) {
+			var html = '';
+			console.log(signalsTable);
+			_.forOwn(signalsTable, function(signal) {
+				html += "<option value='" + signal.id + "'>" + signal.name + "</option>";
+			});
+
+			return html;
 		}
 
 		function buildHTMLFromTree(schemaTree) {
@@ -156,9 +184,16 @@ module.exports = function(Box) {
 			var date = $el.find('#activitydate').val();
 			var time = $el.find('#activitytime').val();
 			var activityID = $el.find('#activitytoadd').val();
+			var addtype = $el.find('#typetoadd').val();
 
 			var es = context.getService('eventService');
-			es.newEventCustomDateTime(date, time, activityID);
+			if (addtype === 'activity') {
+				es.newEventCustomDateTime(date, time, activityID);
+			} else if (addtype === 'signal') {
+				var signalID = activityID;
+				es.newSignalCustomDateTime(date, time, signalID);
+			}
+			
 		}
 
 		var sendDeleteRequestForEvent = function(timestampPlusSchemaID) {
@@ -175,6 +210,20 @@ module.exports = function(Box) {
 		var reloadTable = function() {
 			activate(true);
 		}
+
+		var updateActivitySelect = function() {
+			typeOfEvent = $el.find('#typetoadd').val();
+			if (viewDataCached) {
+
+			}
+			
+
+		}
+
+		$el.find('#typetoadd').on('change', function() {
+			console.log("TYPE CHANGE");
+			bindToView(viewDataCached.eventsAndSignalsList, viewDataCached.schemaTree, viewDataCached.signalsTable);
+		})
 
 		
 

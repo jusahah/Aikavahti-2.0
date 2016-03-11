@@ -2,6 +2,8 @@
 var tinycolor = require('tinycolor2');
 var moment = require('moment');
 
+var SIGNALCOLOR = '777777';
+
 module.exports = function(Box) {
 	Box.Application.addModule('front', function(context) {
 
@@ -136,8 +138,23 @@ module.exports = function(Box) {
 
 			});
 
+			// Change signal buttons
+			buildSignalButtons(data.signalsArray);
+
 
 			
+		}
+
+		var buildSignalButtons = function(signals) {
+			var tc = tinycolor(SIGNALCOLOR);
+			var textcolor = tc.isDark() ? 'fff' : '222'; 
+			var html = '';
+
+			_.each(signals, function(signal) {
+				html += '<button style="margin: 4px; font-size: 16px; color: #' + textcolor + '; background-color: #' + SIGNALCOLOR + ';" data-type="triggersignal" data-payload="' + signal.id + '" class="btn">' + signal.name + '</button>';
+			});
+
+			$el.find('#newsignal_buttons').empty().append(html);
 		}
 
 		var getTodayStartTimestamp = function() {
@@ -291,6 +308,11 @@ module.exports = function(Box) {
 
 		}
 
+		function triggerSignal(signalID) {
+			var es  = context.getService('eventService');
+			var prom = es.newSignal(signalID);			
+		}
+
 		// Public API
 		return {
 			messages: ['routechanged'],
@@ -312,6 +334,9 @@ module.exports = function(Box) {
 					if (notes && notes !== '') {
 						populateQuickNoteModal(notes);
 					}
+				} else if (elementType === 'triggersignal') {
+					var id = $(element).data('payload');
+					triggerSignal(id);
 				}
 			},
 			onmessage: function(name, data) {
