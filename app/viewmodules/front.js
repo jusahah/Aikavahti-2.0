@@ -17,16 +17,30 @@ module.exports = function(Box) {
 		var currentNow = null;
 		var loopTimerHandle = null;
 
+		var $currentPanelWrapper;
+
+		var loopFun = function() {
+				console.warn("LOOPING !");
+				if (!currentNow) {
+					$currentPanelWrapper.find('#currentevent_duration').empty().append('---');
+					return;
+				}
+				var timeString = beautifyDuration(Date.now() - currentNow.start);
+				$currentPanelWrapper.find('#currentevent_duration').empty().append(timeString);
+				Box.Application.broadcast('currenteventupdate', {
+					color: currentNow.color,
+					name: currentNow.name,
+					timeString: timeString
+				});
+		}
+
 		var loopTimer = function() {
 			if (loopTimerHandle) {
 				return;
 			}
 
-			loopTimerHandle = setInterval(function() {
-				console.warn("LOOPING !");
-				$currentPanelWrapper.find('#currentevent_duration').empty().append(beautifyDuration(Date.now() - currentNow.start));
-
-			}, 1010);
+			loopTimerHandle = setInterval(loopFun, 1010);
+			loopFun();
 		} 
 
 		var stopLoopTimer = function() {

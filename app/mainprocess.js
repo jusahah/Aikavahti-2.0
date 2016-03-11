@@ -6,6 +6,8 @@ import env from './env';
 
 var Promise = require('bluebird');
 var _ = require('lodash');
+var tinycolor = require('tinycolor2');
+var moment = require('moment');
 
 
 // Global state here
@@ -91,29 +93,123 @@ Box.Application.addModule('valikko', function(context) {
 	var current;
 	var $el = $(context.getElement());
 	var computeProgressBar = $el.find('#computeprogressbar');
+	var computationText = $el.find('#statscomputationtext');
+
+	var lastCurrentShowData;
+
+	var dataNeeded = ['frontViewData']; // empty means that this view can always render instantly (no need to wait on data)
+		// Private stuff
+
+	var currentNow = null;
+	var loopTimerHandle = null;
+
+	var $currentPanelWrapper = $el.find('#frontshowpanel');
+
+	function beautifyDuration(timeInMs) {
+		var duration = moment.duration(timeInMs);
+
+		return duration.hours() + "h " + duration.minutes() + "m " + duration.seconds() + "s";
+
+			
+	}
+
+	var loopFun = function() {
+				console.warn("LOOPING !");
+				if (!currentNow) {
+					$currentPanelWrapper.find('#currentactivityfrontname').empty().append('---');
+					return;
+				}
+				var timeString = beautifyDuration(Date.now() - currentNow.start);
+				$currentPanelWrapper.find('#currentactivityfront_duration').empty().append(timeString);
+				return;
+				Box.Application.broadcast('currenteventupdate', {
+					color: currentNow.color,
+					name: currentNow.name,
+					timeString: timeString
+				});
+	}
+
+	var loopTimer = function() {
+			if (loopTimerHandle) {
+				return;
+			}
+
+			loopTimerHandle = setInterval(loopFun, 1001);
+			loopFun();
+	} 
+
+	var stopLoopTimer = function() {
+			if (loopTimerHandle) {
+				clearInterval(loopTimerHandle);
+				loopTimerHandle = null;
+			}
+	}	
 
 	var reshowCurrentView = function() {
 		if (current) {
 			Box.Application.broadcast('routechanged', {route: current, payload: null});
 			$('#globalLoadingBanner').show();
 		}
+		// Ask for own data
+		var derivedService  = context.getService('derivedData');
+		var viewDataPromise = derivedService.getDeriveds(dataNeeded);
+
+		viewDataPromise.then(function(viewData) {
+				console.log("VIEW DATA RECEIVED IN VALIKKO: ");
+				console.log(viewData);	
+
+				bindToView(viewData.frontViewData);
+				loopTimer();
+		});		
+	}
+
+	var bindToView = function(frontViewData) {
+		currentNow = frontViewData.current;
+		var color = currentNow.color || '554455';
+		color = color.charAt(0) === '#' ? color.substr(1) : color;
+		var textcolor = tinycolor(color).isDark() ? 'fff' : '222';
+		$currentPanelWrapper.find('#currentactivityfrontname').empty().append(currentNow.name);
+		$currentPanelWrapper.find('#currentactivityfrontname').css('color', '#' + textcolor);
+		$currentPanelWrapper.find('#currentactivityfront_duration').css('color', '#' + textcolor);
+		$currentPanelWrapper.css('background-color', '#' + color);
+
 	}
 
 	var updateProgressBar = function(percentageDone) {
 		console.error("PERC DONE: " + percentageDone);
 		if (percentageDone !== 100) {
+			computationText.empty().append('Tilastoja lasketaan...');
 			computeProgressBar.parent().addClass('active');
 		} else {
 			console.log("Removing active");
+			computationText.empty().append('Tilastot valmiina!');
 			computeProgressBar.parent().removeClass('active');
 		}
 		computeProgressBar.css('width', percentageDone + "%");
 		computeProgressBar.empty().append(percentageDone + "%");
 	}
 
+	var updateFrontShow = function(data) {
+
+		if (_.isEqual(data, lastCurrentShowData)) {
+			console.log("Update front show - no changes, no DOM hit");
+			return;
+		}
+
+		lastCurrentShowData = Object.assign({}, data);
+		console.log(data);
+		console.log("Redrawing front show");
+		// Maybe check against local copy so no unnecessary DOM hit
+		// Although its pretty insignificant anyway
+		var panel = $el.find('#frontshowpanel');
+		panel.find('#currentactivityfrontname').empty().append(data.name);
+		panel.find('#currentactivityfronttime').empty().append(data.timeString);
+		
+	}
+
 	console.log("INITING VALIKKO VIEW MODULE");
 	return {
-		messages: ['cachewasflushed', 'computationprogressupdate'],
+		messages: ['cachewasflushed', 'computationprogressupdate', 'currenteventupdate'],
 		onclick: function(event, element, elementType) {
 			console.log("CLICK IN VALIKKO: " + elementType);
 
@@ -150,8 +246,8 @@ Box.Application.addModule('valikko', function(context) {
 				updateProgressBar(data);
 			} else if (name === 'newacticity_showall') {
 				var ss = context.getService('settingsService');
-				
-
+			} else if (name === 'currenteventupdate') {
+				updateFrontShow(data);
 			}
 		}
 

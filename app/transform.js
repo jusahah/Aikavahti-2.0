@@ -228,7 +228,7 @@ function receiveComputationRequest(data) {
 		}
 		
 		if (transformsList.length !== 0) {
-			var transformSelected = transformsList.pop();
+			var transformSelected = transformsList.shift();
 			var results;	
 			try {
 				console.warn("CURREN TRANSFORMATION: " + transformSelected.name);
@@ -262,7 +262,7 @@ function sendResults(name, results, batchID, percentageDone, calcTime) {
 	console.log(results);
 	ipcTransformer.send('computationresult', {calcTime: calcTime, name: name, results: results, batchID: batchID, percentageDone: percentageDone});
 	var k = 8;
-	for (var i = 0 * 1000 * 1000; i >= 0; i--) {
+	for (var i = 200 * 1000 * 1000; i >= 0; i--) {
 		k += i;
 	};
 }
