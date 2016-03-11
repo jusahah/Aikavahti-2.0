@@ -47,10 +47,13 @@ module.exports = function(Box) {
 			// Gather data from settings form
 			var settingsObj = {};
 			settingsObj.onlineBackup = $el.find('#onlineBackup_el').val() === '1';
+			settingsObj.restorePoint = $el.find('#restorePoint_el').val() === '1';
 			settingsObj.writeToDiskAfterEveryUpdate = $el.find('#writeToDiskAfterEveryUpdate_el').val() === '1';
 			settingsObj.backupKey = $el.find('#backupKey_el').val();
 			// Send settings object to next guy
 			var settingsService = context.getService('settingsService');
+			console.log("SETTING NEW SETTINGS");
+			console.log(JSON.stringify(settingsObj));
 			settingsService.setSettings(settingsObj);
 
 		}
@@ -61,6 +64,7 @@ module.exports = function(Box) {
 			console.log(viewData.data.writeToDiskAfterEveryUpdate);
 			$el.find('#onlineBackup_el').val(viewData.internet.onlineBackup ? "1" : "0");
 			$el.find('#writeToDiskAfterEveryUpdate_el').val(viewData.data.writeToDiskAfterEveryUpdate ? "1" : "0");
+			$el.find('#restorePoint_el').val(viewData.data.restorePoint ? "1" : "0");
 			$el.find('#backupKey_el').val(viewData.internet.backupKey);
 
 		}

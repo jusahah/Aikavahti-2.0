@@ -37,7 +37,7 @@ $('#initializationContainer').load('views/static/initialization.html');
 $('#importContainer').load('views/mainContents/import.html');
 $('#signalsContainer').load('views/mainContents/signals.html');
 $('#resetContainer').load('views/static/resetConfirm.html');
-
+$('#restoreContainer').load('views/static/restore.html');
 
 // View module registrations
 require('./viewmodules/admin')(Box); // Send Box in so view modules can bind themselves into it
@@ -50,7 +50,7 @@ require('./viewmodules/initialization')(Box); // Same
 require('./viewmodules/reset')(Box); // Same
 require('./viewmodules/signals')(Box); // Same
 require('./viewmodules/import')(Box); // Same
-
+require('./viewmodules/restore')(Box); // Same
 // Service registrations
 require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);
@@ -136,6 +136,8 @@ Box.Application.addModule('valikko', function(context) {
 				context.getService('derivedData').forceDataRecomputation();
 			} else if (elementType === 'resetrequest') {
 				Box.Application.broadcast('resetrequest');
+			} else if (elementType === 'restore') {
+				Box.Application.broadcast('restoremodal');
 			}
 		},
 		onmessage: function(name, data) {

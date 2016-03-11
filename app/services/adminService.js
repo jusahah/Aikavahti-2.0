@@ -13,6 +13,12 @@ module.exports = function(Box, datalayer) {
 			},
 			resetProgram: function() {
 				return datalayer.dataCommandIn({opType: 'admin', op: 'reset', data: null});
+			},
+			deploy: function(file) {
+				return datalayer.dataCommandIn({opType: 'admin', op: 'deploy', data: file});
+			},
+			getRestores: function() {
+				return datalayer.dataQueryIn('restores');
 			}
 		}
 

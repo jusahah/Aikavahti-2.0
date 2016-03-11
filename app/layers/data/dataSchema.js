@@ -25,7 +25,8 @@ var signalItem = Joi.object().keys({
 
 var settingsItem = {
 	data: Joi.object().keys({
-		writeToDiskAfterEveryUpdate: Joi.boolean()
+		writeToDiskAfterEveryUpdate: Joi.boolean(),
+		restorePoint: Joi.boolean(),
 	}), // Validate against Joi schema here
 	internet: Joi.object().keys({
 	    onlineBackup: Joi.boolean(),

@@ -1,6 +1,7 @@
 var fs = require('fs-extra'); //var fs = require('fs') 
 var util = require('util');
 var _ = require('lodash');
+var moment = require('moment');
 
 var dataSchema = require('./dataSchema');
 
@@ -8,6 +9,7 @@ var dataSchema = require('./dataSchema');
 var colorAssigner = require('./colorassigner');
  
 var file = __dirname + '/appdata.json';
+var restoreDir = __dirname + '/restorepoints/';
 
 var appData = [1,2,3,4,5];
 var changeCb;
@@ -16,6 +18,89 @@ var changeCbDisabled = false;
 var dataLayerSettings;
 
 var schemaIDCounter = 1;
+
+function getRestoreFileName() {
+	var m = moment();
+	return 'restore_' + m.format('YYYY-MM-DD-HH-mm-ss') + '_' + Math.floor(Math.random()*1000000) + ".json";
+	
+}
+
+function deployRestoreFile(fileName) {
+	var fullpath = restoreDir + fileName;
+	try {
+		var data = fs.readJsonSync(fullpath);
+	} catch(e) {
+		console.log(e);
+		console.error("Restore point loading failed!");
+		return;
+	}
+	
+	console.log(data);
+	appData = data;
+	
+	return writeToDiskIfNeeded();
+} 
+
+function checkRestorePoints() {
+	console.warn("Check restore points");
+
+
+	if (!appData.settings.data.restorePoint) {
+		console.log("Skipping restore point - user has disabled it");
+		return;
+	}
+
+	var fileNames = fs.readdirSync(restoreDir);
+	console.log(fileNames);
+
+	var restoreFiles = _.filter(fileNames, function(name) {
+		console.log(restoreDir + name);
+		return _.startsWith(name, 'restore');
+	});
+
+	if (restoreFiles.length >= 5) {
+		//Drop the oldest one
+		restoreFiles = restoreFiles.sort();
+		var toBeRemoved = restoreFiles[0];
+		console.warn("To be remvoed: " + restoreDir + toBeRemoved);
+		fs.unlinkSync(restoreDir + toBeRemoved);
+
+	}
+	var newFile = restoreDir + getRestoreFileName();
+
+	fs.createFile(newFile, function(err) {
+		if (err) {
+			console.error(err);
+			return;
+		}
+		fs.outputJson(newFile, appData, function(err) {
+			if (err) console.error(err);
+			else console.warn("Restore point created");
+		})
+
+	});
+
+
+}
+
+function listRestorePoints() {
+
+	return new Promise(function(resolve, reject) {
+		fs.readdir(restoreDir, function(err, fileNames) {
+			if (err) return reject(err);
+			console.log(fileNames);
+
+			var restoreFiles = _.filter(fileNames, function(name) {
+				console.log(restoreDir + name);
+				return _.startsWith(name, 'restore');
+			});
+
+			restoreFiles = restoreFiles.sort();
+			return resolve(restoreFiles);
+		});		
+	});
+
+}
 
 function fetchFromDB(cb) {
 	fs.readJson(file, function(err, jsonObj) {
@@ -46,7 +131,8 @@ function getInitialDataObject() {
 		],
 		settings: {
 			data: {
-				writeToDiskAfterEveryUpdate: true
+				writeToDiskAfterEveryUpdate: true,
+				restorePoint: true,
 
 			},
 			internet: {
@@ -539,6 +625,8 @@ function adminCommand(operation, data) {
 		// This can be done sync as user is 
 	} else if (operation === 'reset') {
 		return resetProgramState();
+	} else if ('deploy') {
+		return deployRestoreFile(data);
 	}
 }
 
@@ -602,6 +690,11 @@ module.exports = {
 		}, 10000);
 		*/
 
+	},
+	dataQueryIn: function(dataNeeded) {
+		if (dataNeeded === 'restores') {
+			return listRestorePoints();
+		}
 	},
 	// Returns promise!
 	dataCommandIn: function(dataCommand) {
@@ -734,8 +827,10 @@ module.exports = {
 
 	init: function(cb) {
 		if (cb) this.changeCallback(cb);
+		
 		var didExist = createFileIfNotExist();
 		loadToMemory();
+		checkRestorePoints();
 		//return true;
 		return false;
 		return didExist;

@@ -12,6 +12,7 @@ module.exports = function(Box, datalayer) {
 			setSettings: function(settings) {
 				var data = {
 					writeToDiskAfterEveryUpdate: settings.writeToDiskAfterEveryUpdate,
+					restorePoint: settings.restorePoint,
 				};
 				var internet = {
 					onlineBackup: settings.onlineBackup,
