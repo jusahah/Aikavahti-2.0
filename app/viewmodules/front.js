@@ -86,6 +86,7 @@ module.exports = function(Box) {
 
 
 		var bindToView = function(data) {
+			console.error(d3); // We have link to it
 			if (!data) return;
 			console.log("----FRONT VIEW DATA------ building HTML");
 			console.log(data);

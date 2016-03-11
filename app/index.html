@@ -392,6 +392,7 @@
 					<div id="statsContainer" data-module="stats" style="display: none;"></div>
 					<div id="importContainer" data-module="import" style="display: none;"></div>
 					<div id="signalsContainer" data-module="signals" style="display: none;"></div>
+					<div id="timelineContainer" data-module="timeline" style="display: none;"></div>
 
 					<div id="initializationContainer" data-module="initialization" style="position: absolute;"></div>
 					<div id="resetContainer" data-module="reset" style="position: absolute;"></div>
@@ -492,6 +493,7 @@
 		<!--================================================== -->
 
 		<!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
+
 		<script data-pace-options='{ "restartOnRequestAfter": true }' src="js/plugin/pace/pace.min.js"></script>
 
 		<!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
@@ -509,6 +511,8 @@
 			}
 		</script>
 
+ 		 
+	
 		<!-- IMPORTANT: APP CONFIG -->
 		<script src="js/app.config.js"></script>
 
@@ -590,6 +594,11 @@
 		<script src="js/plugin/sparkline/jquery.sparkline.min.js"></script>
 		<script src="js/spectrum.js"></script>
 		<script src="js/sorter.js"></script>
+
+		<script src="js/d3.js"></script>
+		<script src="js/d3timeline.js"></script>
+		
+
 		<script src="mainprocess.js"></script>
 
 	</body>
