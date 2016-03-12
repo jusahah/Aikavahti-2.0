@@ -310,7 +310,7 @@ setTimeout(function() {
 	});
 	console.groupEnd();
 }, 1400);
-
+*/
 var dates = [
 	'03-04-2016 21:59',
 	'03-04-2016 22:05',
@@ -324,7 +324,7 @@ var dates = [
 
 setTimeout(function() {
 	datalayer.disableChangeCb();
-	var ids = [1,2,3,11,12];
+	var ids = [1,2,3];
 	for (var i = dates.length-1; i >= 0; i--) {
 		console.group();
 		var id = ids[Math.floor(ids.length*Math.random())];
@@ -342,10 +342,10 @@ setTimeout(function() {
 
 	datalayer.enableChangeCb();
 
-}, 1600);
+}, 600);
 
 setTimeout(function() {
 	datalayer.broadcastChange();
-}, 2800);
-*/
+}, 900);
+
 

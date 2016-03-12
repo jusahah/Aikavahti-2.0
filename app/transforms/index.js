@@ -27,7 +27,7 @@ module.exports = {
 		{name: 'dayByDayPerSchemaId', transform: require('./dayByDayPerSchemaId'), prerequisite: null},
 		{name: 'signalsTable', transform: require('./signalsTable'), prerequisite: null},
 		{name: 'dayByDayCountPerSignalId', transform: require('./dayByDayCountPerSignalId'), prerequisite: null},
-
+		{name: 'last30DaysTimelines', transform: require('./last30DaysTimelines'), prerequisite: null},
 	]
 
 };

@@ -13,6 +13,9 @@ module.exports = function(Box, datalayer) {
 		}
 
 		return {
+			getCurrent: function() {
+				return datalayer.dataQueryIn('currentEvent');
+			},
 			newSignal: function(signalID) {
 				console.warn("NEW SIGNAL IN EVENT SERVICE");
 				var timestamp = Date.now();

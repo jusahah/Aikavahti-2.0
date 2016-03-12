@@ -19,6 +19,8 @@ var dataLayerSettings;
 
 var schemaIDCounter = 1;
 
+var POISSA_COLOR = '554455';
+
 function getRestoreFileName() {
 	var m = moment();
 	return 'restore_' + m.format('YYYY-MM-DD-HH-mm-ss') + '_' + Math.floor(Math.random()*1000000) + ".json";
@@ -674,6 +676,35 @@ function addSchemaItemToParent(parentID, name, color) {
 	return writeToDiskIfNeeded();
 }
 
+function getCurrentEventInfo() {
+	if (appData.events.length === 0) {
+		return Promise.reject('No current event yet - system in fresh state!');
+	}
+
+	var eventFound;
+	for (var i = appData.events.length - 1; i >= 0; i--) {
+		if (!appData.events[i].signal) {
+			eventFound = appData.events[i];
+			break;
+		}
+	};
+
+	if (!eventFound) return Promise.reject('Current event not found - only signals in the system!');
+
+	var currentCopy = Object.assign({}, eventFound);
+
+	if (parseInt(currentCopy.s) === 0) {
+		currentCopy.color = POISSA_COLOR;
+		currentCopy.name = '(poissa)';
+	} else {
+		var item = getSchemaItemIfExists(currentCopy.s);
+		currentCopy.color = item.color;
+		currentCopy.name  = item.name;
+	}
+
+	return Promise.resolve(currentCopy);
+}
+
 
 
 module.exports = {
@@ -694,6 +725,8 @@ module.exports = {
 	dataQueryIn: function(dataNeeded) {
 		if (dataNeeded === 'restores') {
 			return listRestorePoints();
+		} else if ('currentEvent') {
+			return getCurrentEventInfo();
 		}
 	},
 	// Returns promise!
