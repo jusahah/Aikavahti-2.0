@@ -39,6 +39,7 @@ $('#initializationContainer').load('views/static/initialization.html');
 $('#importContainer').load('views/mainContents/import.html');
 $('#signalsContainer').load('views/mainContents/signals.html');
 $('#timelineContainer').load('views/mainContents/timeline.html');
+$('#comparisonsContainer').load('views/mainContents/comparisons.html');
 
 $('#resetContainer').load('views/static/resetConfirm.html');
 $('#restoreContainer').load('views/static/restore.html');
@@ -56,6 +57,7 @@ require('./viewmodules/signals')(Box); // Same
 require('./viewmodules/import')(Box); // Same
 require('./viewmodules/restore')(Box); // Same
 require('./viewmodules/timeline')(Box); // Same
+require('./viewmodules/comparisons')(Box); // Same
 // Service registrations
 require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);
@@ -337,15 +339,15 @@ var dates = [
 
 setTimeout(function() {
 	datalayer.disableChangeCb();
-	var ids = [0,1,2,3];
-	for (var i = 1000; i >= 0; i--) {
+	var ids = [0,1,2,3,11];
+	for (var i = 600; i >= 0; i--) {
 		console.group();
 		var id = ids[Math.floor(ids.length*Math.random())];
 		datalayer.dataCommandIn({
 			opType: 'new',
 			treePath: 'events',
 			data: {
-				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 128),
+				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 138),
 				//t: moment(dates.pop()).valueOf(),
 				s: id
 			}
