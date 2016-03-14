@@ -51,7 +51,9 @@ module.exports = function(Box) {
 			var html = '<tr><th style="width: 40px;"><strong>Viikkonumero</strong></th>'; // First is empty as week name is there
 
 			_.forOwn(schemaItems, function(item) {
-				html += '<th style="max-width: 40px; font-size: 9px; overflow: hidden;">' + item.name + '</th>';
+				var isLeaf = !item.children || item.children.length === 0;
+				var thColor = isLeaf ? '568A89' : '9D5353';
+				html += '<th style="padding: 2px; color: white; background-color: #' + thColor + '; max-width: 48px; font-size: 8px; overflow: hidden;">' + item.name + '</th>';
 			})
 
 			html += '</tr>';
