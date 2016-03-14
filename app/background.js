@@ -92,7 +92,7 @@ app.on('ready', function () {
         y: mainWindowState.y,
         width: mainWindowState.width,
         height: mainWindowState.height,
-        show: false
+        show: true
     });
 
     transformWindow.loadURL('file://' + __dirname + '/transform.html');

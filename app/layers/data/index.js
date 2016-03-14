@@ -133,7 +133,7 @@ function getInitialDataObject() {
 		],
 		settings: {
 			data: {
-				writeToDiskAfterEveryUpdate: true,
+				writeToDiskAfterEveryUpdate: false,
 				restorePoint: true,
 
 			},

@@ -36,6 +36,19 @@ function sortEvents(events) {
 	});
 }
 
+function addCurrent(events) {
+	if (events.length === 0) return [];
+	var currentEvent = Object.assign({}, events[0]);
+	currentEvent.t = Date.now();
+	var newEvents = [currentEvent];
+
+	for (var i = 0, j = events.length; i < j; i++) {
+		newEvents.push(events[i]);
+	};
+
+	return newEvents;
+}
+
 function durationalizeEvents(events) {
 
 	// events is sorted DESC by timestamp and day change stuff is added
@@ -210,7 +223,9 @@ function receiveComputationRequest(data) {
 	var noSignals    = filterSignalsAway(data.events);
 	//var onlySignals  = filterActivitiesAway(data.events);
 	var sortedEvents = sortEvents(noSignals);
-	var dayChangesAdded = addDayChanges(sortedEvents);
+	//addCurrent(sortedEvents);
+	var sortedEventsWithCurrent = addCurrent(sortedEvents);
+	var dayChangesAdded = addDayChanges(sortedEventsWithCurrent);
 	var sortedDurations = durationalizeEvents(dayChangesAdded);
 
 	function percentageDone() {

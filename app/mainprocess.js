@@ -109,9 +109,12 @@ Box.Application.addModule('valikko', function(context) {
 	var $currentPanelWrapper = $el.find('#frontshowpanel');
 
 	function beautifyDuration(timeInMs) {
+		//return Math.round(timeInMs / (3600 * 1000));
 		var duration = moment.duration(timeInMs);
+		var hours = Math.floor(duration.asHours());
+		var minsSecsDuration = duration.subtract(hours*3600*1000);
 
-		return duration.hours() + "h " + duration.minutes() + "m " + duration.seconds() + "s";
+		return hours + "h " + minsSecsDuration.minutes() + "m " + minsSecsDuration.seconds() + "s";
 
 			
 	}
