@@ -49,6 +49,8 @@ module.exports = function(Box) {
 				console.log(viewData);
 
 				context.getService('eventService').getCurrent().then(function(currentEvent){
+					console.warn("EVENT SERVICE THINKS CURRENT IS:" + currentEvent.name);
+					console.log(currentEvent);
 					//var dataObj = context.getService('derivedData').easify(viewData);			
 					// viewData is always object with transforNames being keys and data being values
 					$('#globalLoadingBanner').hide();
@@ -144,6 +146,8 @@ module.exports = function(Box) {
 			}
 
 			if (currentEvent) {
+				console.warn("CURRENT EVENT IS: ");
+				console.log(JSON.stringify(currentEvent));
 				times.push({
 					starting_time: clampStartOfTheDay(name, currentEvent.t),
 					ending_time: Date.now(),

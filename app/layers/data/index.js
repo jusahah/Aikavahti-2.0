@@ -682,14 +682,20 @@ function getCurrentEventInfo() {
 	}
 
 	var eventFound;
+	console.warn("SEARCHING UCRREN")
+	console.log(JSON.stringify(appData.events));
+	var currentWinnerTime = 0;
 	for (var i = appData.events.length - 1; i >= 0; i--) {
-		if (!appData.events[i].signal) {
-			eventFound = appData.events[i];
-			break;
+		var event = appData.events[i];
+		if (!event.signal && event.t > currentWinnerTime) {
+			eventFound = event;
+			currentWinnerTime = event.t;
 		}
 	};
 
 	if (!eventFound) return Promise.reject('Current event not found - only signals in the system!');
+	console.warn("CURRENT EVENT FOUND IN DATALAYer");
+	console.log(JSON.stringify(eventFound));
 
 	var currentCopy = Object.assign({}, eventFound);
 
