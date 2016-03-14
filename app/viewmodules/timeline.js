@@ -1,5 +1,6 @@
 // Admin page module
 var _ = require('lodash');
+var moment = require('moment');
 
 module.exports = function(Box) {
 
@@ -10,6 +11,12 @@ module.exports = function(Box) {
 
 		var dataNeeded = ['last30DaysTimelines'];
 
+		var numShown = 7;
+
+		var div = d3.select("body").append("div")   
+	    .attr("class", "timelinetooltip")               
+	    .style("opacity", 0);
+
 		// Private stuff
 
 		var deactivate = function() {
@@ -19,12 +26,21 @@ module.exports = function(Box) {
 			}
 		}
 
-		var activate = function() {
+		var activate = function(noHide) {
 			// hide right away in case we are reactivating view that is currently visible
-			$el.hide();
+			if (!noHide) $el.hide();
 			var derivedService  = context.getService('derivedData');
 			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 			isHidden = false;
+
+			// Set 7 and 30 button classes
+			if (numShown === 30) {
+				$el.find('#show7days').removeClass('btn-success').addClass('btn-default');
+				$el.find('#show30days').removeClass('btn-default').addClass('btn-success');
+			} else {
+				$el.find('#show30days').removeClass('btn-success').addClass('btn-default');
+				$el.find('#show7days').removeClass('btn-default').addClass('btn-success');
+			}
 
 			viewDataPromise.then(function(viewData) {
 				console.error("TIMELINE VIEW RECEIVED SETTINGS");
@@ -37,8 +53,15 @@ module.exports = function(Box) {
 					// viewData is always object with transforNames being keys and data being values
 					$('#globalLoadingBanner').hide();
 					//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
+					$el.show();
 					setTimelineData(viewData.last30DaysTimelines, currentEvent);
-					$el.show();					
+										
+				}).catch(function(err) {
+
+					$('#globalLoadingBanner').hide();
+					var globalError = $('#globalErrorBanner');
+					globalError.find('h1').empty().append(err);
+					globalError.show();
 				});
 
 
@@ -52,7 +75,8 @@ module.exports = function(Box) {
 			console.log(currentEvent);
 
 			var arr = [];
-			var last30Days = createLast30(Date.now());
+			var lastXDays = createLastX(Date.now(), numShown);
+			//var last7Days  = createLastX(Date.now(), 7);
 			/*
 			_.forOwn(last30DaysTimelines, function(durationsArr, dateString) {
 				arr.push({date: dateString, slug: slugify(dateString), arr: durationsArr});
@@ -64,15 +88,19 @@ module.exports = function(Box) {
 			console.log("Timeline data sorted in view");
 			console.log(JSON.stringify(arr));
 			*/
+
+			// Import that elemet is "display: block" BEFORE width is taken here!
+			var containerWidth = $el.width();
+			console.error("CONTAINER WITH NOW: " + containerWidth);
 			var timelineEl = $el.find('#timelinearea');
 			timelineEl.empty();
 
-			_.each(last30Days, function(day) {
+			_.each(lastXDays, function(day) {
 				var times = last30DaysTimelines[day.name] || [];
 				var slug = slugify(day.name);
 				var html = '<div id="timeline_' + slug + '" style="width: 100%; height: 68px; margin-left: 20px;"></div>';
 				timelineEl.append(html);
-				initTimeline(slug, day.name, times, currentEvent);
+				initTimeline(slug, day.name, times, currentEvent, containerWidth);
 				currentEvent = null; // No more in future rounds
 			});
 			/*
@@ -89,7 +117,32 @@ module.exports = function(Box) {
 			return timestamp <  start ? start : timestamp;
 		}
 
-		var initTimeline = function(slug, name, times, currentEvent) {
+		var getTooltipText = function(d) {
+			var name = d.name;
+
+			var startString = moment(d.starting_time).format('DD.MM HH:mm');
+			var endString   = moment(d.ending_time).format('DD.MM HH:mm');
+
+			return name + " <br>(" + startString + " - " + endString + ")";  
+		}
+
+		var redrawTimelinesAfterResize = function() {
+			var containerWidth = $el.width();
+
+		}
+
+		var initTimeline = function(slug, name, times, currentEvent, containerWidth) {
+
+			
+			console.error("TIMELINE WIDTH: " + containerWidth);
+			var tickInterval = 1;
+
+			if (containerWidth < 1300) {
+				tickInterval = 2;
+				if (containerWidth < 600) tickInterval = 6;
+				else if (containerWidth < 1000) tickInterval = 4;
+			}
+
 			if (currentEvent) {
 				times.push({
 					starting_time: clampStartOfTheDay(name, currentEvent.t),
@@ -110,16 +163,36 @@ module.exports = function(Box) {
 			var chart = d3.timeline().margin({left: 80, right: 20, top: 22, bottom: 4}).beginning(startOfDay).ending(endOfDay).tickFormat({
 				  format: d3.time.format("%H:%M"),
 				  tickTime: d3.time.hours,
-				  tickInterval: 2,
+				  tickInterval: tickInterval,
 				  tickSize: 4
 				})
 				.itemHeight(14)
-				.hover(function(d, i, datum) {
+				.mouseover(function(d, i, datum) {
 					console.log(d);
-					console.log(i);
+					
+					div.transition()        
+					                .duration(100)      
+					                .style("opacity", .9);      
+					            div.html(getTooltipText(d))  
+					                .style("left", (d3.event.pageX - 90) + "px")     
+					                .style("top", (d3.event.pageY - 28) + "px");    
+					           
+				})
+				.mouseout(function(d) {
+					
+					div.transition().duration(200).style("opacity", 0);   
+				})
+				.click(function(d, i, datum) {
+					console.log(d);
+					div.transition()        
+					                .duration(200)      
+					                .style("opacity", 1);      
+					            div.html(getTooltipText(d))  
+					                .style("left", (d3.event.pageX - 90) + "px")     
+					                .style("top", (d3.event.pageY - 28) + "px");    					
 				});
 
-			var svg = d3.select("#timeline_" + slug).append("svg").attr("width", 800).attr("height", 68)
+			var svg = d3.select("#timeline_" + slug).append("svg").attr("width", containerWidth-80).attr("height", 68)
 			  .datum(testData).call(chart);  			
 		}
 
@@ -127,7 +200,7 @@ module.exports = function(Box) {
 			return dateString.split('.').join('_');
 		}
 
-		var createLast30 = function(nowTs) {
+		var createLastX = function(nowTs, howMany) {
 			var days = [];
 			var today = new Date(nowTs);
 
@@ -140,7 +213,7 @@ module.exports = function(Box) {
 				name: moment(startOfDay+1000).format('DD.MM.YY') // Add one thousand so... i dont know... little buffer... oh god thats just stupid tho
 			});
 
-			for (var i = 29; i >= 0; i--) {
+			for (var i = howMany-2; i >= 0; i--) {
 				startOfDay -= 86400 * 1000;
 				endOfDay   -= 86400 * 1000;
 				days.push({
@@ -159,12 +232,19 @@ module.exports = function(Box) {
 
 		// Public API
 		return {
-			messages: ['routechanged'],
+			messages: ['routechanged', 'globalresize'],
 			onclick: function(event, element, elementType) {
 				event.preventDefault();
 				console.error("EVENT TARGET");
 				console.error(event.target);
 				console.log("CLICK IN SETTINGS");
+				if (elementType === 'show7') {
+					numShown = 7;
+					activate(true);
+				} else if (elementType === 'show30') {
+					numShown = 30;
+					activate(true);
+				}
 			},
 			onmessage: function(name, data) {
 				console.log("ON MESSAGE IN SETTINGS");
@@ -177,7 +257,9 @@ module.exports = function(Box) {
 					} else {
 						deactivate();
 					}
-				} 
+				} else if (name === 'globalresize') {
+					redrawTimelinesAfterResize();
+				}
 				
 			}
 

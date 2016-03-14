@@ -1,5 +1,5 @@
 <div>
-			<div class="jarviswidget" id="wid-id-3" data-widget-editbutton="false" data-widget-custombutton="false">
+			<div class="jarviswidget jarviswidget-color-blueDark" id="wid-id-3" data-widget-editbutton="false" data-widget-custombutton="false">
 				<!-- widget options:
 					usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
 					
@@ -15,7 +15,13 @@
 				-->
 				<header>
 					<span class="widget-icon"> <i class="fa fa-edit"></i> </span>
-					<h2>Visuaalinen aikajana (viimeiset 30 päivää)</h2>				
+					<h2>Visuaalinen aikajana</h2>	
+									<button id="show30days" class="btn dropdown-toggle btn-xs btn-default" style="float: right; margin: 4px;" data-type="show30">
+												Viim. 30 päivää
+											</button>									
+									<button id="show7days" class="btn dropdown-toggle btn-xs btn-default" style="float: right; margin: 4px;" data-type="show7">
+												Viim. 7 päivää
+											</button>
 					
 				</header>
 
@@ -49,6 +55,10 @@
 
 
 <script>
+
+
+
+
 var testData = [
   {class: "pA", label: "08.03.2016", times: [
     {"starting_time": Date.now() - 6 * 60 * 1000 * 60, "ending_time": Date.now()},

@@ -229,6 +229,7 @@ Box.Application.addModule('valikko', function(context) {
 
 				// Start loading banner
 				// View itself is responsible of hiding it when its ready
+				$('#globalErrorBanner').hide();
 				$('#globalLoadingBanner').show();
 			} else if (elementType === 'forceflush') {
 				console.warn("Artificial cache flush");
@@ -259,6 +260,14 @@ Box.Application.addModule('valikko', function(context) {
 
 });	
 
+
+// Global window resize listener
+
+$(window).on('resize', function(e) {
+	console.log("GLOBAL RESIZE!");
+	console.log("Window size: " + $(window).width());
+	Box.Application.broadcast('globalresize');
+});
 
 
 /*

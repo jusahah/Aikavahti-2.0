@@ -65,6 +65,21 @@
 			color: #333;
 		}
 
+		.timelinetooltip {
+ 
+			  position: absolute;           
+			  text-align: center;    
+			  width: 190px;                        
+			  height: 28px;                 
+			  padding: 2px;             
+			  font: 11px sans-serif;        
+			  background: lightsteelblue;   
+			  border: 0px;      
+			  border-radius: 8px;           
+			  pointer-events: none;         
+					
+		}
+
 		</style>
 
 
@@ -397,6 +412,11 @@
 						<h1 style="text-align: center;">Ladataan aineistoa...</h1>
 
 					</div>
+					<div id="globalErrorBanner" style="display: none;">
+					<h3 style="text-align: center;"><i class="fa fa-minus-square fa-4x"></i></h3>
+						<h1 style="text-align: center;">Virhe tapahtui!</h1>
+
+					</div>					
 					<div id="frontContainer" data-module="front" style="display: none;"></div>
 					<div id="adminContainer" data-module="admin" style="display: none;"></div>
 					<div id="schemaviewerContainer" data-module="schemaviewer" style="display: none;"></div>
