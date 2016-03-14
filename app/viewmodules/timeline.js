@@ -120,7 +120,7 @@ module.exports = function(Box) {
 		}
 
 		var getTooltipText = function(d) {
-			var name = d.name;
+			var name = d.name || '(poissa)';
 
 			var startString = moment(d.starting_time).format('DD.MM HH:mm');
 			var endString   = moment(d.ending_time).format('DD.MM HH:mm');

@@ -183,7 +183,12 @@ function receiveComputationRequest(data) {
 	var signalsArr = data.data.signals;
 	// data = {batchID: int, data: {...}}
 	var schemaTree = data.data.schema['_root_']; // To be passed to each transform as 2nd arg
+
+	// push our custom (poissa) schema item there too
+	//schemaTree.push({name: '(poissa)', id: 0, color: '554455'});
+
 	var schemaNormalizedTable = normalizeSchemaTree(schemaTree);
+
 	console.warn("normalizeSchemaTable");
 	console.log(JSON.stringify(schemaNormalizedTable));
 	var settingsTree = data.data.settings;

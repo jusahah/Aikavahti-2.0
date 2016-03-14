@@ -52,7 +52,7 @@ module.exports = function(Box, datalayer) {
 
 				var promAll = Promise.all(proms);
 				var promEasified = promAll.then(function(viewData) {
-					return this.easify(viewData);
+					return this.takeCopy(this.easify(viewData));
 				}.bind(this));
 				return promEasified;
 
@@ -71,6 +71,9 @@ module.exports = function(Box, datalayer) {
 
 				return prom;
 				*/
+			},
+			takeCopy: function(viewData) {
+				return _.cloneDeep(viewData);
 			},
 			easify: function(viewDataArray) {
 				//array -> object with transformNames as keys

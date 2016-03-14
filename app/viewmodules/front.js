@@ -101,7 +101,8 @@ module.exports = function(Box) {
 
 			
 			var currName = $currentPanel.find('#currentevent_name');
-			var color = current.color || '554455';
+			var color = parseInt(current.s) === 0 ? '554455' : current.color;
+			var name  = parseInt(current.s) === 0 ? '(poissa)' : current.name;
 			if (color.charAt(0) === '#') {
 				color = color.substr(1);
 			}
@@ -191,9 +192,13 @@ module.exports = function(Box) {
 		}
 
 		var buildActivityButtons = function(schemaItems) {
+			console.error("ACTIVITY BUTTONS");
+			console.log(JSON.stringify(schemaItems));
 			$buttonsArea = $el.find('#newactivity_buttons');
 
 			var html = '';
+
+			schemaItems.unshift({name: '(poissa)', id: 0, color: '554455'});
 
 			_.each(schemaItems, function(item) {
 				var color = item.color || '554455';

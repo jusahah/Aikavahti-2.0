@@ -363,6 +363,7 @@ function ensureSignalIDExists(id) {
 }
 
 function ensureSchemaIDExists(id) {
+	id = parseInt(id);
 	var found = false;
 	var firstLevelArray = appData.schema['_root_'];
 	var searchSubtree = function(branch) {
@@ -382,6 +383,7 @@ function ensureSchemaIDExists(id) {
 }
 
 function getSchemaItemIfExists(id) {
+	id = parseInt(id);
 	var found = null;
 	var firstLevelArray = appData.schema['_root_'];
 	var searchSubtree = function(branch) {

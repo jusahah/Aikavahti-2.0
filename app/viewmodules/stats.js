@@ -486,6 +486,8 @@ module.exports = function(Box) {
 		}
 
 		var loadDataToIndividualStatsModal = function(schemaID, onlyOwn) {
+			loadTimespanModal(schemaID, onlyOwn);
+			return;
 			if (currentPayload === 'today') {
 				loadTodayModal(schemaID, onlyOwn);
 			}
@@ -664,8 +666,10 @@ module.exports = function(Box) {
 			var d = new Date();
 
 			var limitTs = d;
-
-			if (currentPayload === 'week') {
+			if (currentPayload === 'today') {
+				limitTs = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+			}
+			else if (currentPayload === 'week') {
 				limitTs = getMonday(d);
 				console.log("Week limit: " + limitTs);
 			} else if (currentPayload === 'month') {

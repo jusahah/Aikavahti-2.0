@@ -29,7 +29,13 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 			id: 0
 		};
 	} else {
-		currentSchemaItemCopy = getCopyOfSchemaItem(currentEvent.s, normalizedSchemaTable);
+		if (parseInt(currentEvent.s) === 0) {
+			currentSchemaItemCopy = {id: 0, name: '(poissa)', color: '554455'};
+		}
+		else {
+			currentSchemaItemCopy = getCopyOfSchemaItem(currentEvent.s, normalizedSchemaTable);
+		}
+		
 		currentSchemaItemCopy.start = currentEvent.t;
 		currentSchemaItemCopy.notes = currentEvent.notes;
 	}
