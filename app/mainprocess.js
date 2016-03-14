@@ -297,7 +297,7 @@ setTimeout(function() {
 		}
 	})
 }, 4000);
-*/
+
 setTimeout(function() {
 	console.group();
 	datalayer.dataCommandIn({
@@ -310,7 +310,7 @@ setTimeout(function() {
 	})
 	console.groupEnd();
 }, 500);
-/*
+
 setTimeout(function() {
 	console.group();
 	datalayer.dataCommandIn({
@@ -339,15 +339,15 @@ var dates = [
 
 setTimeout(function() {
 	datalayer.disableChangeCb();
-	var ids = [0,1,2,3,11,12,121,122,123,31,32,33,331];
-	for (var i = 200; i >= 0; i--) {
+	var ids = [0,11,121,122,123,21,31,32,331,34,35,36];
+	for (var i = 300; i >= 0; i--) {
 		console.group();
 		var id = ids[Math.floor(ids.length*Math.random())];
 		datalayer.dataCommandIn({
 			opType: 'new',
 			treePath: 'events',
 			data: {
-				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 48),
+				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 88),
 				//t: moment(dates.pop()).valueOf(),
 				s: id
 			}

@@ -132,14 +132,19 @@ function getInitialDataObject() {
 					]},	
 
 				]},
-				{color: '559955', name: 'Opinnot', id: 2, children: []},
+				{color: '559955', name: 'Opinnot', id: 2, children: [
+					{color: '554488', name: 'Kirjallisuus', id: 21, children: []},
+				]},
 				{color: '554488', name: 'Vapaa-aika', id: 3, children: [
 					{color: '554488', name: 'Tennis', id: 31, children: []},		
 					{color: '554488', name: 'Jalkapallo', id: 32, children: []},	
 					{color: '554488', name: 'Lounas', id: 33, children: [
 						{color: '554488', name: 'Stockmann', id: 331, children: []},	
 
-					]},			
+					]},		
+					{color: '554488', name: 'Sählinki', id: 34, children: []},	
+					{color: '554488', name: 'TV:n katselu', id: 35, children: []},
+					{color: '554488', name: 'Runoillat', id: 36, children: []},
 				]}
 			]
 		},
