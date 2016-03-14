@@ -122,9 +122,25 @@ function getInitialDataObject() {
 		events: [],
 		schema: {
 			_root_: [
-				{color: '884455', name: 'Työ', id: 1, children: []},
+				{color: '884455', name: 'Työ', id: 1, children: [
+					{color: '554488', name: 'PHP', id: 11, children: []},	
+					{color: '554488', name: 'Javascript', id: 12, children: [
+						{color: '554488', name: 'Node.js', id: 121, children: []},	
+						{color: '554488', name: 'Browser development', id: 122, children: []},	
+						{color: '554488', name: 'Electron App', id: 123, children: []},	
+
+					]},	
+
+				]},
 				{color: '559955', name: 'Opinnot', id: 2, children: []},
-				{color: '554488', name: 'Vapaa-aika', id: 3, children: []}
+				{color: '554488', name: 'Vapaa-aika', id: 3, children: [
+					{color: '554488', name: 'Tennis', id: 31, children: []},		
+					{color: '554488', name: 'Jalkapallo', id: 32, children: []},	
+					{color: '554488', name: 'Lounas', id: 33, children: [
+						{color: '554488', name: 'Stockmann', id: 331, children: []},	
+
+					]},			
+				]}
 			]
 		},
 		triggers: {},

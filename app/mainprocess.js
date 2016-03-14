@@ -339,7 +339,7 @@ var dates = [
 
 setTimeout(function() {
 	datalayer.disableChangeCb();
-	var ids = [0,1,2,3,11];
+	var ids = [0,1,2,3,11,12,121,122,123,31,32,33,331];
 	for (var i = 600; i >= 0; i--) {
 		console.group();
 		var id = ids[Math.floor(ids.length*Math.random())];

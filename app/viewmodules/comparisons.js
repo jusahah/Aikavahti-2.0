@@ -48,10 +48,10 @@ module.exports = function(Box) {
 		}
 
 		var buildTableHead = function(schemaItems) {
-			var html = '<tr><td><strong>Viikkonumero</strong></td>'; // First is empty as week name is there
+			var html = '<tr><th style="width: 40px;"><strong>Viikkonumero</strong></th>'; // First is empty as week name is there
 
 			_.forOwn(schemaItems, function(item) {
-				html += '<td>' + item.name + '</td>';
+				html += '<th style="max-width: 40px; font-size: 9px; overflow: hidden;">' + item.name + '</th>';
 			})
 
 			html += '</tr>';
