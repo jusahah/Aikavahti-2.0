@@ -26,7 +26,8 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 			start: Date.now(),
 			notes: 'Tervetuloa Aikavahti-ohjelman pariin!',
 			name: '(poissa)',
-			id: 0
+			id: 0,
+			color: '554455'
 		};
 	} else {
 		if (parseInt(currentEvent.s) === 0) {

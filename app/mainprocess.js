@@ -292,7 +292,7 @@ setTimeout(function() {
 		}
 	})
 }, 4000);
-
+*/
 setTimeout(function() {
 	console.group();
 	datalayer.dataCommandIn({
@@ -304,8 +304,8 @@ setTimeout(function() {
 		}
 	})
 	console.groupEnd();
-}, 1200);
-
+}, 500);
+/*
 setTimeout(function() {
 	console.group();
 	datalayer.dataCommandIn({
@@ -322,6 +322,7 @@ setTimeout(function() {
 */
 var dates = [
 	'03-04-2016 21:59',
+	'03-04-2016 21:59',
 	'03-04-2016 22:05',
 	'03-05-2016 08:19',
 	'03-07-2016 11:00',
@@ -333,16 +334,16 @@ var dates = [
 
 setTimeout(function() {
 	datalayer.disableChangeCb();
-	var ids = [1,2,3];
-	for (var i = dates.length-1; i >= 0; i--) {
+	var ids = [0,1,2,3];
+	for (var i = 1000; i >= 0; i--) {
 		console.group();
 		var id = ids[Math.floor(ids.length*Math.random())];
 		datalayer.dataCommandIn({
 			opType: 'new',
 			treePath: 'events',
 			data: {
-				//t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 48),
-				t: moment(dates.pop()).valueOf(),
+				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 128),
+				//t: moment(dates.pop()).valueOf(),
 				s: id
 			}
 		});
@@ -350,11 +351,12 @@ setTimeout(function() {
 	};
 
 	datalayer.enableChangeCb();
+	datalayer.broadcastChange();
 
-}, 600);
-
+}, 700);
+/*
 setTimeout(function() {
 	datalayer.broadcastChange();
-}, 900);
-
+}, 1100);
+*/
 
