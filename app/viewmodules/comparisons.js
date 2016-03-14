@@ -8,7 +8,9 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['weekByWeekTable', 'schemaItems'];
+		var dataNeeded = ['weekByWeekTable', 'monthByMonthTable', 'schemaItems'];
+
+		var currentPayload = 'week';
 
 		var viewDataCached;
 
@@ -40,7 +42,12 @@ module.exports = function(Box) {
 				// viewData is always object with transforNames being keys and data being values
 				$('#globalLoadingBanner').hide();
 				$el.find('#comparisons_table_head').empty().append(buildTableHead(viewData.schemaItems));
-				$el.find('#comparisons_table_body').empty().append(buildTableBody(viewData.weekByWeekTable, viewData.schemaItems));
+				if (currentPayload === 'week') {
+					$el.find('#comparisons_table_body').empty().append(buildTableBodyWeek(viewData.weekByWeekTable, viewData.schemaItems));
+				} else {
+					$el.find('#comparisons_table_body').empty().append(buildTableBodyMonth(viewData.monthByMonthTable, viewData.schemaItems));
+
+				}
 				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
 				$el.show();
 			});
@@ -82,9 +89,21 @@ module.exports = function(Box) {
 			}
 
 			return arr;
+		}
 
+		var createMonthsArray = function(timestamp) {
+			var m = moment(timestamp);
+			var arr = [];
 
+			arr.push(m.year() + "-" + m.month());
 
+			for (var i = 11; i >= 0; i--) {
+				m = m.subtract(1, 'months');
+				arr.push(m.year() + "-" + m.month());
+			};
+			console.log("MONTH ARR");
+			console.log(arr);
+			return arr;
 		}
 
 		function beautifyDuration(timeInMs) {
@@ -103,8 +122,8 @@ module.exports = function(Box) {
 			var parts = weekString.split('-');
 			return "<strong>" + parts[1] + "</strong><span style='font-size: 11px; font-style: italic;''> (" + parts[0] + ")</span>";
 		}
-
-		var buildRow = function(weekString, weekByWeekTable, schemaItems, itemsCount) {
+		// Note that weekString can also be monthString (same for weekByWeekTable)
+		var buildRow = function(upperLimitInMs, weekString, weekByWeekTable, schemaItems, itemsCount) {
 
 			var firstTd = '<td>' + beautifiedWeekString(weekString) + '</td>';
 			
@@ -112,14 +131,14 @@ module.exports = function(Box) {
 				return firstTd + _.repeat('<td>---</td>', itemsCount);
 			}
 
-			var weekUpperLimitInMs = 3600 * 1000 * 100; // 100 hours is color cap
+			//var weekUpperLimitInMs = 3600 * 1000 * 100; // 100 hours is color cap
 
 			var row = firstTd;
 			var weekObj = weekByWeekTable[weekString];
 			_.forOwn(schemaItems, function(item) {
 				if (weekObj.hasOwnProperty(item.id)) {
 					var d = weekObj[item.id];
-					var darkenAmount = Math.floor(d / weekUpperLimitInMs * 95);
+					var darkenAmount = Math.floor(d / upperLimitInMs * 95);
 					var bg = tinycolor('#eeeeee').darken(darkenAmount);
 					var textcolor = bg.isDark() ? 'fff' : '222'; 
 
@@ -133,20 +152,45 @@ module.exports = function(Box) {
 			return row;
 
 		}
-
-
-
-		var buildTableBody = function(weekByWeekTable, schemaItems) {
+		// This and buildTableBodyWeek could be collapsed into one method later
+		var buildTableBodyMonth = function(monthByMonthTable, schemaItems) {
 
 			var itemsCount = _.keys(schemaItems).length;
 
 			var body = '';
+			var upperLimitInMs = 3600 * 1000 * 400; // 400 hours is color cap for month
+
+			var monthsArray = createMonthsArray(Date.now());
+			console.error("STARTING TO BUILD TABLE FOR MONTH");
+			console.log(monthsArray);
+			console.log(monthByMonthTable);
+
+			_.each(monthsArray, function(monthString) {
+				body += '<tr>';
+				body += buildRow(upperLimitInMs, monthString, monthByMonthTable, schemaItems, itemsCount);
+				body += '</tr>';
+
+			});
+			console.error("COMPARISONG TABLE BODY (FOR MONTH)");
+			console.log(body);
+			return body;
+
+			//var sortedArrayOfMonthStrings = getWeekArray(weekByWeekTable);
+
+		}
+
+		var buildTableBodyWeek = function(weekByWeekTable, schemaItems) {
+
+			var itemsCount = _.keys(schemaItems).length;
+
+			var body = '';
+			var upperLimitInMs = 3600 * 1000 * 100; // 100 hours is color cap for week
 
 			var weeksArray = createWeeksArray(Date.now());
 
 			_.each(weeksArray, function(weekString) {
 				body += '<tr>';
-				body += buildRow(weekString, weekByWeekTable, schemaItems, itemsCount);
+				body += buildRow(upperLimitInMs, weekString, weekByWeekTable, schemaItems, itemsCount);
 				body += '</tr>';
 
 			});
@@ -224,8 +268,9 @@ module.exports = function(Box) {
 				console.log("MSG IN COMPARISONG");
 				if (name === 'routechanged') {
 					var route = data.route;
+					var payload = data.payload;
 					if (route.split('-')[0] === 'comparisons') {
-
+						currentPayload = payload;
 						activate();
 					} else {
 						deactivate();
