@@ -80,27 +80,37 @@ function addDayChanges(events) {
 		console.log("--->" + moment(events[i].t).format('DD.MM.YYYY HH:mm:ss'));
 		var event = events[i];
 		event.human = moment(event.t).format('DD.MM.YYYY HH:mm:ss');
-		var dayChangeTimestamp = getDayChangeTimestamp(event.t, curr.t);
-		console.log("---Day change: " + dayChangeTimestamp);
-		if (dayChangeTimestamp !== 0) {
-			modifiedEvents.push({
-				s: event.s,
-				t: dayChangeTimestamp+1,
-				human: moment(dayChangeTimestamp+1).format('DD.MM.YYYY HH:mm:ss')
-				
-			});
-			modifiedEvents.push({
-				s: 0,
-				t: dayChangeTimestamp-1,
-				human: moment(dayChangeTimestamp-1).format('DD.MM.YYYY HH:mm:ss')
-				
-			})
+		var dayChangeTimestamps = getDayChangeTimestamp(event.t, curr.t);
+		console.log("---Day change");
+		console.log(JSON.stringify(dayChangeTimestamps));
+
+		if (dayChangeTimestamps.length !== 0) {
+			var schemaID = event.s;
+			for (var i2 = dayChangeTimestamps.length - 1; i2 >= 0; i2--) {
+				var dayChangeTimestamp = dayChangeTimestamps[i2];
+				modifiedEvents.push({
+					s: parseInt(schemaID),
+					t: dayChangeTimestamp+1,
+					human: moment(dayChangeTimestamp+1).format('DD.MM.YYYY HH:mm:ss')
+					
+				});
+				modifiedEvents.push({
+					s: 0,
+					t: dayChangeTimestamp-1,
+					human: moment(dayChangeTimestamp-1).format('DD.MM.YYYY HH:mm:ss')
+					
+				});
+			};
+
 
 		}
 		modifiedEvents.push(event);
 		curr = event;
 
 	};
+	modifiedEvents = _.sortBy(modifiedEvents, function(event) {
+		return (-1)*event.t;
+	});
 
 	console.warn("DAY CHANGES ADDED");
 	console.log(JSON.stringify(modifiedEvents));
@@ -114,14 +124,22 @@ function getDayChangeTimestamp(prev, next) {
 	var d1 = new Date(prev);
 	var d2 = new Date(next);
 
+	var interDays = [];
+
 	console.log(d1.getDay() + " | " + d2.getDay());
 
 	if (d1.getDay() !== d2.getDay() || d1.getMonth() !== d2.getMonth()) {
 		var startOfDay = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
-		return startOfDay.getTime();
+		var startOfDayTs = startOfDay.getTime();
+		interDays.push(startOfDayTs);
+		startOfDayTs = startOfDayTs - 86400 * 1000;
+		while (startOfDayTs > prev) {
+			interDays.push(startOfDayTs);
+			startOfDayTs -= 86400 * 1000;
+		}
 	}
 
-	return 0;
+	return interDays;
 }
 
 function normalizeChildrenToIDs(childrenArray) {
