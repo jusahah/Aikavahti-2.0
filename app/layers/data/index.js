@@ -116,7 +116,7 @@ function pushToDB(jsonObj, cb) {
 	fs.writeJson(file, jsonObj, cb);
 
 }
-
+// Goal addition to application's data schema starts now
 function getInitialDataObject() {
 	return {
 		events: [],
