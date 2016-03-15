@@ -81,9 +81,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 		console.log("BOX INITED");
 		var showFirstTimeMsg = datalayer.init();
+		
 		if (showFirstTimeMsg) {
 			console.log("FIRST TIME");
 			Box.Application.broadcast('showInitializationScreen');
+		} else {
+			Box.Application.broadcast('initFirstView');
 		}
 
 	}, 200);
@@ -215,9 +218,22 @@ Box.Application.addModule('valikko', function(context) {
 		
 	}
 
+	var handleRouteChange = function(elementType, payload) {
+		Box.Application.broadcast('routechanged', {route: elementType, payload: payload});
+		console.log("EL TYPE: " + elementType);
+		current = elementType;
+		$el.find('#aikavahti_mainmenu').find('li').removeClass('active');
+		var linkEl = $(element);
+		linkEl.addClass('active');
+		// Start loading banner
+		// View itself is responsible of hiding it when its ready
+		$('#globalErrorBanner').hide();
+		$('#globalLoadingBanner').show();		
+	}
+
 	console.log("INITING VALIKKO VIEW MODULE");
 	return {
-		messages: ['cachewasflushed', 'computationprogressupdate', 'currenteventupdate'],
+		messages: ['cachewasflushed', 'computationprogressupdate', 'currenteventupdate', 'initFirstView'],
 		onclick: function(event, element, elementType) {
 			console.log("CLICK IN VALIKKO: " + elementType);
 
@@ -225,17 +241,9 @@ Box.Application.addModule('valikko', function(context) {
 				console.log("Route change clicked");
 				var payload = $(element).data('payload');
 				// Changing a route
-				Box.Application.broadcast('routechanged', {route: elementType, payload: payload});
-				console.log("EL TYPE: " + elementType);
-				current = elementType;
-				$el.find('#aikavahti_mainmenu').find('li').removeClass('active');
-				var linkEl = $(element);
-				linkEl.addClass('active');
+				handleRouteChange(elementType, payload);
 
-				// Start loading banner
-				// View itself is responsible of hiding it when its ready
-				$('#globalErrorBanner').hide();
-				$('#globalLoadingBanner').show();
+
 			} else if (elementType === 'forceflush') {
 				console.warn("Artificial cache flush");
 				context.getService('derivedData').forceDataRecomputation();
@@ -257,6 +265,8 @@ Box.Application.addModule('valikko', function(context) {
 				var ss = context.getService('settingsService');
 			} else if (name === 'currenteventupdate') {
 				updateFrontShow(data);
+			} else if (name === 'initFirstView') {
+				handleRouteChange('front-route', null);
 			}
 		}
 
@@ -336,11 +346,11 @@ var dates = [
 	'03-08-2016 08:08',
 ];
 
-
+/*
 setTimeout(function() {
 	datalayer.disableChangeCb();
 	var ids = [0,11,121,122,123,21,31,32,331,34,35,36];
-	for (var i = 130; i >= 0; i--) {
+	for (var i = 330; i >= 0; i--) {
 		console.group();
 		var id = ids[Math.floor(ids.length*Math.random())];
 		datalayer.dataCommandIn({
@@ -356,9 +366,9 @@ setTimeout(function() {
 	};
 
 	datalayer.enableChangeCb();
-	datalayer.broadcastChange();
+	//datalayer.broadcastChange();
 
-}, 700);
+}, 1500);
 /*
 setTimeout(function() {
 	datalayer.broadcastChange();

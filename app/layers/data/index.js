@@ -156,7 +156,7 @@ function getInitialDataObject() {
 		],
 		settings: {
 			data: {
-				writeToDiskAfterEveryUpdate: false,
+				writeToDiskAfterEveryUpdate: true,
 				restorePoint: true,
 
 			},
@@ -189,7 +189,7 @@ function createFileIfNotExist() {
 		fs.writeJsonSync(file, getInitialDataObject());
 	}
 	// FFor now just write each time from fresh
-	fs.writeJsonSync(file, getInitialDataObject());
+	//fs.writeJsonSync(file, getInitialDataObject());
 	return notExist;
 }
 
@@ -919,7 +919,6 @@ module.exports = {
 		loadToMemory();
 		checkRestorePoints();
 		//return true;
-		return false;
 		return didExist;
 
 	},

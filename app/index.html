@@ -28,8 +28,8 @@
 		     specific styles this will also ensure you retrain your customization with each SmartAdmin update.
 		<link rel="stylesheet" type="text/css" media="screen" href="css/your_style.css"> -->
 
-		<!-- Demo purpose only: goes with demo.js, you can delete this css when designing your own WebApp -->
-		<link rel="stylesheet" type="text/css" media="screen" href="css/demo.min.css">
+		<!-- Demo purpose only: goes with demo.js, you can delete this css when designing your own WebApp 
+		<link rel="stylesheet" type="text/css" media="screen" href="css/demo.min.css">-->
 
 		<!-- FAVICONS -->
 		<link rel="shortcut icon" href="img/favicon/favicon.ico" type="image/x-icon">
@@ -55,6 +55,7 @@
 		<link rel="apple-touch-startup-image" href="img/splash/iphone.png" media="screen and (max-device-width: 320px)">
 
 		<style>
+
 		text.timeline-label {
 			font-size: 14px;
 			color: #222;
@@ -82,6 +83,27 @@
 
 		#aikavahti_mainmenu li.aikavahtilink:hover {
 			cursor: pointer;
+
+		}
+
+		@media (max-width: 979px) {	
+		  #left-panel {
+		    margin-top: 0px;
+		    
+		  }
+
+		  #aikavahti_nav {
+		  	
+		  }
+
+		  #mainContainer {
+		  	margin-top: 250px !important;
+		  }
+
+		  .hideOnLittle {
+		  	display: none !important;
+		  }
+
 
 		}
 
@@ -141,10 +163,27 @@
 		<!-- END HEADER -->
 
 		<!-- Left panel : Navigation area -->
-		<!-- Note: This width of the aside area can be adjusted through LESS variables -->
+		<!-- Note: This width of the aside area can be adjusted through LESS variables
 		<div id="logoplace" style="position: absolute; top: 0px; left: 0px; width: 220px; height: 39px; color: #222; padding: 2px;"><p style="font-size: 26px; text-align: center;">Aikavahti 2.0</p></div>
+		 -->
 
-		<aside id="left-panel" style="padding: 0; margin-top: 40px;">
+
+			<!-- end projects dropdown -->
+
+			<!-- pulled right: nav area -->
+
+				
+				<!-- collapse menu button -->
+
+
+				<!-- end multiple lang -->
+
+
+			<!-- end pulled right: nav area -->
+
+
+
+		<aside id="left-panel" style="padding: 0;">
 
 
 			<!-- end user info -->
@@ -164,33 +203,7 @@
 		<!-- MAIN PANEL -->
 		<div id="main" role="main">
 
-			<!-- RIBBON -->
-			<div id="ribbon">
 
-				<span class="ribbon-button-alignment"> 
-					<span id="refresh" class="btn btn-ribbon" data-action="resetWidgets" data-title="refresh"  rel="tooltip" data-placement="bottom" data-original-title="<i class='text-warning fa fa-warning'></i> Warning! This will reset all your widget settings." data-html="true">
-						<i class="fa fa-refresh"></i>
-					</span> 
-				</span>
-
-				<!-- breadcrumb -->
-				<ol class="breadcrumb">
-					<li>Home</li><li>Dashboard</li>
-				</ol>
-				<!-- end breadcrumb -->
-
-				<!-- You can also add more buttons to the
-				ribbon for further usability
-
-				Example below:
-
-				<span class="ribbon-button-alignment pull-right">
-				<span id="search" class="btn btn-ribbon hidden-xs" data-title="search"><i class="fa-grid"></i> Change Grid</span>
-				<span id="add" class="btn btn-ribbon hidden-xs" data-title="add"><i class="fa-plus"></i> Add</span>
-				<span id="search" class="btn btn-ribbon" data-title="search"><i class="fa-search"></i> <span class="hidden-mobile">Search</span></span>
-				</span> -->
-
-			</div>
 			<!-- END RIBBON -->
 
 			<!-- MAIN CONTENT -->
@@ -235,7 +248,7 @@
 		<div class="page-footer">
 			<div class="row">
 				<div class="col-xs-12 col-sm-6">
-					<span class="txt-color-white">SmartAdmin 1.8.2 <span class="hidden-xs"> - Web Application Framework</span> © 2014-2015</span>
+					<span class="txt-color-white">Aikavahti 2.0.1 (päivitetty 6.4.2016)<span class="hidden-xs">  | </span> © Nollaversio IT</span>
 				</div>
 
 				<div class="col-xs-6 col-sm-6 text-right hidden-xs">
@@ -382,8 +395,8 @@
 
 		<![endif]-->
 
-		<!-- Demo purpose only -->
-		<script src="js/demo.min.js"></script>
+		<!-- Demo purpose only 
+		<script src="js/demo.min.js"></script>-->
 
 		<!-- MAIN APP JS FILE -->
 		<script src="js/app.min.js"></script>
@@ -424,6 +437,15 @@
 		
 
 		<script src="mainprocess.js"></script>
+
+		<script>
+			$(window).resize(function(){
+				var w = window.width;
+				var h = window.height;
+				if (w < 988) window.resizeTo(w,h);
+			});
+
+		</script>
 
 	</body>
 
