@@ -164,7 +164,7 @@ function getInitialDataObject() {
 				onlineBackup: false
 			},
 			view: {
-				eventsOnlyToLeaves: true,
+				eventsOnlyToLeaves: false,
 				userSelectedEventsShow: false,
 				userSelectedEvents: [],
 			}

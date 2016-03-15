@@ -146,8 +146,13 @@ module.exports = function(Box) {
 
 				} else {
 					if (settings.view.eventsOnlyToLeaves) {
+						$el.find('#showleaves_b').removeClass('btn-default').addClass('btn-success');
+						$el.find('#showall_b').removeClass('btn-success').addClass('btn-default');
 						buildActivityButtons(data.schemaLeaves);
 					} else {
+						$el.find('#showleaves_b').removeClass('btn-success').addClass('btn-default');
+						$el.find('#showall_b').removeClass('btn-default').addClass('btn-success');
+
 						buildActivityButtons(data.schemaItems)
 					}					
 				}	
