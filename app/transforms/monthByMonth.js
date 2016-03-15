@@ -48,8 +48,8 @@ function getMonthString(datestring) {
 	console.log("DATE STRING IN GET MONTHSTRING: " + datestring);
 
 	var m = moment(datestring, 'DD.MM.YYYY');
-	console.log("Month STRING IS: " + m.year() + "-" + m.month());
-	return m.year() + "-" + m.month();
+	console.log("Month STRING IS: " + m.year() + "-" + (m.month()+1));
+	return m.year() + "-" + (m.month() + 1);
 }
 
 function makeItSortedArray(monthsTable) {

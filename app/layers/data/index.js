@@ -151,6 +151,8 @@ function getInitialDataObject() {
 		triggers: {},
 		signals: [
 			{name: 'Kahvi', id: 9999},
+			{name: 'Olut', id: 9998},
+			{name: 'Punaviini', id: 9997},
 		],
 		settings: {
 			data: {
@@ -677,6 +679,17 @@ function updateNotes(timestamp, notes) {
 
 }
 
+function addMainSchemaItem(name, color) {
+	var schemaData = {
+		name: name,
+		color: color,
+		id: generateSchemaID()
+	}
+
+	appData.schema['_root_'].push(schemaData);
+	return writeToDiskIfNeeded();	
+}
+
 function addSchemaItemToParent(parentID, name, color) {
 	var item = getSchemaItemIfExists(parentID);
 
@@ -775,6 +788,11 @@ module.exports = {
 			if (err) {
 				console.error("SCHEMA item Validation failed in data layer dataCommandIn!");
 				return Promise.reject(err);
+			}
+
+			if (dataCommand.data.parent === -1) {
+				// No parent
+				return addMainSchemaItem(dataCommand.data.name, dataCommand.data.color);
 			}
 
 			return addSchemaItemToParent(dataCommand.data.parent, dataCommand.data.name, dataCommand.data.color);

@@ -3,9 +3,14 @@
 
 								<header>
 									<span class="widget-icon"> <i class="fa fa-table"></i> </span>
-									<h2>Viikkotaulukko</h2>	
-								<div class="label" style="margin: 8px; background-color: #568A89; float: right">= Itsenäinen</div>										
-									<div class="label" style="margin: 8px; background-color: #9D5353; float: right">= Ryhmä</div>
+									<h2 id="comparisons_table_title">Viikkotaulukko</h2>	
+									<button id="showSignals_b" class="btn dropdown-toggle btn-xs btn-default" style="float: right; margin: 4px;" data-type="showSignalsTable">
+												Signaalit
+											</button>
+									<button id="showActivity_b" class="btn dropdown-toggle btn-xs btn-default" style="float: right; margin: 4px;" data-type="showActivityTable">
+												Aktiviteetit
+											</button>									
+
 	
 
 								</header>
@@ -22,8 +27,11 @@
 
 									<!-- widget content -->
 									<div class="widget-body" style="overflow: auto;">
-										<p>Viikottainen kokonaisaika per aktiviteetti</p>
-										<p style="font-size: 10px; color: red">HUOM! Ryhmäaktiviteetin kokonaisaika = jälkeläisten kokonaisajat + oma kokonaisaika.</p>
+										<span id="comparisons_p">Viikottainen kokonaisaika per aktiviteetti</span>
+										
+										<div class="label" style="display: inline-block; margin: 8px; background-color: #568A89; float: right">= Itsenäinen</div>										
+										<div class="label" style="display: inline-block; margin: 8px; background-color: #9D5353; float: right">= Ryhmä</div>
+										<p style="font-size: 10px; color: red" id="groupnoticetext"></p>
 										
 										<div class="table" style="font-size: 11px;">
 										

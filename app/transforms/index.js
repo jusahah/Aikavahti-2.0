@@ -30,6 +30,7 @@ module.exports = {
 		{name: 'last30DaysTimelines', transform: require('./last30DaysTimelines'), prerequisite: null},
 		{name: 'weekByWeekTable', transform: require('./weekByWeekTable'), prerequisite: null},
 		{name: 'monthByMonthTable', transform: require('./monthByMonth'), prerequisite: null},
+		{name: 'signalsPerWeekAndMonth', transform: require('./signalsPerWeekAndMonth'), prerequisite: null},
 	]
 
 };

@@ -239,8 +239,9 @@ module.exports = function(Box) {
 				icon = '<i class="fa fa-warning" style="position: absolute; font-size: 8px; bottom: 2px; right: 2px;"></i>';	
 			}
 			
-			var textcolor = tc.isDark() ? 'txt-color-white' : 'txt-color-black'; 			
-			li += '<span ' + toggleText + ' style="position: relative; background-color:#' + color + ';" class="' + textcolor + '" data-description="' + ended + '-' + started + '" data-icon="fa-time">' + name + icon + '</span>';
+			var textcolor = tc.isDark() ? 'txt-color-white' : 'txt-color-black'; 	
+			var timecolor = tc.isDark() ? 'fff' : '222';		
+			li += '<span ' + toggleText + ' style="text-align: center; min-width: 88px; position: relative; background-color:#' + color + ';" class="' + textcolor + '" data-icon="fa-time"><span style="color: #' + timecolor + '; position: absolute; bottom: 6px; left: 12px; font-size: 10px;">' + ended + '-' + started + '</span>' + name + icon + '</span>';
 			li += '</li>';
 
 

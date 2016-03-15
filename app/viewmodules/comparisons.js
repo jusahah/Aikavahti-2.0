@@ -8,8 +8,9 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['weekByWeekTable', 'monthByMonthTable', 'schemaItems'];
+		var dataNeeded = ['weekByWeekTable', 'monthByMonthTable', 'schemaItems', 'signalsTable', 'signalsPerWeekAndMonth'];
 
+		var showSignals = false;
 		var currentPayload = 'week';
 
 		var viewDataCached;
@@ -23,13 +24,22 @@ module.exports = function(Box) {
 			}
 		}
 
-		var activate = function() {
+		var activate = function(noHide) {
 			console.log("COMPARISONG ACTIVATING!!");
 			// hide right away in case we are reactivating view that is currently visible
-			$el.hide();
+			if (!noHide) $el.hide();
 			var derivedService  = context.getService('derivedData');
 			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 			isHidden = false;
+
+			// Switch top button classes
+			if (showSignals) {
+				$el.find('#showActivity_b').removeClass('btn-success').addClass('btn-default');
+				$el.find('#showSignals_b').removeClass('btn-default').addClass('btn-success');
+			} else {
+				$el.find('#showSignals_b').removeClass('btn-success').addClass('btn-default');
+				$el.find('#showActivity_b').removeClass('btn-default').addClass('btn-success');				
+			}
 
 			viewDataPromise.then(function(viewData) {
 				if (isHidden) return; // User already switched to another view			
@@ -40,22 +50,104 @@ module.exports = function(Box) {
 
 				//var dataObj = context.getService('derivedData').easify(viewData);			
 				// viewData is always object with transforNames being keys and data being values
-				$('#globalLoadingBanner').hide();
-				$el.find('#comparisons_table_head').empty().append(buildTableHead(viewData.schemaItems));
-				if (currentPayload === 'week') {
-					$el.find('#comparisons_table_body').empty().append(buildTableBodyWeek(viewData.weekByWeekTable, viewData.schemaItems));
+				var headName = currentPayload === 'week' ? 'Viikkonumero' : 'kk. numero';
+				if (showSignals) {
+					$el.find('#groupnoticetext').empty();
+					$el.find('#comparisons_table_head').empty().append(buildSignalsTableHead(viewData.signalsTable, viewData.signalsPerWeekAndMonth, headName));
+					if (currentPayload === 'week') {
+						$el.find('#comparisons_table_title').empty().append('Viikkotaulukko');
+						$el.find('#comparisons_p').empty().append('Viikottainen kokonaismäärä per signaali');
+
+						$el.find('#comparisons_table_body').empty().append(buildSignalsTableBodyWeek(viewData.signalsTable, viewData.signalsPerWeekAndMonth.week));
+					} else {
+						$el.find('#comparisons_table_title').empty().append('Kuukausitaulukko');
+						$el.find('#comparisons_p').empty().append('Kuukausittainen kokonaismäärä per signaali');					
+
+						$el.find('#comparisons_table_body').empty().append(buildSignalsTableBodyMonth(viewData.signalsTable, viewData.signalsPerWeekAndMonth.month));
+
+					}
+
 				} else {
-					$el.find('#comparisons_table_body').empty().append(buildTableBodyMonth(viewData.monthByMonthTable, viewData.schemaItems));
+					$el.find('#groupnoticetext').empty().append('HUOM! Ryhmäaktiviteetin kokonaisaika = jälkeläisten kokonaisajat + oma kokonaisaika.');
+					$el.find('#comparisons_table_head').empty().append(buildTableHead(viewData.schemaItems, headName));
+					if (currentPayload === 'week') {
+						$el.find('#comparisons_table_title').empty().append('Viikkotaulukko');
+						$el.find('#comparisons_p').empty().append('Viikottainen kokonaisaika per aktiviteetti');
+
+						$el.find('#comparisons_table_body').empty().append(buildTableBodyWeek(viewData.weekByWeekTable, viewData.schemaItems));
+					} else {
+						$el.find('#comparisons_table_title').empty().append('Kuukausitaulukko');
+						$el.find('#comparisons_p').empty().append('Kuukausittainen kokonaisaika per aktiviteetti');					
+
+						$el.find('#comparisons_table_body').empty().append(buildTableBodyMonth(viewData.monthByMonthTable, viewData.schemaItems));
+
+					}
 
 				}
+
+
+				$('#globalLoadingBanner').hide();
 				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
 				$el.show();
 			});
 			
 		}
 
-		var buildTableHead = function(schemaItems) {
-			var html = '<tr><th style="width: 40px;"><strong>Viikkonumero</strong></th>'; // First is empty as week name is there
+		var buildSignalsTableHead = function(signalsTable, signalsPerWeekAndMonth, headName) {
+			var html = '<tr><th style="width: 40px;"><strong>' + headName + '</strong></th>'; // First is empty as week name is there
+
+			_.forOwn(signalsTable, function(item) {
+				html += '<th style="padding: 2px; color: white; background-color: #776677; max-width: 48px; font-size: 8px; overflow: hidden;">' + item.name + '</th>';
+			})
+
+			html += '</tr>';
+			return html;			
+		}
+
+		var buildSignalsTableBodyWeek = function(signalsTable, signalsPerWeek) {
+			var itemsCount = _.keys(signalsTable).length;
+
+			var body = '';
+			var upperLimitInCount = 300; // 100
+
+			var weeksArray = createWeeksArray(Date.now());
+			console.error("STARTING TO BUILD SIGNAL TABLE FOR WEEK");
+
+
+			_.each(weeksArray, function(weekString) {
+				body += '<tr>';
+				body += buildSignalRow(upperLimitInCount, weekString, signalsPerWeek, signalsTable, itemsCount);
+				body += '</tr>';
+
+			});
+			console.error("COMPARISONG TABLE BODY (FOR WEEK)");
+			console.log(body);
+			return body;			
+		}
+
+		var buildSignalsTableBodyMonth = function(signalsTable, signalsPerMonth) {
+			var itemsCount = _.keys(signalsTable).length;
+
+			var body = '';
+			var upperLimitInCount = 300; // 100
+
+			var monthsArray = createMonthsArray(Date.now());
+			console.error("STARTING TO BUILD SIGNAL TABLE FOR MONTH");
+			console.log(monthsArray);
+
+			_.each(monthsArray, function(monthString) {
+				body += '<tr>';
+				body += buildSignalRow(upperLimitInCount, monthString, signalsPerMonth, signalsTable, itemsCount);
+				body += '</tr>';
+
+			});
+			console.error("COMPARISONG TABLE BODY (FOR MONTH)");
+			console.log(body);
+			return body;			
+		}
+
+		var buildTableHead = function(schemaItems, headName) {
+			var html = '<tr><th style="width: 40px;"><strong>' + headName + '</strong></th>'; // First is empty as week name is there
 
 			_.forOwn(schemaItems, function(item) {
 				var isLeaf = !item.children || item.children.length === 0;
@@ -95,11 +187,11 @@ module.exports = function(Box) {
 			var m = moment(timestamp);
 			var arr = [];
 
-			arr.push(m.year() + "-" + m.month());
+			arr.push(m.year() + "-" + (m.month()+1));
 
 			for (var i = 11; i >= 0; i--) {
 				m = m.subtract(1, 'months');
-				arr.push(m.year() + "-" + m.month());
+				arr.push(m.year() + "-" + (m.month() + 1)); // We will use one-based month indeces
 			};
 			console.log("MONTH ARR");
 			console.log(arr);
@@ -152,6 +244,37 @@ module.exports = function(Box) {
 			return row;
 
 		}
+
+		var buildSignalRow = function(upperLimitInCount, dateString, dateTable, signalsTable, itemsCount) {
+
+			var firstTd = '<td>' + beautifiedWeekString(dateString) + '</td>';
+			
+			if (!dateTable.hasOwnProperty(dateString)) {
+				return firstTd + _.repeat('<td>---</td>', itemsCount);
+			}
+
+			//var weekUpperLimitInMs = 3600 * 1000 * 100; // 100 hours is color cap
+
+			var row = firstTd;
+			var dateObj = dateTable[dateString];
+			_.forOwn(signalsTable, function(item) {
+				if (dateObj.hasOwnProperty(item.id)) {
+					var count = dateObj[item.id];
+					var darkenAmount = Math.floor(count / upperLimitInCount * 95);
+					var bg = tinycolor('#eeeeee').darken(darkenAmount);
+					var textcolor = bg.isDark() ? 'fff' : '222'; 
+
+					row += '<td style="color: #' + textcolor + '; background-color: ' + bg.toHexString() + ';">' + count + '</td>';
+				} else {
+					row += '<td>---</td>';
+				}
+				
+			});
+
+			return row;
+
+		}
+
 		// This and buildTableBodyWeek could be collapsed into one method later
 		var buildTableBodyMonth = function(monthByMonthTable, schemaItems) {
 
@@ -262,6 +385,12 @@ module.exports = function(Box) {
 					}
 				} else if (elementType === 'submitNewSignal') {
 					gatherAndSendSignalData();
+				} else if (elementType === 'showSignalsTable') {
+					showSignals = true;
+					activate(true);
+				} else if (elementType === 'showActivityTable') {
+					showSignals = false;
+					activate(true);
 				}
 			},
 			onmessage: function(name, data) {
@@ -271,6 +400,7 @@ module.exports = function(Box) {
 					var payload = data.payload;
 					if (route.split('-')[0] === 'comparisons') {
 						currentPayload = payload;
+						showSignals = false;
 						activate();
 					} else {
 						deactivate();

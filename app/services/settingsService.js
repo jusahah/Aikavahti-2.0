@@ -50,6 +50,13 @@ module.exports = function(Box, datalayer) {
 					color: '6622ee',
 				}});
 			},
+			createMainSchemaItem: function(name) {
+				return datalayer.dataCommandIn({opType: 'newSchemaItem', data: {
+					parent: -1,
+					name: name,
+					color: '9944ee',
+				}});				
+			},
 			createSignalItem: function(name) {
 				return datalayer.dataCommandIn({opType: 'newSignalItem', data: name});
 			},

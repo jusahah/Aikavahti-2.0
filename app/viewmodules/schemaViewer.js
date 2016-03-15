@@ -253,6 +253,23 @@ module.exports = function(Box) {
 
 		}
 
+		function showNewMainGroupModal() {
+			// well how embarrasing... this is actually no-op as modal needs no dynamic data
+
+		}
+
+		function gatherAndSendMainGroup() {
+			var name = $el.find('#main_activityname_el').val();
+			if (!name || name === '') {
+				console.error('Schema main group creation fail - no name');
+				return;
+			}
+
+			var ss = context.getService('settingsService');	
+			var prom = ss.createMainSchemaItem(name);		
+
+		}
+
 
 
 		
@@ -280,6 +297,10 @@ module.exports = function(Box) {
 					gatherSubgroupCreate();
 				} else if (elementType === 'submitNewSchemaItemName') {
 					gatherAndSendEditSchemaName();
+				} else if (elementType === 'newMainGroup') {
+					showNewMainGroupModal();
+				} else if (elementType === 'createmaingroup') {
+					gatherAndSendMainGroup();
 				}
 			},
 			onmessage: function(name, data) {
