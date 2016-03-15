@@ -314,7 +314,7 @@ module.exports = function(Box) {
 
 			var notes = area.val();
 
-			if (notes.length > 512) {
+			if (notes.length > 1024) {
 				console.error('Too long string in notes area');
 				return;
 			}

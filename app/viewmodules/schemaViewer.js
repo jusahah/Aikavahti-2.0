@@ -10,7 +10,7 @@ module.exports = function(Box) {
 		var isHidden = true;
 		var $el = $(context.getElement());
 
-		var dataNeeded = ['schemaTree', 'schemaItems'];
+		var dataNeeded = ['eventList', 'schemaTree', 'schemaItems'];
 
 		var viewDataCached;
 
@@ -155,7 +155,9 @@ module.exports = function(Box) {
 			html += "<td style='padding-left:" + padding + "px;'><button data-type='schemaItemInSchemaViewer' data-payload='" + id + "_" + ownText + "' class='btn' style='width: 100%; text-align: left; background-color: #" + color + "; color: #" + textcolor+ ";'>" + name + "</button></td>";
 			html += "<td><button data-type='addAsSubgroup' data-payload='" + id + "' class='btn btn-default' data-toggle='modal' data-target='#addsubgroupModal'>Uusi alaryhmä</td>";
 			html += "<td><button data-type='editSchemaItem' data-payload='" + id + "' class='btn btn-warning' data-toggle='modal' data-target='#schemaItemModal'>Väritä</td>";
-			html += "<td><button data-type='editSchemaItemName' data-payload='" + id + "' class='btn btn-primary' data-toggle='modal' data-target='#editSchemaItemNameModal'>Muokkaa</td>";			html += "</tr>";
+			html += "<td><button data-type='editSchemaItemName' data-payload='" + id + "' class='btn btn-danger' data-toggle='modal' data-target='#editSchemaItemNameModal'>Muokkaa</td>";			
+			html += "<td><button data-type='showEventHistory' data-payload='" + id + "' class='btn btn-primary' data-toggle='modal' data-target='#eventHistory'>Selaa</td>";
+			html += "</tr>";
 			return html;
 		}
 
@@ -306,6 +308,38 @@ module.exports = function(Box) {
 
 		}
 
+		function timeStringToNote(timestamp) {
+			return moment(timestamp).format('dd DD.MM.YY HH:mm');
+		}
+
+
+		function populateEventHistory(schemaID) {
+			if (!viewDataCached) return;
+			schemaID = parseInt(schemaID);
+			var eventsArr = viewDataCached.eventList;
+			var schemaItem = viewDataCached.schemaItems[schemaID];
+
+			var onlyThisSchemaEventsWithNotes = _.filter(eventsArr, function(event) {
+				return event.s === schemaID && event.notes;
+			});
+
+			var html = '';
+			_.each(onlyThisSchemaEventsWithNotes, function(notedEvent) {
+				html += '<li style="min-height: 80px;">';
+				html += '<div class="smart-timeline-time">';
+				html += '<small>' + timeStringToNote(notedEvent.t) + '</small>';
+				html += '</div>'
+				html += '<div class="smart-timeline-content">';
+				html += '<p>' + notedEvent.notes + '</p>';
+				html += '</div>';
+				html += '</li>';				
+			});
+
+			$el.find('#notes_ul').empty().append(html);
+			$el.find('#eventhistory_title').empty().append((schemaItem.name || '???') + " - muistiinpanot");
+
+		}
+
 
 
 		
@@ -337,6 +371,8 @@ module.exports = function(Box) {
 					showNewMainGroupModal();
 				} else if (elementType === 'createmaingroup') {
 					gatherAndSendMainGroup();
+				} else if (elementType === 'showEventHistory') {
+					populateEventHistory($(element).data('payload'));
 				}
 			},
 			onmessage: function(name, data) {

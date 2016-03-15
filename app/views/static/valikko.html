@@ -5,66 +5,63 @@
 				traditional href="" links. See documentation for details.
 				-->
 
-				<ul>
-					<li data-type="front-route">
-						<a><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent">Reaaliaikanäkymä</span></a>	
+				<ul id="aikavahti_mainmenu">
+					<li class="aikavahtilink" data-type="front-route">
+						<a><i class="fa fa-lg fa-fw fa-dashboard txt-color-white"></i> <span class="menu-item-parent">Reaaliaikanäkymä</span></a>	
 					</li>
-					<li>
-						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Tilastot</span></a>
+					<li class="aikavahtilink">
+						<a><i class="fa fa-lg fa-fw fa-calendar txt-color-blue"></i> <span class="menu-item-parent">Tilastot</span></a>
 						<ul>
-							<li data-type="stats-route" data-payload="today">
+							<li class="aikavahtilink" data-type="stats-route" data-payload="today">
 								<a>Tänään</a>
 							</li>
-							<li data-type="stats-route" data-payload="week">
+							<li class="aikavahtilink" data-type="stats-route" data-payload="week">
 								<a>Kuluva viikko</a>
 							</li>
-							<li data-type="stats-route" data-payload="month">
+							<li class="aikavahtilink" data-type="stats-route" data-payload="month">
 								<a>Kuluva kuukausi</a>
 							</li>	
-							<li data-type="stats-route" data-payload="year"> 
+							<li class="aikavahtilink" data-type="stats-route" data-payload="year"> 
 								<a>Kuluva vuosi</a>
 							</li>		
-							<li data-type="stats-route" data-payload="custom">
-								<a>Hae aikaväliltä</a>
-							</li>
-							<li data-type="timeline-route" data-payload="">
+							<li class="aikavahtilink" data-type="timeline-route" data-payload="">
 								<a>Timeline</a>
 							</li>							
-							<li>
-								<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Vertailut</span></a>
+							<li class="aikavahtilink">
+								<a><i class="fa fa-lg fa-fw fa-bar-chart-o txt-color-yellow"></i> <span class="menu-item-parent">Vertailut</span></a>
 								<ul>
-									<li data-type="comparisons-route" data-payload="week">
+									<li class="aikavahtilink" data-type="comparisons-route" data-payload="week">
 										<a>Viikkovertailu</a>
 									</li>
-									<li data-type="comparisons-route" data-payload="month">
+									<li class="aikavahtilink" data-type="comparisons-route" data-payload="month">
 										<a>Kuukausivertailu</a>
 									</li>																			
 								</ul>
 							</li>																		
 						</ul>
 					</li>
-					<li data-type="schemaviewer-route">
-						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Aktiviteetit</span></a>
+					<li class="aikavahtilink" data-type="schemaviewer-route">
+						<a><i class="fa fa-lg fa-fw fa-sitemap txt-color-blue"></i> <span class="menu-item-parent">Aktiviteetit</span></a>
 					</li>
-					<li data-type="signals-route">
-						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Signaalit</span></a>
+					<li class="aikavahtilink" data-type="signals-route">
+						<a><i class="fa fa-lg fa-fw fa-flash txt-color-blue"></i> <span class="menu-item-parent">Signaalit</span></a>
 					</li>							
-					<li data-type="settings-route">
-						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Asetukset</span></a>
+					<li class="aikavahtilink" data-type="settings-route">
+						<a><i class="fa fa-lg fa-fw fa-wrench txt-color-blue"></i> <span class="menu-item-parent">Asetukset</span></a>
 					</li>									
-					<li>
-						<a><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Hallinnoi</span></a>
+					<li class="aikavahtilink">
+						<a><i class="fa fa-lg fa-fw fa-user txt-color-blue"></i> <span class="menu-item-parent">Hallinnoi</span></a>
 						<ul>
-							<li data-type="manage-route">
+							<li class="aikavahtilink" data-type="manage-route">
 								<a>Muokkaa aikajanaa</a>
 							</li>
-							<li data-type="import-route">
+							<li class="aikavahtilink" data-type="import-route">
 								<a>Tuo / Vie</a>
 							</li>	
-							<li data-type="restore">
+							<li class="aikavahtilink" data-type="restore">
 								<a>Palautuspisteet</a>
 							</li>					
-							<li data-type="resetrequest">
+							<li class="aikavahtilink" data-type="resetrequest">
 								<a>Resetoi ohjelma</a>
 							</li>
 						</ul>						
@@ -104,6 +101,6 @@
 				</ul>
 			</nav>
 
-																					<hr>
-									<h3>Testing stuff</h3>
+																		
+
 								

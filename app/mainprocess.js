@@ -228,9 +228,9 @@ Box.Application.addModule('valikko', function(context) {
 				Box.Application.broadcast('routechanged', {route: elementType, payload: payload});
 				console.log("EL TYPE: " + elementType);
 				current = elementType;
+				$el.find('#aikavahti_mainmenu').find('li').removeClass('active');
 				var linkEl = $(element);
 				linkEl.addClass('active');
-				linkEl.siblings().removeClass('active');
 
 				// Start loading banner
 				// View itself is responsible of hiding it when its ready
