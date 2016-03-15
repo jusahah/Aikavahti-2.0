@@ -18,7 +18,7 @@
 
 									<!-- widget content -->
 									<div class="widget-body">
-										<p>Voit luoda ja poistaa signaaleja. Poistaessasi signaalin kaikki sen signaalitapahtumat poistetaan myös.</p>
+										<p>Voit luoda ja poistaa signaaleja. Poistaessasi signaalin kaikki sen signaalitapahtumat poistetaan myös. Signaalin päivätavoitetta ei ole mahdollista muuttaa luonnin jälkeen.</p>
 										
 										<div class="table-responsive">
 										
@@ -26,6 +26,7 @@
 												<thead>
 													<tr>
 														<th>Signaali</th>
+														<th>Päivätavoite</th>
 														<th>Poista</th>
 													</tr>
 												</thead>
@@ -94,15 +95,41 @@
 			
 
 
-										<fieldset>
-												
-													<label class="input">
-														<input type="text" name="newsignalname" id="newsignalname_el" placeholder="Syötä signaalin nimi">
-													</label>
-																			
+											<fieldset>
+												<div class="row">
+												<div class="col col-6">
+													<section>
+														<label class="label">Signaalin nimi</label>
+														<label class="input">
+															<input type="text" name="newsignalname" id="newsignalname_el" placeholder="Syötä uusi nimi">
+														</label>
+													</section>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col col-6">
+													<section>
+														<label class="label">Päivätavoitteen täyttymisehto: </label>
+														<label class="select">	
+															<select class="select" name="signalitemcomp" id="signalitemcomp_el">
+																<option value="dd">(poissa käytöstä)</option>
+																<option value="gt">Enemmän kuin</option>
+																<option value="le">Vähemmän tai yhtä paljon kuin</option>
+															</select><i></i>
+														</label>
+													</section>
+													</div>
+													<div class="col col-6">
+													<section>
+														<label class="label">Kpl-määrä</label>
+														<label class="input">
+															<input type="number" name="signalitemboundary" id="signalitemboundary_el" placeholder="Syötä kokonaisluku">
+														</label>
+													</section>
+													</div>
+												</div>
 
-
-										</fieldset>
+											</fieldset>	
 
 						
 									</div>

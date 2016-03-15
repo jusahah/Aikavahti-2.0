@@ -43,22 +43,24 @@ module.exports = function(Box, datalayer) {
 					fields: schemaUpdatedFields
 				}});
 			},
-			createSchemaItem: function(parentID, name) {
+			createSchemaItem: function(parentID, name, dayGoal) {
 				return datalayer.dataCommandIn({opType: 'newSchemaItem', data: {
 					parent: parentID,
 					name: name,
 					color: '6622ee',
+					daygoal: dayGoal
 				}});
 			},
-			createMainSchemaItem: function(name) {
+			createMainSchemaItem: function(name, dayGoal) {
 				return datalayer.dataCommandIn({opType: 'newSchemaItem', data: {
 					parent: -1,
 					name: name,
 					color: '9944ee',
+					daygoal: dayGoal
 				}});				
 			},
-			createSignalItem: function(name) {
-				return datalayer.dataCommandIn({opType: 'newSignalItem', data: name});
+			createSignalItem: function(name, dayGoal) {
+				return datalayer.dataCommandIn({opType: 'newSignalItem', name: name, daygoal: dayGoal});
 			},
 			deleteSignalItem: function(signalID) {
 				return datalayer.dataCommandIn({opType: 'deleteSignalItem', data: signalID});

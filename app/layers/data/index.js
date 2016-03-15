@@ -122,37 +122,37 @@ function getInitialDataObject() {
 		events: [],
 		schema: {
 			_root_: [
-				{color: '884455', name: 'Työ', id: 1, children: [
-					{color: '554488', name: 'PHP', id: 11, children: []},	
-					{color: '554488', name: 'Javascript', id: 12, children: [
-						{color: '554488', name: 'Node.js', id: 121, children: []},	
+				{daygoal: 'gt_' + 3600*1000*6, color: '884455', name: 'Työ', id: 1, children: [
+					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'PHP', id: 11, children: []},	
+					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Javascript', id: 12, children: [
+						{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Node.js', id: 121, children: []},	
 						{color: '554488', name: 'Browser development', id: 122, children: []},	
-						{color: '554488', name: 'Electron App', id: 123, children: []},	
+						{daygoal: '', color: '554488', name: 'Electron App', id: 123, children: []},	
 
 					]},	
 
 				]},
-				{color: '559955', name: 'Opinnot', id: 2, children: [
-					{color: '554488', name: 'Kirjallisuus', id: 21, children: []},
+				{daygoal: 'gt_' + 3600*1000*6, color: '559955', name: 'Opinnot', id: 2, children: [
+					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Kirjallisuus', id: 21, children: []},
 				]},
-				{color: '554488', name: 'Vapaa-aika', id: 3, children: [
-					{color: '554488', name: 'Tennis', id: 31, children: []},		
-					{color: '554488', name: 'Jalkapallo', id: 32, children: []},	
-					{color: '554488', name: 'Lounas', id: 33, children: [
-						{color: '554488', name: 'Stockmann', id: 331, children: []},	
+				{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Vapaa-aika', id: 3, children: [
+					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Tennis', id: 31, children: []},		
+					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Jalkapallo', id: 32, children: []},	
+					{daygoal: 'gt_' + 3600*1000*5, color: '554488', name: 'Lounas', id: 33, children: [
+						{daygoal: 'gt_' + 3600*1000*4, color: '554488', name: 'Stockmann', id: 331, children: []},	
 
 					]},		
-					{color: '554488', name: 'Sählinki', id: 34, children: []},	
-					{color: '554488', name: 'TV:n katselu', id: 35, children: []},
-					{color: '554488', name: 'Runoillat', id: 36, children: []},
+					{daygoal: 'lt_' + 3600*1000*3, color: '554488', name: 'Sählinki', id: 34, children: []},	
+					{daygoal: 'gt_' + 3600*1000*2, color: '554488', name: 'TV:n katselu', id: 35, children: []},
+					{daygoal: 'gt_' + 3600*1000*1, color: '554488', name: 'Runoillat', id: 36, children: []},
 				]}
 			]
 		},
 		triggers: {},
 		signals: [
-			{name: 'Kahvi', id: 9999},
-			{name: 'Olut', id: 9998},
-			{name: 'Punaviini', id: 9997},
+			{daygoal: 'e_' + 1, name: 'Kahvi', id: 9999},
+			{daygoal: 'le_' + 2, name: 'Olut', id: 9998},
+			{daygoal: 'gt_' + 5, name: 'Punaviini', id: 9997},
 		],
 		settings: {
 			data: {
@@ -347,12 +347,13 @@ function checkSignalItemNameClash(name) {
 	return i !== -1;
 }
 
-function addSignalItem(name) {
+function addSignalItem(name, daygoal) {
 
 	if (checkSignalItemNameClash(name)) return Promise.reject('Signal item with provided name already exists: ' + name);
 
 	var signalItemData = {
 		name: name,
+		daygoal: daygoal,
 		id: generateSchemaID()
 	}
 
@@ -578,6 +579,7 @@ function updateSchemaItem(data) {
 
 	var name = fields.name;
 	var color = fields.color;
+	var daygoal = fields.daygoal;
 
 	var item = getSchemaItemIfExists(id);
 
@@ -588,6 +590,7 @@ function updateSchemaItem(data) {
 	var clonedItem = _.assign({}, item);
 	clonedItem.color = color ? color : clonedItem.color;
 	clonedItem.name = name ? name : clonedItem.name;
+	clonedItem.daygoal = daygoal ? daygoal : clonedItem.daygoal;
 
 	console.log("Changed schema item clone: " + JSON.stringify(clonedItem));
 
@@ -600,6 +603,7 @@ function updateSchemaItem(data) {
 	// No errors so update real schema object
 	item.color = color ? color : item.color;
 	item.name  = name ? name : item.name;
+	item.daygoal = daygoal ? daygoal : item.daygoal;
 
 	return writeToDiskIfNeeded();
 
@@ -679,18 +683,19 @@ function updateNotes(timestamp, notes) {
 
 }
 
-function addMainSchemaItem(name, color) {
+function addMainSchemaItem(name, color, daygoal) {
 	var schemaData = {
 		name: name,
 		color: color,
-		id: generateSchemaID()
+		id: generateSchemaID(),
+		daygoal: daygoal
 	}
 
 	appData.schema['_root_'].push(schemaData);
 	return writeToDiskIfNeeded();	
 }
 
-function addSchemaItemToParent(parentID, name, color) {
+function addSchemaItemToParent(parentID, name, color, daygoal) {
 	var item = getSchemaItemIfExists(parentID);
 
 	if (!item) {
@@ -704,7 +709,8 @@ function addSchemaItemToParent(parentID, name, color) {
 	var schemaData = {
 		name: name,
 		color: color,
-		id: generateSchemaID()
+		id: generateSchemaID(),
+		daygoal: daygoal
 	}
 
 	item.children.push(schemaData);
@@ -742,6 +748,7 @@ function getCurrentEventInfo() {
 		var item = getSchemaItemIfExists(currentCopy.s);
 		currentCopy.color = item.color;
 		currentCopy.name  = item.name;
+		currentCopy.daygoal = item.daygoal;
 	}
 
 	return Promise.resolve(currentCopy);
@@ -792,10 +799,10 @@ module.exports = {
 
 			if (dataCommand.data.parent === -1) {
 				// No parent
-				return addMainSchemaItem(dataCommand.data.name, dataCommand.data.color);
+				return addMainSchemaItem(dataCommand.data.name, dataCommand.data.color, dataCommand.data.daygoal);
 			}
 
-			return addSchemaItemToParent(dataCommand.data.parent, dataCommand.data.name, dataCommand.data.color);
+			return addSchemaItemToParent(dataCommand.data.parent, dataCommand.data.name, dataCommand.data.color, dataCommand.data.daygoal);
 		}
 
 		if (dataCommand.opType === 'deleteSignalItem') {
@@ -804,11 +811,11 @@ module.exports = {
 		}
 
 		if (dataCommand.opType === 'newSignalItem') {
-			var name = dataCommand.data;
+			var name = dataCommand.name;
 			name = _.escape(name);
 			name = _.truncate(name, {length: 64});
 
-			return addSignalItem(name);
+			return addSignalItem(name, dataCommand.daygoal);
 		}		
 
 		if (dataCommand.opType === 'newSignal') {

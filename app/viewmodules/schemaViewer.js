@@ -231,25 +231,61 @@ module.exports = function(Box) {
 
 		}
 
+		function resolveFullHours(timeInMs) {
+			return Math.floor(timeInMs / (3600 * 1000));
+		}
+
+		function resolveLeftMins(timeInMs) {
+			var hours = resolveFullHours(timeInMs);
+			return Math.round((timeInMs - (hours * 3600 * 1000)) / (60 * 1000));
+		}
+
 		function populateEditNameModal(schemaID) {
 			console.log("Populating edit name modal: " + schemaID);
 			var item = viewDataCached.schemaItems[schemaID];
+			if (item.daygoal && item.daygoal !== '' && item.daygoal !== '0') {
+				var parts = item.daygoal.split('_');
+				$el.find('#schemaitemcomp_el').val(parts[0]);
+				$el.find('#schemaitemboundaryhours_el').val(resolveFullHours(parseInt(parts[1])));
+				$el.find('#schemaitemboundarymins_el').val(resolveLeftMins(parseInt(parts[1])));				
+			} else {
+				$el.find('#schemaitemcomp_el').val('dd');
+				$el.find('#schemaitemboundaryhours_el').val(0);
+				$el.find('#schemaitemboundarymins_el').val(0);					
+			}
 
 			$el.find('#newschemaitemname_el').val(item.name);
 			$el.find('#editSchemaItemNameModal').data('schemaid', schemaID);
+			
+		}
+
+		function resolveHoursAndMins(hours, mins) {
+			hours = parseInt(hours);
+			if (isNaN(hours)) hours = 0;
+			mins = parseInt(mins);
+			if (isNaN(mins)) mins = 0;
+			return hours * 3600 * 1000 + mins * 60 * 1000;
 		}
 
 		function gatherAndSendEditSchemaName() {
-
+			// Now also edits daily goal stuff
+			var goalTypes = ['lt', 'le', 'gt', 'le'];
 			var schemaID = $el.find('#editSchemaItemNameModal').data('schemaid');
 			if (!schemaID || schemaID == '0') {
 				return;
 			}
 			console.warn("Updating schema item name");
 			var newName = $el.find('#newschemaitemname_el').val();
+			var goalType = $el.find('#schemaitemcomp_el').val();
+			var goalHours  = $el.find('#schemaitemboundaryhours_el').val();
+			var goalMins  = $el.find('#schemaitemboundarymins_el').val();
+
+			var timeInMs = resolveHoursAndMins(goalHours, goalMins);
+			var daygoalString = goalTypes.indexOf(goalType) === -1 ? '0' : goalType + '_' + timeInMs;
 			console.log("New name: " + newName);
+			console.log("New daily goal: " + daygoalString);
 			var ss = context.getService('settingsService');
-			ss.updateSchemaItem(schemaID, {name: newName});
+			ss.updateSchemaItem(schemaID, {name: newName, daygoal: daygoalString});
 
 		}
 

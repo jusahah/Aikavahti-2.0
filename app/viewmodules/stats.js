@@ -500,22 +500,26 @@ module.exports = function(Box) {
 			var dayArr = getDayArrayForGivenPayload();
 			var dayArrayWithTotalCount = [];
 			var data = viewDataCached.dayByDayCountPerSignalId;
+			var signalItem = viewDataCached.signalsTable[signalID];
+			var dayGoal = signalItem.daygoal;
 
 			_.each(dayArr, function(dateString) {
 
 				if (!data.hasOwnProperty(dateString) || !data[dateString].hasOwnProperty(signalID)) {
-					dayArrayWithTotalCount.push({date: dateString, count: 0});
+					dayArrayWithTotalCount.push({date: dateString, count: 0, goal: resolveGoal(0, dayGoal)});
 					return;
 				}
-
-				dayArrayWithTotalCount.push({date: dateString, count: data[dateString][signalID]});
+				var count = data[dateString][signalID];
+				dayArrayWithTotalCount.push({date: dateString, count: count, goal: resolveGoal(count, dayGoal)});
 
 			});	
 
 			$el.find('#individual_signalstatstable_body').empty().append(buildIndividualSignalStatsHTML(dayArrayWithTotalCount));
 			$el.find('#individual_signalstatstable').trigger('update');
-			var signalItem = viewDataCached.signalsTable[signalID];
+			
 			$el.find('#individual_signalstats_title').empty().append(signalItem ? signalItem.name : '---');
+			$el.find('#individual_signalstats_goalstring').empty().append(getGoalStringSignal(dayGoal));
+
 		}
 
 		var resolveAllChildrenOfSchemaId = function(schemaID) {
@@ -555,11 +559,21 @@ module.exports = function(Box) {
 					weekStart = "<span style='float: right; font-size: 10px; color: #333;'>(vko " + newWeek + ")</span>"; 
 					highlight = 'warning';
 				}
-
+				var goalSpan;
+				if (day.goal === undefined) {
+					// No goal rule defined
+					goalSpan = '---';
+				}
+				else if (day.goal) {
+					goalSpan = '<span class="txt-color-green"><i class="fa fa-check"></i></span>';
+				} else {
+					goalSpan = '<span class="txt-color-red"><i class="fa fa-times"></i></span>';
+				}
 				
 				html += '<tr class="'  + highlight + '">';
 				html += '<td data-sort="'+ m.format('YYYY-MM-DD') + '">' + m.format('DD.MM.YYYY (ddd)') + '' + weekStart + '</td>';
 				html += '<td data-sort=' + day.count + '>' + day.count + '</td>';
+				html += '<td>' + goalSpan + '</td>';
 				html += '</tr>';
 			};
 
@@ -583,15 +597,50 @@ module.exports = function(Box) {
 					highlight = 'warning';
 				}
 
+				var goalSpan;
+				if (day.goal === undefined) {
+					// No goal rule defined
+					goalSpan = '---';
+				}
+				else if (day.goal) {
+					goalSpan = '<span class="txt-color-green"><i class="fa fa-check"></i></span>';
+				} else {
+					goalSpan = '<span class="txt-color-red"><i class="fa fa-times"></i></span>';
+				}
+
 				
 				html += '<tr class="'  + highlight + '">';
 				html += '<td data-sort="'+ m.format('YYYY-MM-DD') + '">' + m.format('DD.MM.YYYY (ddd)') + '' + weekStart + '</td>';
 				html += '<td data-sort=' + day.t + '>' + beautifyTime(day.t) + '</td>';
 				html += '<td>' + getTimeBar(day.t) + '</td>';
+				html += '<td>' + goalSpan + '</td>';
 				html += '</tr>';
 			};
 
 			return html;
+		}
+
+		var resolveGoal = function(value, goalrule) {
+			// goalrule example: '>3600'
+			if (!goalrule || goalrule === '') return undefined; // No goal rule to apply
+
+			var parts = goalrule.split('_');
+
+			if (parts[0] === 'lt') {
+				return value < parseInt(parts[1]);
+			}
+			if (parts[0] === 'le') {
+				return value <= parseInt(parts[1]);
+			}
+			if (parts[0] === 'gt') {
+				return value > parseInt(parts[1]);
+			}
+			if (parts[0] === 'ge') {
+				return value >= parseInt(parts[1]);
+			}
+			if (parts[0] === 'e') {
+				return value === parseInt(parts[1]);
+			}
 		}
 
 		var loadTimespanModal = function(schemaID, onlyOwn) {
@@ -600,7 +649,8 @@ module.exports = function(Box) {
 			console.log(schemaID + " | " + onlyOwn);
 
 			console.log(viewDataCached.schemaItems);
-
+			var schemaItem = viewDataCached.schemaItems[schemaID];
+			var dayGoal = schemaItem.daygoal;
 			var allIDsToBeTotaled = [];
 			var kids = [schemaID];
 
@@ -619,7 +669,7 @@ module.exports = function(Box) {
 
 			_.each(dayArr, function(dateString) {
 				if (!data.hasOwnProperty(dateString)) {
-					dayArrayWithTotalTime.push({date: dateString, t: 0});
+					dayArrayWithTotalTime.push({date: dateString, t: 0, goal: resolveGoal(0, dayGoal)});
 					return;
 				}
 
@@ -632,7 +682,7 @@ module.exports = function(Box) {
 					}
 				});
 
-				dayArrayWithTotalTime.push({date: dateString, t: sum});
+				dayArrayWithTotalTime.push({date: dateString, t: sum, goal: resolveGoal(sum, dayGoal)});
 			});
 			console.warn("DAY ARRAY WITH TOTAL TIME");
 			console.log(dayArrayWithTotalTime);	
@@ -640,16 +690,44 @@ module.exports = function(Box) {
 			$el.find('#individual_statstable_body').empty().append(buildIndividualStatsHTML(dayArrayWithTotalTime));
 			$el.find('#individual_statstable').trigger('update');
 			// Changed here by adding var in front of schemaItem
-			var schemaItem = viewDataCached.schemaItems[schemaID];
+			
 			var titleString = schemaItem ? schemaItem.name : '---';
 			if (onlyOwn) titleString += " (vain omat)";
 			var subTitleString = !onlyOwn ? "Alaryhmiin kuuluvat aktiviteetit mukana tilastossa!" : "Alaryhmiin kuuluvat aktiviteetit EIVÄT ole mukana!";
 
 			$el.find('#individual_stats_title').empty().append(titleString);
 			$el.find('#individual_stats_subtitle').empty().append(subTitleString);
+			$el.find('#individual_stats_goalstring').empty().append(getGoalString(dayGoal));
 
 
 
+		}
+
+		var getComparisonString = function(comp) {
+			if (comp === 'lt') return 'alle';
+			if (comp === 'le') return 'maksimissaan';
+			if (comp === 'gt') return 'enemmän kuin';
+			if (comp === 'ge') return 'vähintään';
+			if (comp === 'e')  return 'tasan'; 
+			return '?';
+
+		}
+		var getGoalStringSignal = function(goalrule) {
+			if (!goalrule || goalrule === '') return 'Päivätavoite: ---';
+
+			var parts = goalrule.split('_');
+			var compString = getComparisonString(parts[0]);
+
+			return 'Päivätavoite: ' + compString + ' ' + parseInt(parts[1]) + ' kpl';
+		}
+
+		var getGoalString = function(goalrule) {
+			if (!goalrule || goalrule === '') return 'Päivätavoite: ---';
+
+			var parts = goalrule.split('_');
+			var compString = getComparisonString(parts[0]);
+
+			return 'Päivätavoite: ' + compString + ' ' + beautifyTime(parseInt(parts[1]));
 		}
 
 

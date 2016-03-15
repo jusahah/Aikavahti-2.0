@@ -44,6 +44,24 @@ module.exports = function(Box) {
 			});
 			
 		}
+		var getComparisonString = function(comp) {
+			if (comp === 'lt') return 'alle';
+			if (comp === 'le') return 'maksimissaan';
+			if (comp === 'gt') return 'enemmän kuin';
+			if (comp === 'ge') return 'vähintään';
+			if (comp === 'e')  return 'tasan'; 
+			return '?';
+
+		}		
+
+		var resolveDayGoalForTable = function(daygoal) {
+			if (!daygoal || daygoal === '' || daygoal == '0') return '---';
+
+			var parts = daygoal.split('_');
+			if (parts.length !== 2) return '---';
+			return getComparisonString(parts[0]) + " " + parts[1] + " kpl";
+
+		}
 
 		var buildHTML = function(signalsTable) {
 
@@ -53,6 +71,7 @@ module.exports = function(Box) {
 				 
 				html += '<tr>';
 				html += '<td>' + signalItem.name + '</td>';
+				html += '<td>' + resolveDayGoalForTable(signalItem.daygoal) + '</td>';
 				html += '<td><a data-toggle="modal" data-target="#deletesignalModal" data-type="deletesignalitem" data-payload="' + signalItem.id + '" class="btn btn-danger">Poista</a></td>';
 				html += '</tr>';
 			});
@@ -77,11 +96,16 @@ module.exports = function(Box) {
 		}
 
 		var gatherAndSendSignalData = function() {
+			var goalTypes = ['lt', 'le', 'gt', 'le', 'e'];
 			console.warn("Gather and send siglan creation");
 			var signalName = $el.find('#newsignalname_el').val();
+			var signalcomp = $el.find('#signalitemcomp_el').val();
+			var signalboundary = $el.find('#signalitemboundary_el').val();
+
+			var daygoalString = goalTypes.indexOf(signalcomp) === -1 || isNaN(parseInt(signalboundary)) ? '0' : signalcomp + '_' + signalboundary;
 
 			var ss  = context.getService('settingsService');
-			var prom = ss.createSignalItem(signalName);
+			var prom = ss.createSignalItem(signalName, daygoalString);
 
 		}
 

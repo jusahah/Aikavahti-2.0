@@ -15,7 +15,8 @@ var schemaItem = Joi.object().keys({
     color: Joi.string().required().hex(), // Color
     parent: Joi.number().integer(),
     children: Joi.optional(),
-    active: Joi.boolean()
+    active: Joi.boolean(),
+    daygoal: Joi.string().optional()
 }); // Validate against Joi schema here
 
 var signalItem = Joi.object().keys({
