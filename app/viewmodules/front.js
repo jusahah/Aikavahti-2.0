@@ -122,12 +122,13 @@ module.exports = function(Box) {
 			$lastTenUL.empty();
 
 			var todayStartTimestamp = getTodayStartTimestamp();
-
+			var first = true;
 			_.each(lastTen, function(oneLast) {
 				console.log("APPENDING ONE");
 				if (oneLast.start >= todayStartTimestamp) {
-					$lastTenUL.append(getLastTenLI(oneLast));
+					$lastTenUL.append(getLastTenLI(oneLast, first));
 				}
+				first = false;
 				
 			});
 
@@ -219,7 +220,7 @@ module.exports = function(Box) {
 			return html;
 		}
 
-		var getLastTenLI = function(schemaItem) {
+		var getLastTenLI = function(schemaItem, isFirst) {
 			console.log("BUILDING LI FOR last 10");
 			console.log(schemaItem);
 			var started = beautifyTimestamp(schemaItem.start);
@@ -246,7 +247,7 @@ module.exports = function(Box) {
 			
 			var textcolor = tc.isDark() ? 'txt-color-white' : 'txt-color-black'; 	
 			var timecolor = tc.isDark() ? 'fff' : '222';		
-			li += '<span ' + toggleText + ' style="text-align: center; min-width: 88px; position: relative; background-color:#' + color + ';" class="' + textcolor + '" data-icon="fa-time"><span style="color: #' + timecolor + '; position: absolute; bottom: 6px; left: 12px; font-size: 10px;">' + ended + '-' + started + '</span>' + name + icon + '</span>';
+			li += '<span ' + toggleText + ' style="text-align: center; min-width: 88px; position: relative; background-color:#' + color + ';" class="' + textcolor + '" data-icon="fa-time"><span style="color: #' + timecolor + '; position: absolute; bottom: 6px; left: 12px; font-size: 10px;">' + (isFirst ? '??.??' : ended) + '-' + started + '</span>' + name + icon + '</span>';
 			li += '</li>';
 
 

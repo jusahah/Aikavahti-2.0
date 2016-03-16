@@ -372,13 +372,13 @@ function deleteSignalItem(id) {
 		return signal.id === id;
 	});
 
-	if (i === -1) return Promise.reject('Signal item deletion failed - item not found');
+	if (i === -1) return Promise.reject('Signaalia ei löytynyt järjestelmästä.');
 
 	// Remove events wit this signal id
 	removeSignalEvents(id);
 	// Remove signal item
 	appData.signals.splice(i, 1);
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Signaali ja sen tapahtumat poistettu järjestelmästä.');
 }
 
 function ensureSignalIDExists(id) {
@@ -406,7 +406,6 @@ function ensureSchemaIDExists(id) {
 
 	}
 	_.each(firstLevelArray, searchSubtree);
-	console.log("ensureSchemaIDExists: " + found);
 	return found;
 }
 
@@ -426,8 +425,16 @@ function getSchemaItemIfExists(id) {
 
 	}
 	_.each(firstLevelArray, searchSubtree);
-	console.log("getSchemaItemIfExists: " + found);
 	return found;
+}
+
+function getSignalItemIfExists(id) {
+	id = parseInt(id);
+	var i = _.findIndex(appData.signals, function(signal) {
+		return signal.id === id;
+	});
+
+	return i === -1 ? null : appData.signals[i];	
 }
 
 function addSignalEvent(eventData) {
@@ -437,8 +444,8 @@ function addSignalEvent(eventData) {
 	var t = eventData.t + "";
 	t = t.substring(0, t.length-1);
 	eventData.t = parseInt(t + "5");
-
-	if (parseInt(eventData.s) !== 0 && !ensureSignalIDExists(parseInt(eventData.s))) {
+	var signalItem = getSignalItemIfExists(eventData.s);
+	if (parseInt(eventData.s) !== 0 && !signalItem) {
 		return Promise.reject('Signaalitapahtuman luonti epäonnistui! Signaalia ei löytynyt.');
 	}
 
@@ -446,7 +453,7 @@ function addSignalEvent(eventData) {
 
 	// If we need to inform some web API event hook this would be pretty good place to do it
 
-	return writeToDiskIfNeeded(null, 'Uusi signaalitapahtuma lisätty aikajanalle!');
+	return writeToDiskIfNeeded(null, 'Uusi signaalitapahtuma lisätty aikajanalle: <strong>' + signalItem.name + ' (' + moment(eventData.t).format('DD.MM.YYYY HH:mm') + ')</strong>');
 
 }
 
@@ -457,16 +464,16 @@ function addEvent(eventData) {
 	var t = eventData.t + "";
 	t = t.substring(0, t.length-1);
 	eventData.t = parseInt(t + "5");
-
-	if (parseInt(eventData.s) !== 0 && !ensureSchemaIDExists(parseInt(eventData.s))) {
-		return Promise.reject('New event fail! Schema ID does not exist in datalayer!');
+	var schemaItem = getSchemaItemIfExists(eventData.s);
+	if (parseInt(eventData.s) !== 0 && !schemaItem) {
+		return Promise.reject('Tapahtuman luonti epäonnistui! Aktiviteettia ei löytynyt.');
 	}
 
 	appData.events.push(eventData);
 
 	// If we need to inform some web API event hook this would be pretty good place to do it
 
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Uusi aktiviteetti aloitettu: <strong>' + schemaItem.name + ' (' + moment(eventData.t).format('DD.MM.YYYY HH:mm') + ')</strong>');
 
 }
 
@@ -475,16 +482,13 @@ function addSchemaItem(pathParts, schemaData) {
 	pathParts.shift(); // Remove first which is 'schema'
 	var currentChildren = appData.schema['_root_'];
 	var last = pathParts.pop();
-	//console.log(pathParts);
+
 
 	// Hunt down the parent
 	_.each(pathParts, function(part) {
-		console.log("Current children");
-		//console.log(JSON.stringify(currentChildren));
+
 		var found = false;
 		for(var i = 0, j = currentChildren.length; i < j; i++) {
-
-			//console.log(currentChildren[i]);
 			var child = currentChildren[i];
 			console.log("Comparing in schema traversal: " + child.id + " vs. " + part);
 			if (parseInt(child.id) === parseInt(part)) {
@@ -495,13 +499,14 @@ function addSchemaItem(pathParts, schemaData) {
 			}
 		}
 
-		if (!found) throw 'Child not found in addSchemaItem';
+		if (!found) {
+			console.error('Child not found in addSchemaItem');
+			throw 'Child not found in addSchemaItem';
+		}
 
 		
 	});
 
-	console.log("CHILDREN HUNTED DOWN");
-	// Find the parent now
 	var parentItem;
 	for(var i = 0, j = currentChildren.length; i < j; i++) {
 		if (parseInt(currentChildren[i].id) === parseInt(last)) {
@@ -510,23 +515,24 @@ function addSchemaItem(pathParts, schemaData) {
 		}
 	}
 	
-	if (!parentItem) throw 'Final child not found in addSchemaItem';
+	if (!parentItem) {
+		console.error('Final child not found in addSchemaItem');
+		throw 'Final child not found in addSchemaItem';
+	}
 
 	if (!parentItem.hasOwnProperty('children')) parentItem.children = [];
 
 	schemaData.id = generateSchemaID();
 	parentItem.children.push(schemaData);
-	//appData.schema[schemaData.id] = schemaData;
-	//console.log(JSON.stringify(appData));
 
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Uusi aktiviteetti lisätty järjestelmään!');
 
 }
 
 function deleteSchemaItem(pathParts, schemaData) {
 	// Unsupported as of now
 	console.error("Deleting schema items currently unsupported - this may change in future versions of Aikavahti");
-	return Promise.reject('Schema items can not be deleted - unsupported operation');
+	return Promise.reject('Kerran luotua aktiviteettia ei voi poistaa.');
 
 }
 
@@ -542,11 +548,11 @@ function deleteEvent(data) {
 	});
 
 	if (i === -1) {
-		return Promise.reject('Event not found and could not be deleted!');
+		return Promise.reject('Tapahtuman poisto epäonnistui! Tapahtumaa ei löytynyt annetulla aikamääreellä.');
 	}
 
 	events.splice(i, 1); // Deletion
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Tapahtuma poistettu.');
 
 }
 
@@ -557,27 +563,20 @@ function modifyOneSetting(path, newValue) {
 	_.each(parts, function(part) {
 		currTraversing = currTraversing[part];
 	});	
-	console.log("Overwriting old settings data with new!");
-	//console.log(currTraversing);
-	console.log(currTraversing);
 	currTraversing[last] = newValue;
 
-	return writeToDiskIfNeeded(true);
+	return writeToDiskIfNeeded(true, 'Asetukset päivitetty.');
 }
 
 function recolorSchema() {
-	console.warn("DATA LAYER: Recoloring...");
+
 	colorAssigner(appData.schema['_root_']);
-			console.error("DATA TREE IN READY");
-	console.log(appData.schema['_root_']);
-	console.log(JSON.stringify(appData.schema['_root_']));
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Aktiviteettipuu on väritetty arvotuilla väreillä.');
 
 }
 
 function updateSchemaItem(data) {
-	console.warn("UPDATING SCHEMA ITEM IN DATA LAYER");
-	console.log(data);
+
 	var id = data.id;
 	var fields = data.fields;
 
@@ -588,7 +587,7 @@ function updateSchemaItem(data) {
 	var item = getSchemaItemIfExists(id);
 
 	if (!item) {
-		return Promise.reject('Schema item not found with ID: ' + id);
+		return Promise.reject('Aktiviteettia ei löytynyt identifikaatiotunnuksella: ' + id);
 	}
 
 	var clonedItem = _.assign({}, item);
@@ -596,55 +595,48 @@ function updateSchemaItem(data) {
 	clonedItem.name = name ? name : clonedItem.name;
 	clonedItem.daygoal = daygoal ? daygoal : clonedItem.daygoal;
 
-	console.log("Changed schema item clone: " + JSON.stringify(clonedItem));
-
 	var err = dataSchema.validateSchemaItem(clonedItem);
 
 	if (err) {
-		console.error(err);
-		return Promise.reject(err);
+		return Promise.reject('Aktiviteetin päivitys epäonnistui. Tarkista syöttämäsi tiedot.');
 	}
 	// No errors so update real schema object
 	item.color = color ? color : item.color;
 	item.name  = name ? name : item.name;
 	item.daygoal = daygoal ? daygoal : item.daygoal;
 
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Aktiviteetin tiedot päivitetty.');
 
 }
 
 function importFromFile(file) {
 	try {
 		var data = fs.readJsonSync(file);
-		console.warn("IMPORT IMPORT IMPORT!!!!");
-		console.log(data);
 	} catch(e) {
-		console.error("IMPORT FAILURE!!!!");
-		console.log(e);
-		return Promise.reject('Import failed');
+		return Promise.reject({msg: 'Tuonti tiedostosta epäonnistui.', priv: e});
 	}	
 
 	if (!data.hasOwnProperty('aikavahtiTimestamp')) {
-		return Promise.reject('Import failed - JSON did not contain aikavahtiTimestamp-property');
+		return Promise.reject('Tiedoston luku onnistui, mutta data mahdollisesti korruptoitunut.');
 	}
 
 	// All is fine
 	appData = data.data;
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Aineiston tuonti tiedostosta onnistui.');
 }
 
 function exportToFile(file) {
 	return new Promise(function(resolve, reject) {
-		console.warn("Push to EXPORT file: " + file);
 		var exportData = {
 			aikavahtiTimestamp: Date.now(),
 			data: appData
 		};
 		fs.writeJson(file, exportData, function(err) {
 			if (err) {
-				return reject(err);
+				console.error(err);
+				return reject({msg: 'Vienti tiedostoon epäonnistui.', priv: err});
 			}
-			return resolve();
+			return resolve('Uusi tiedosto luotu: <strong>' + file + '</strong>');
 		});
 	});	
 }
@@ -666,7 +658,7 @@ function adminCommand(operation, data) {
 }
 
 function updateNotes(timestamp, notes) {
-	console.warn("UPDATING NOTES: " + notes + ", " + timestamp);
+
 	notes = _.escape(notes);
 	notes = _.truncate(notes, {length: 512});
 	timestamp = parseInt(timestamp);
@@ -678,12 +670,12 @@ function updateNotes(timestamp, notes) {
 	});
 
 	if (i === -1) {
-		return Promise.reject('Event not found and could not be updated!');
+		return Promise.reject('Tapahtuman muistiinpanojen päivitys epäonnistui! Tapahtumaa ei löytynyt.');
 	}	
 
 	events[i].notes = notes;
 
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Tapahtuman muistiinpanot päivitetty.');
 
 }
 
@@ -696,14 +688,14 @@ function addMainSchemaItem(name, color, daygoal) {
 	}
 
 	appData.schema['_root_'].push(schemaData);
-	return writeToDiskIfNeeded();	
+	return writeToDiskIfNeeded(null, 'Uusi aktiveettien pääryhmä lisätty järjestelmään.');	
 }
 
 function addSchemaItemToParent(parentID, name, color, daygoal) {
 	var item = getSchemaItemIfExists(parentID);
 
 	if (!item) {
-		return Promise.reject('Creation failed! Parent schema item not found with ID: ' + id);
+		return Promise.reject('Aktiviteetin/aliryhmän luonti epäonnistui. Isäntäryhmää ei löytynyt: ' + id);
 	}	
 
 	if (!item.hasOwnProperty('children')) {
@@ -719,17 +711,15 @@ function addSchemaItemToParent(parentID, name, color, daygoal) {
 
 	item.children.push(schemaData);
 
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Uusi aktiviteetti lisätty osaksi ryhmää <strong>' + item.name + '</strong>');
 }
 
 function getCurrentEventInfo() {
 	if (appData.events.length === 0) {
-		return Promise.reject('No current event yet - system in fresh state!');
+		return Promise.reject('Järjestelmä vailla ainuttakaan tapahtumaa - lisää uusi tapahtuma ensin.');
 	}
 
 	var eventFound;
-	console.warn("SEARCHING UCRREN")
-	console.log(JSON.stringify(appData.events));
 	var currentWinnerTime = 0;
 	for (var i = appData.events.length - 1; i >= 0; i--) {
 		var event = appData.events[i];
@@ -739,9 +729,7 @@ function getCurrentEventInfo() {
 		}
 	};
 
-	if (!eventFound) return Promise.reject('Current event not found - only signals in the system!');
-	console.warn("CURRENT EVENT FOUND IN DATALAYer");
-	console.log(JSON.stringify(eventFound));
+	if (!eventFound) return Promise.reject('Järjestelmä sisältää signaalitapahtumia, mutta ei tapahtumia.');
 
 	var currentCopy = Object.assign({}, eventFound);
 
@@ -797,8 +785,8 @@ module.exports = {
 			var err = dataSchema.validateSchemaItem(dataCommand.data);
 
 			if (err) {
-				console.error("SCHEMA item Validation failed in data layer dataCommandIn!");
-				return Promise.reject(err);
+				console.error(err);
+				return Promise.reject('Aktiviteetin luonti epäonnistui. Tarkista syöttämäsi tiedot.');
 			}
 
 			if (dataCommand.data.parent === -1) {
@@ -826,8 +814,8 @@ module.exports = {
 			var err = dataSchema.validateEvent(dataCommand.data);
 
 			if (err) {
-				console.error("Event (signal) validation failed in data layer dataCommandIn!");
-				return Promise.reject(err);
+				console.error(err);
+				return Promise.reject('Signaalitapahtuman luonti epäonnistui. Tarkista tiedot.');
 			}
 
 			return addSignalEvent(dataCommand.data);			
@@ -848,9 +836,8 @@ module.exports = {
 			var err = dataSchema.validate(dataCommand.treePath, dataCommand.data);
 			if (err) {
 
-				console.error("Validation failed in data layer dataCommandIn!");
-				console.log(err);
-				return Promise.reject(err);
+				console.error(err);
+				return Promise.reject('Syötettyjen tietojen validointi ei mennyt lävitse. Tarkista tiedot.');
 			}			
 		} 
 		// Data is good
@@ -889,9 +876,8 @@ module.exports = {
 			}			
 		}
 
-		console.error("No clause matched in dataCommandIn!");
-		console.log(dataCommand);
-		return Promise.reject('Clause match failed in dataCommandIn');
+		console.error("No clause matched in dataCommandIn: " + dataCommand.opType);
+		return Promise.reject({msg: 'Järjestelmävirhe - tarkista virheloki', priv: 'No clause matched in command dispatcher in data layer!'});
 
 
 	},
@@ -940,12 +926,4 @@ module.exports = {
 
 
 }
-/*
-setTimeout(function() {
-	pushToDB({name: 'jaakko'});
-}, 1900);
 
-setTimeout(function() {
-	fetchFromDB();
-}, 2500);
-*/
