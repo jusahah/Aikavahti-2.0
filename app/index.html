@@ -255,7 +255,7 @@
 					<div class="txt-color-white inline-block">
 						<i class="txt-color-blueLight hidden-mobile">Tilastot päivitetty: <strong><span id="aikavahti_statstime">---</span></strong> </i>
 						<div class="btn-group dropup">
-							<button style="margin-left: 6px;" class="btn dropdown-toggle btn-xs bg-color-blue txt-color-white" data-toggle="dropdown">Ilmoitushistoria
+							<button style="margin-left: 6px;" class="btn dropdown-toggle btn-xs bg-color-blue txt-color-white" data-type="notificationHistory" data-toggle="modal" data-target="#notificationsModal">Ilmoitushistoria
 								
 							</button>
 							<ul class="dropdown-menu pull-right text-left">
@@ -300,6 +300,39 @@
 			<div class="row" id="alertBottomRow" style="margin: 0; padding: 0; display: none; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1005;">
 				<div id="aikavahti_notification" class="alert alert-danger" style="height: 52px; width: 100%; margin: 0; text-align: center; font-size: 14px; padding-top: 14px;"></div>
 			</div>
+
+			<!-- Notification history modal -->
+			<div class="modal fade" id="notificationsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title">Ilmoitushistoria</h4>
+								<br/>
+								<p style="font-style: italic;">
+								Historia näyttää vain ilmoitukset, jotka ovat tapahtuneet ohjelman ajon aikana.
+									
+								</p>
+							</div>
+							<div class="modal-body">
+									<div class="widget-body" id="notificationhistory_area">
+
+										
+
+									</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">
+									Sulje
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 		<!-- END PAGE FOOTER -->
 

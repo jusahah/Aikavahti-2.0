@@ -1,4 +1,6 @@
 // Errors & notifications module
+var moment = require('moment');
+var _ = require('lodash');
 
 module.exports = function(Box) {
 
@@ -13,6 +15,8 @@ module.exports = function(Box) {
 		var DURATION = 6000;
 
 		var currAlertCounter = 1;
+		var historyArr = [];
+
 
 
 		// Private stuff
@@ -25,13 +29,13 @@ module.exports = function(Box) {
 			if (data && typeof(data) === 'object') {
 				notif.removeClass('alert-success alert-warning alert-info alert-danger').addClass('alert-' + data.type);
 				notif.empty().append(data.msg);
+				historyArr.push({type: data.type, msg: data.msg, t: Date.now()});
 			} else {
 				// It is error
 				notif.removeClass('alert-success alert-warning alert-info').addClass('alert-danger');
 				notif.empty().append(data);
+				historyArr.push({type: 'danger', msg: data, t: Date.now()});
 			}
-			
-
 			
 			//defaultRow.hide();
 			alertRow.show();
@@ -52,18 +56,39 @@ module.exports = function(Box) {
 			showTimer = null;
 		}
 
+		var populateHistoryModal = function() {
+			var historyArea = $el.find('#notificationhistory_area');
+			var html = '';
+			_.forEachRight(historyArr, function(notification) {
+				html += '<div class="alert alert-block alert-' + notification.type + '">';
+				html += '<span style="font-size: 11px;">' + moment(notification.t).format('HH:mm:ss') + '</span>';
+				html += '<p>' + notification.msg + '</p>';
+				html += '</div>';
+			});
+			console.log("HTML: " + html);
+			historyArea.empty().append(html);
+		}
+
 
 		
 
 		// Public API
 		return {
 
-			messages: ['notificationTriggered'],
+			messages: ['notificationTriggered', 'statsUpdated'],
+
+			onclick: function(event, element, elementType) {
+				if (elementType === 'notificationHistory') {
+					populateHistoryModal();
+				}
+			},
 
 			onmessage: function(name, data) {
 
 				if (name === 'notificationTriggered') {
 					showNotification(data);
+				} else if (name === 'statsUpdated') {
+					$el.find('#aikavahti_statstime').empty().append(moment().format('HH:mm:ss'));
 				}
 			}
 

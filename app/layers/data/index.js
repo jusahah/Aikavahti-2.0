@@ -457,7 +457,7 @@ function addSignalEvent(eventData) {
 
 }
 
-function addEvent(eventData) {
+function addEvent(eventData, isAfter) {
 	// Here we do the "fivecation"
 	// This is done because allows easier adding of "artificial events" in transforms
 	// For example, overlapping can not happen as long as artificials use 0 and 9 as last digit.
@@ -470,10 +470,10 @@ function addEvent(eventData) {
 	}
 
 	appData.events.push(eventData);
-
+	var succText = isAfter ? 'Uusi tapahtuma lisätty jälkikäteen:' : 'Uusi aktiviteetti aloitettu:';
 	// If we need to inform some web API event hook this would be pretty good place to do it
 
-	return writeToDiskIfNeeded(null, 'Uusi aktiviteetti aloitettu: <strong>' + schemaItem.name + ' (' + moment(eventData.t).format('DD.MM.YYYY HH:mm') + ')</strong>');
+	return writeToDiskIfNeeded(null, succText + ' <strong>' + schemaItem.name + ' (' + moment(eventData.t).format('DD.MM.YYYY HH:mm') + ')</strong>');
 
 }
 
@@ -864,7 +864,7 @@ module.exports = {
 			}
 		} else if (dataCommand.opType === 'new') {
 			if (firstPath === 'events') {
-				return addEvent(dataCommand.data);
+				return addEvent(dataCommand.data, dataCommand.afterWards);
 			} else if (firstPath === 'schema') {
 				return addSchemaItem(pathParts, dataCommand.data);
 			}

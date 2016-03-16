@@ -53,6 +53,7 @@ module.exports = function(Box, datalayer) {
 				var timestamp = Date.now();
 				return datalayer.dataCommandIn({
 					opType: 'new', 
+					afterWards: false,
 					treePath: 'events', 
 					data: {
 						s: schemaID,
@@ -71,6 +72,7 @@ module.exports = function(Box, datalayer) {
 				}
 				return datalayer.dataCommandIn({
 					opType: 'new', 
+					afterWards: true,
 					treePath: 'events', 
 					data: {
 						s: schemaID,

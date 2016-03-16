@@ -198,7 +198,7 @@ Box.Application.addModule('valikko', function(context) {
 			console.log("Removing active");
 			computationText.empty().append('Tilastot valmiina!');
 			computeProgressBar.parent().removeClass('active');
-			$('#aikavahti_statstime').empty().append(moment().format('HH:mm:ss'));
+			Box.Application.broadcast('statsUpdated');
 		}
 		computeProgressBar.css('width', percentageDone + "%");
 		computeProgressBar.empty().append(percentageDone + "%");
