@@ -26,14 +26,24 @@ module.exports = function(Box) {
 		}
 
 		var activate = function() {
-			//$el.hide();			
-			isHidden = false;	
-			setTimeout(function() {
-				$('#globalLoadingBanner').hide();	
-			}, 0);
+			// hide right away in case we are reactivating view that is currently visible
+			$el.hide();
+			var derivedService  = context.getService('derivedData');
+			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
+			isHidden = false;
 
-			console.warn("IMPORT activate");
-			$el.show();
+			viewDataPromise.then(function(viewData) {
+				if (isHidden) return; // User already switched to another view			
+
+				//viewDataCached = viewData;
+
+				//var dataObj = context.getService('derivedData').easify(viewData);			
+				// viewData is always object with transforNames being keys and data being values
+				$('#globalLoadingBanner').hide();
+				//$el.find('#signalstable_body').empty().append(buildHTML(viewData.signalsTable));
+				//$el.empty().append("<h3>" + JSON.stringify(viewData) + "</h3>");
+				$el.show();
+			});
 			
 		}
 
@@ -45,7 +55,6 @@ module.exports = function(Box) {
 		}
 
 		var importFile = function() {
-			console.warn("UPLOADING FILE");
   			
 			dialog.showOpenDialog(function (fileNames) {
 				console.log(fileNames);
@@ -60,24 +69,12 @@ module.exports = function(Box) {
 			var adminService = context.getService('adminService');
 			var prom = adminService.importFile(file);
 
-			prom.then(function() {
-				$el.css('background-color', 'green');
-			}).catch(function() {
-				$el.css('background-color', 'red');
-			});
 		}
 
 		var sendExportCommand = function(file) {
 			var adminService = context.getService('adminService');
 			var prom = adminService.exportFile(file);
-
-			prom.then(function() {
-				console.log("EXPORT SUCC");
-				$el.css('background-color', 'green');
-			}).catch(function() {
-				console.log("EXPORT FAIL");
-				$el.css('background-color', 'red');
-			});			
+		
 		}
 
 		

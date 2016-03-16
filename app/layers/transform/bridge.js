@@ -6,7 +6,6 @@ var ipcRenderer = require('electron').ipcRenderer;
 
 // Listen for incoming stuff
 ipcRenderer.on('computationresult', function(event, data) {
-	console.log("One result came back!");
 	receiveResult(data.name, data.results, data.batchID, data.percentageDone, data.calcTime);
 });
 ipcRenderer.on('computationfailure', function(event, data) {
@@ -21,17 +20,13 @@ var msgIDCounter = 1; //Static counter for app lifecycle
 var cbsBack = {};
 
 function sendAway(data, batchID) {
-	console.log("BRIDGE -> Main process");
-	console.log(data);
+	console.log("BRIDGE -> Main process: " + batchID);
 	ipcRenderer.send('computationrequest', {data: data, batchID: batchID});
 }
 
 function receiveResult(name, results, batchID, percentageDone, calcTime) {
 	if (cbsBack.hasOwnProperty(batchID)) {
-		logging.dev("PIPING RESULTS BACK TO RESULTS CB");
-		console.log("Results back in bridge");
-		console.log("NAME: " + name);
-		console.log(results);
+		console.log("Results back in bridge: " + batchID);
 		cbsBack[batchID](name, results, percentageDone, calcTime);
 	}
 }

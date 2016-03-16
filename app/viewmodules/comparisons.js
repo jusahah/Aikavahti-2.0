@@ -43,8 +43,6 @@ module.exports = function(Box) {
 
 			viewDataPromise.then(function(viewData) {
 				if (isHidden) return; // User already switched to another view			
-				console.log("View data");
-				console.log(viewData);
 
 				viewDataCached = viewData;
 
@@ -111,8 +109,6 @@ module.exports = function(Box) {
 			var upperLimitInCount = 300; // 100
 
 			var weeksArray = createWeeksArray(Date.now());
-			console.error("STARTING TO BUILD SIGNAL TABLE FOR WEEK");
-
 
 			_.each(weeksArray, function(weekString) {
 				body += '<tr>';
@@ -120,8 +116,6 @@ module.exports = function(Box) {
 				body += '</tr>';
 
 			});
-			console.error("COMPARISONG TABLE BODY (FOR WEEK)");
-			console.log(body);
 			return body;			
 		}
 
@@ -132,8 +126,6 @@ module.exports = function(Box) {
 			var upperLimitInCount = 300; // 100
 
 			var monthsArray = createMonthsArray(Date.now());
-			console.error("STARTING TO BUILD SIGNAL TABLE FOR MONTH");
-			console.log(monthsArray);
 
 			_.each(monthsArray, function(monthString) {
 				body += '<tr>';
@@ -141,8 +133,6 @@ module.exports = function(Box) {
 				body += '</tr>';
 
 			});
-			console.error("COMPARISONG TABLE BODY (FOR MONTH)");
-			console.log(body);
 			return body;			
 		}
 
@@ -162,7 +152,6 @@ module.exports = function(Box) {
 		var getWeekString = function(timestamp) {
 
 			var m = moment(timestamp);
-			console.log("WEEK STRING IS: " + m.isoWeekYear() + "-" + m.isoWeeks());
 			return m.isoWeekYear() + "-" + m.isoWeeks();
 		}
 
@@ -193,8 +182,6 @@ module.exports = function(Box) {
 				m = m.subtract(1, 'months');
 				arr.push(m.year() + "-" + (m.month() + 1)); // We will use one-based month indeces
 			};
-			console.log("MONTH ARR");
-			console.log(arr);
 			return arr;
 		}
 
@@ -284,9 +271,6 @@ module.exports = function(Box) {
 			var upperLimitInMs = 3600 * 1000 * 400; // 400 hours is color cap for month
 
 			var monthsArray = createMonthsArray(Date.now());
-			console.error("STARTING TO BUILD TABLE FOR MONTH");
-			console.log(monthsArray);
-			console.log(monthByMonthTable);
 
 			_.each(monthsArray, function(monthString) {
 				body += '<tr>';
@@ -294,8 +278,6 @@ module.exports = function(Box) {
 				body += '</tr>';
 
 			});
-			console.error("COMPARISONG TABLE BODY (FOR MONTH)");
-			console.log(body);
 			return body;
 
 			//var sortedArrayOfMonthStrings = getWeekArray(weekByWeekTable);
@@ -317,8 +299,6 @@ module.exports = function(Box) {
 				body += '</tr>';
 
 			});
-			console.error("COMPARISONG TABLE BODY");
-			console.log(body);
 			return body;
 
 			var sortedArrayOfWeekStrings = getWeekArray(weekByWeekTable);
@@ -350,14 +330,12 @@ module.exports = function(Box) {
 		}
 
 		var sendSignalDeleteRequest = function(signalID) {
-			console.warn("SIGNAL DELETE REQUEST FOR SIGNAL: " + signalID);
 			var ss  = context.getService('settingsService');
 
 			var prom = ss.deleteSignalItem(signalID);
 		}
 
 		var gatherAndSendSignalData = function() {
-			console.warn("Gather and send siglan creation");
 			var signalName = $el.find('#newsignalname_el').val();
 
 			var ss  = context.getService('settingsService');

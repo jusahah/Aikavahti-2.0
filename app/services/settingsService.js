@@ -22,7 +22,6 @@ module.exports = function(Box, datalayer) {
 
 				var p1 = this.setDataSettings(data);
 				//var p2 = this.setInternetSettings(internet);
-				console.warn("Settings passed to next layer down");
 				return p1
 				.then(application.getService('errorService').success)
 				.catch(application.getService('errorService').notify);				
@@ -77,8 +76,7 @@ module.exports = function(Box, datalayer) {
 				.catch(application.getService('errorService').notify);								
 			},
 			createSignalItem: function(name, dayGoal) {
-				console.log("NOTIFY FUN BELOW");
-				console.log(application.getService('errorService').notify);
+
 				return datalayer.dataCommandIn({opType: 'newSignalItem', name: name, daygoal: dayGoal})
 				.then(application.getService('errorService').success)
 				.catch(application.getService('errorService').notify);

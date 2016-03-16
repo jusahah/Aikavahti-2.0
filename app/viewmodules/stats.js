@@ -39,7 +39,6 @@ module.exports = function(Box) {
 		var activate = function(preventHide) {
 			// hide right away in case we are reactivating view that is currently visible
 			if (!preventHide) $el.hide();			
-			console.log("Activate in stats module");
 			var derivedService  = context.getService('derivedData');
 			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 			isHidden = false;
@@ -78,9 +77,6 @@ module.exports = function(Box) {
 
 		var decorateSchemaTree = function(decorations, schemaTree) {
 
-			console.log("DECS");
-			console.log(decorations);
-
 			var decorateChild = function(decorations, child) {
 				var sum = 0;
 				if (decorations.hasOwnProperty(child.id)) {
@@ -97,7 +93,6 @@ module.exports = function(Box) {
 				} else {
 					child.leaf = true;
 				}
-				console.log("CHILD " + child.id + " GETS: " + sum);
 				child.totalTime = sum;
 				return sum;
 
@@ -183,8 +178,7 @@ module.exports = function(Box) {
 					o[signal.s] += 1;
 				}
 			});
-			console.log("SIGNAL COUNTS PER ID");
-			console.log(JSON.stringify(o));
+
 			return o;
 
 
@@ -240,8 +234,6 @@ module.exports = function(Box) {
 			var endTs = Date.now() + 1000;
 			var signalIDToDuration = signalCountsSinceAndBeforeTimestamp(eventsAndSignalsList, startTs, endTs);
 			var decoratedSignalTable = decorateSignalTable(signalsTable, signalIDToDuration);
-			console.log("DECOR SIGNAL TABLE");
-			console.log(decoratedSignalTable);
 
 			$el.find('#signals_table_body').empty().append(buildSignalHTML(decoratedSignalTable));
 			$el.find("#signals_table_sortable").trigger("update"); 
@@ -297,7 +289,6 @@ module.exports = function(Box) {
 
 			if (coloredTree && coloredTree.length !== 0) {
 				_.each(coloredTree, function(branch) {
-					console.log("BRANCH: " + branch.name + " with depth " + depth);
 					if (showMode !== 'leaves' || (!branch.hasOwnProperty('children') || branch.children.length === 0)) {
 						subHTML += createOneElement(branch.id, false, branch.name, branch.totalTime, branch.color, depth);
 						if (!branch.leaf) {
@@ -523,9 +514,9 @@ module.exports = function(Box) {
 		}
 
 		var resolveAllChildrenOfSchemaId = function(schemaID) {
-			console.log("RESOLVING KIDS FOR SCHEMA ID: " + schemaID);
+
 			var schemaItem = viewDataCached.schemaItems[schemaID];
-			console.log(schemaItem);
+
 			if (schemaItem && schemaItem.hasOwnProperty('children') && schemaItem.children.length !== 0) {
 				var kids = _.map(schemaItem.children, resolveAllChildrenOfSchemaId);
 				kids.push(schemaID);
@@ -645,10 +636,6 @@ module.exports = function(Box) {
 
 		var loadTimespanModal = function(schemaID, onlyOwn) {
 
-			console.log("LOADING TIME SPAN MODAL");
-			console.log(schemaID + " | " + onlyOwn);
-
-			console.log(viewDataCached.schemaItems);
 			var schemaItem = viewDataCached.schemaItems[schemaID];
 			var dayGoal = schemaItem.daygoal;
 			var allIDsToBeTotaled = [];
@@ -659,9 +646,8 @@ module.exports = function(Box) {
 				kids = _.flattenDeep(kids);
 			} 
 
-			console.log("KIDS ARE: " + JSON.stringify(kids));
+
 			allIDsToBeTotaled = _.concat(allIDsToBeTotaled, kids);
-			console.log("ALL IDS ARE: " + JSON.stringify(allIDsToBeTotaled));
 			var dayArr = getDayArrayForGivenPayload();	
 
 			var dayArrayWithTotalTime = [];
@@ -684,8 +670,6 @@ module.exports = function(Box) {
 
 				dayArrayWithTotalTime.push({date: dateString, t: sum, goal: resolveGoal(sum, dayGoal)});
 			});
-			console.warn("DAY ARRAY WITH TOTAL TIME");
-			console.log(dayArrayWithTotalTime);	
 
 			$el.find('#individual_statstable_body').empty().append(buildIndividualStatsHTML(dayArrayWithTotalTime));
 			$el.find('#individual_statstable').trigger('update');
@@ -761,8 +745,7 @@ module.exports = function(Box) {
 				arr.push(moment(d).format('DD-MM-YYYY'));
 				d -= 86400 * 1000;
 			}
-			console.warn("DAY ARRAY");
-			console.log(JSON.stringify(arr));
+
 			return arr;
 
 		}
@@ -773,9 +756,7 @@ module.exports = function(Box) {
 			messages: ['routechanged'],
 			onclick: function(event, element, elementType) {
 				event.preventDefault();
-				console.error("EVENT TARGET");
-				console.error(event.target);
-				console.log("CLICK IN stats");
+
 
 				if (elementType === 'addactivity') gatherAndAddActivity();
 				else if (elementType === 'deleteactivity') {
@@ -805,11 +786,10 @@ module.exports = function(Box) {
 				}
 			},
 			onmessage: function(name, data) {
-				console.log("ON MESSAGE IN stats");
+
 				if (name === 'routechanged') {
 					var route = data.route;
 					if (route.split('-')[0] === 'stats') {
-						console.log("CAUGHT IN stats");
 
 						if (data.payload) {
 							currentPayload = data.payload;

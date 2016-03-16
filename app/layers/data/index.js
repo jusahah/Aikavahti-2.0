@@ -23,7 +23,7 @@ var POISSA_COLOR = '554455';
 
 function getRestoreFileName() {
 	var m = moment();
-	return 'restore_' + m.format('YYYY-MM-DD-HH-mm-ss') + '_' + Math.floor(Math.random()*1000000) + ".json";
+	return 'restore_' + m.format('YYYY-MM-DD-HH-mm-ss') + '_' + Math.floor(Math.random()*10000) + ".json";
 	
 }
 
@@ -32,19 +32,17 @@ function deployRestoreFile(fileName) {
 	try {
 		var data = fs.readJsonSync(fullpath);
 	} catch(e) {
-		console.log(e);
 		console.error("Restore point loading failed!");
 		return Promise.reject({msg: 'Palautuspisteen käyttö epäonnistui.', priv: e});
 	}
 	
-	console.log(data);
 	appData = data;
 	
 	return writeToDiskIfNeeded(null, 'Palautuspiste otettu käyttöön tiedostosta: <strong>' + fileName + '</strong>');
 } 
 
 function checkRestorePoints() {
-	console.warn("Check restore points");
+	console.log("Check restore points");
 
 	if (!appData.settings.data.restorePoint) {
 		console.log("INIT: Skipping restore point - user has disabled it");
@@ -52,10 +50,8 @@ function checkRestorePoints() {
 	}
 
 	var fileNames = fs.readdirSync(restoreDir);
-	console.log(fileNames);
 
 	var restoreFiles = _.filter(fileNames, function(name) {
-		console.log(restoreDir + name);
 		return _.startsWith(name, 'restore');
 	});
 
@@ -104,13 +100,10 @@ function listRestorePoints() {
 
 function fetchFromDB(cb) {
 	fs.readJson(file, function(err, jsonObj) {
-	  console.warn("READ FROM FILE");
-	  console.log(jsonObj); //0.1.3 
 	}); 
 }
 
 function pushToDB(jsonObj, cb) {
-	console.warn("Push to file!");
 	fs.writeJson(file, jsonObj, cb);
 
 }
@@ -229,9 +222,7 @@ function generateSchemaID() {
 	return parseInt(s);
 }
 
-function writeToDiskIfNeeded(noChangeCbCall, successMsg) {
-	console.log("APP DATA NOW");
-	//console.log(JSON.stringify(appData));
+function writeToDiskIfNeeded(noChangeCbCall, successMsg, settingsHaveChanged) {
 	if (!changeCbDisabled && !noChangeCbCall) {
 		setTimeout(function() {
 			changeCb(appData);
@@ -239,8 +230,9 @@ function writeToDiskIfNeeded(noChangeCbCall, successMsg) {
 	}
 
 	return new Promise(function(resolve, reject) {
-		if (appData.settings.data.writeToDiskAfterEveryUpdate) {
+		if (appData.settings.data.writeToDiskAfterEveryUpdate || settingsHaveChanged) {
 			pushToDB(appData, function(err) {
+				console.log("APPDATA PUSHED TO DB");
 				if (err) reject({type: 'danger', msg: 'Levylle kirjoittamisessa tapahtui virhe.', priv: err});
 				else resolve(successMsg);
 			});
@@ -254,30 +246,26 @@ function writeToDiskIfNeeded(noChangeCbCall, successMsg) {
 // Modify/create/delete private functions
 //
 function modifySettings(path, data) {
-	console.warn("MODIFY SETTINGS: " + path);
+	console.log("Modifying settings in one batch update");
 	var parts = path.split('.');
 	var last  = parts.pop();
 	var currTraversing = appData;
 	_.each(parts, function(part) {
 		currTraversing = currTraversing[part];
 	});	
-	console.log("Overwriting old settings data with new!");
-	//console.log(currTraversing);
+	if (_.isEqual(currTraversing[last], data)) {
+		console.log("Modification of settings aborted - nothing has changed!");
+		return Promise.resolve('Ei muutoksia');
+	}
 	currTraversing[last] = data;
-	return writeToDiskIfNeeded(true, "Asetukset päivitetty.");
+	return writeToDiskIfNeeded(true, "Asetukset päivitetty.", true);
 }
 
 function modifySchemaItem(pathParts, updatedSchemaItem) {
 	// Find item using id
 	// Overwrite new data in
 	// Resolve promise
-	/*
-	if (!appData.schema.hasOwnProperty(updatedSchemaItem.id)) {
-		return Promise.reject('Schema item not found');
-	}
 
-	appData.schema[updatedSchemaItem.id] = updatedSchemaItem; // Its this simple
-	*/
 	// ID generation for new schema item!
 	pathParts.shift(); // Remove first which is 'schema'
 	var currentChildren = appData.schema['_root_'];
@@ -564,8 +552,9 @@ function modifyOneSetting(path, newValue) {
 		currTraversing = currTraversing[part];
 	});	
 	currTraversing[last] = newValue;
+	console.log("Modified one setting");
 
-	return writeToDiskIfNeeded(true, 'Asetukset päivitetty.');
+	return writeToDiskIfNeeded(true, 'Asetukset päivitetty.', true);
 }
 
 function recolorSchema() {
@@ -926,8 +915,7 @@ module.exports = {
 	forceSave: function() {
 		return new Promise(function(resolve, reject) {
 			pushToDB(appData, function(err) {
-				err = 'joo';
-				return reject({type: 'danger', msg: 'Levylle kirjoittamisessa tapahtui virhe.', priv: err});
+				console.log("APPDATA PUSHED TO DB");
 				if (err) reject({type: 'danger', msg: 'Levylle kirjoittamisessa tapahtui virhe.', priv: err});
 				else resolve('Aineisto tallennettu levylle - suljetaan ohjelma...');
 			});

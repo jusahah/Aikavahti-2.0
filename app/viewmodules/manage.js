@@ -33,7 +33,6 @@ module.exports = function(Box) {
 		var activate = function(preventHide) {
 			// hide right away in case we are reactivating view that is currently visible
 			if (!preventHide) $el.hide();			
-			console.log("Activate in manage module");
 			var derivedService  = context.getService('derivedData');
 			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 			isHidden = false;
@@ -92,12 +91,11 @@ module.exports = function(Box) {
 
 			// Add activity part
 			typeOfEvent = $el.find('#typetoadd').val();
-			console.log("TYPE OF EVENT NOW: " + typeOfEvent);
+
 			$select = $el.find('#activitytoadd');
 			if (typeOfEvent === 'activity') {
 				$select.empty().append(buildHTMLFromTree(schemaTree));
 			} else if (typeOfEvent === 'signal') {
-				console.warn("BUILDING SIGNAL TABLE");
 				$select.empty().append(buildHTMLFromSignalTable(signalsTable));
 			}
 			
@@ -107,7 +105,6 @@ module.exports = function(Box) {
 
 		function buildHTMLFromSignalTable(signalsTable) {
 			var html = '';
-			console.log(signalsTable);
 			_.forOwn(signalsTable, function(signal) {
 				html += "<option value='" + signal.id + "'>" + signal.name + "</option>";
 			});
@@ -224,7 +221,6 @@ module.exports = function(Box) {
 		}
 
 		$el.find('#typetoadd').on('change', function() {
-			console.log("TYPE CHANGE");
 			bindToView(viewDataCached.eventsAndSignalsList, viewDataCached.schemaTree, viewDataCached.signalsTable);
 		})
 
@@ -235,9 +231,7 @@ module.exports = function(Box) {
 			messages: ['routechanged'],
 			onclick: function(event, element, elementType) {
 				event.preventDefault();
-				console.error("EVENT TARGET");
-				console.error(event.target);
-				console.log("CLICK IN manage");
+
 
 				if (elementType === 'addactivity') gatherAndAddActivity();
 				else if (elementType === 'deleteactivity') {
@@ -256,7 +250,6 @@ module.exports = function(Box) {
 				if (name === 'routechanged') {
 					var route = data.route;
 					if (route.split('-')[0] === 'manage') {
-						console.log("CAUGHT IN manage");
 
 						activate();
 					} else {

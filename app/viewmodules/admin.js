@@ -27,8 +27,7 @@ module.exports = function(Box) {
 
 			viewDataPromise.then(function(viewData) {
 				if (isHidden) return; // User already switched to another view			
-				console.log("View data");
-				console.log(viewData);
+
 
 				//var dataObj = context.getService('derivedData').easify(viewData);			
 				// viewData is always object with transforNames being keys and data being values
@@ -46,7 +45,7 @@ module.exports = function(Box) {
 		return {
 			messages: ['routechanged'],
 			onclick: function(event, element, elementType) {
-				console.log("CLICK IN VALIKKO");
+				console.log("CLICK IN ADMIN");
 			},
 			onmessage: function(name, data) {
 				if (name === 'routechanged') {

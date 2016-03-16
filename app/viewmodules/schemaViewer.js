@@ -34,8 +34,6 @@ module.exports = function(Box) {
 
 			viewDataPromise.then(function(viewData) {
 				if (isHidden) return; // User already switched to another view			
-				console.log("View data");
-				console.log(viewData);
 
 				viewDataCached = viewData;
 
@@ -111,9 +109,7 @@ module.exports = function(Box) {
 			var subHTML = '';
 
 			if (coloredTree && coloredTree.length !== 0) {
-				_.each(coloredTree, function(branch) {
-					console.log("BRANCH: " + branch.name + " with depth " + depth);
-		
+				_.each(coloredTree, function(branch) {		
 					subHTML += createOneElement(branch.id, branch.name, branch.color, depth);
 					//subHTML += createOneElement(branch.id, '(' + branch.name + ')', branch.hisOwnTotals, branch.color, depth+1);						
 					
@@ -183,7 +179,7 @@ module.exports = function(Box) {
 			var inputColor = modalBody.find('#pickschemecolor');
 			var saveButton = $el.find('#saveSchemaItemChanges');
 			var schemaItem = viewDataCached.schemaItems[schemaID];
-			console.warn("FILLING EDIT SCHEMA ITEM MODAL!: " + schemaItem.color);
+
 			inputColor.spectrum('set', '#' + schemaItem.color);
 			saveButton.data('payload', schemaID);
 		}
@@ -192,9 +188,7 @@ module.exports = function(Box) {
 			var modalBody = $el.find('#schemaItemModalBody');
 			var inputColor = modalBody.find('#pickschemecolor');
 			var color = inputColor.spectrum('get');
-			console.log("COLOR NOW");
-			console.log(color);
-			console.log(color.toHexString());
+
 			var ss = context.getService('settingsService');
 			ss.updateSchemaItem(schemaID, {
 				color: color.toHexString().substr(1) // Drop the leading #
@@ -243,7 +237,7 @@ module.exports = function(Box) {
 		}
 
 		function populateEditNameModal(schemaID) {
-			console.log("Populating edit name modal: " + schemaID);
+
 			var item = viewDataCached.schemaItems[schemaID];
 			if (item.daygoal && item.daygoal !== '' && item.daygoal !== '0') {
 				var parts = item.daygoal.split('_');
@@ -276,7 +270,6 @@ module.exports = function(Box) {
 			if (!schemaID || schemaID == '0') {
 				return;
 			}
-			console.warn("Updating schema item name");
 			var newName = $el.find('#newschemaitemname_el').val();
 			var goalType = $el.find('#schemaitemcomp_el').val();
 			var goalHours  = $el.find('#schemaitemboundaryhours_el').val();
@@ -284,8 +277,6 @@ module.exports = function(Box) {
 
 			var timeInMs = resolveHoursAndMins(goalHours, goalMins);
 			var daygoalString = goalTypes.indexOf(goalType) === -1 ? '0' : goalType + '_' + timeInMs;
-			console.log("New name: " + newName);
-			console.log("New daily goal: " + daygoalString);
 			var ss = context.getService('settingsService');
 			ss.updateSchemaItem(schemaID, {name: newName, daygoal: daygoalString});
 
@@ -351,7 +342,6 @@ module.exports = function(Box) {
 				console.log("CLICK IN SCHEMA VIEWER");
 				event.preventDefault();
 				if (elementType === 'recolorschema') {
-					console.warn("RECOLOR REQUEST");
 					recolorRequest();
 				} else if (elementType === 'editSchemaItem') {
 					loadEditSchemaItemModal($(element).data('payload'));
@@ -363,7 +353,6 @@ module.exports = function(Box) {
 					console.warn("SAVING SCHEMA ITEM CHANGES: " + $(element).data('payload'));
 					gatherAndSaveSchemaChanges($(element).data('payload'));
 				} else if (elementType === 'createsubgroup') {
-					console.warn("CREATING NEW SCHEMA ITEM");
 					gatherSubgroupCreate();
 				} else if (elementType === 'submitNewSchemaItemName') {
 					gatherAndSendEditSchemaName();
@@ -376,7 +365,6 @@ module.exports = function(Box) {
 				}
 			},
 			onmessage: function(name, data) {
-				console.log("ROUTE CHAGE RECEIVED IN schemaviewer");
 				if (name === 'routechanged') {
 					var route = data.route;
 					if (route.split('-')[0] === 'schemaviewer') {

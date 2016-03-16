@@ -20,7 +20,6 @@ module.exports = function(Box) {
 		var $currentPanelWrapper;
 
 		var loopFun = function() {
-				console.warn("LOOPING !");
 				if (!currentNow) {
 					$currentPanelWrapper.find('#currentevent_duration').empty().append('---');
 					return;
@@ -61,15 +60,13 @@ module.exports = function(Box) {
 		var activate = function() {
 			// hide right away in case we are reactivating view that is currently visible
 			$el.hide();			
-			console.log("Activate fron");
+
 			var derivedService  = context.getService('derivedData');
 			var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 			isHidden = false;
 
 			viewDataPromise.then(function(viewData) {
-				console.log("VIEW DATA RECEIVED IN FRONT: ");
-				console.log(viewData);
-				console.log("Is Hidden?" + isHidden);
+
 				if (isHidden) return; // User already switched to another view			
 
 				// viewData is always object with transforNames being keys and data being values
@@ -86,10 +83,7 @@ module.exports = function(Box) {
 
 
 		var bindToView = function(data) {
-			console.error(d3); // We have link to it
 			if (!data) return;
-			console.log("----FRONT VIEW DATA------ building HTML");
-			console.log(data);
 
 			var current = data.current;
 			currentNow = current;
@@ -106,7 +100,6 @@ module.exports = function(Box) {
 			if (color.charAt(0) === '#') {
 				color = color.substr(1);
 			}
-			console.warn("COLOR IN FRONT: " + color);
 			var tc = tinycolor(color);
 			var textcolor = tc.isDark() ? 'fff' : '222'; 
 			$currentPanel.css('background-color', '#' + color);
@@ -124,7 +117,6 @@ module.exports = function(Box) {
 			var todayStartTimestamp = getTodayStartTimestamp();
 			var first = true;
 			_.each(lastTen, function(oneLast) {
-				console.log("APPENDING ONE");
 				if (oneLast.start >= todayStartTimestamp) {
 					$lastTenUL.append(getLastTenLI(oneLast, first));
 				}
@@ -136,13 +128,9 @@ module.exports = function(Box) {
 			// Change activity buttons
 			var ss = context.getService('settingsService');
 			ss.getSettings().then(function(settings) {
-				console.log("-------SEttings in front.js----");
-				console.log(settings);
 
 				if (settings.view.userSelectedEventsShow) {
 					var filteredWithUserSelections = filterUserSelectedButtons(data.schemaItems, settings.view.userSelectedEvents);
-					console.error("----FILTERED ONES");
-					console.log(filteredWithUserSelections);
 					buildActivityButtons(filteredWithUserSelections);
 
 				} else {
@@ -188,9 +176,6 @@ module.exports = function(Box) {
 		}
 
 		var filterUserSelectedButtons = function(schemaItems, userSelecteds) {
-			console.log("USER SEL");
-			console.log(JSON.stringify(userSelecteds));
-			console.log(JSON.stringify(schemaItems));
 			var userSelectedItems = _.filter(schemaItems, function(item) {
 				return userSelecteds.indexOf(parseInt(item.id)) !== -1;
 			});
@@ -198,8 +183,6 @@ module.exports = function(Box) {
 		}
 
 		var buildActivityButtons = function(schemaItems) {
-			console.error("ACTIVITY BUTTONS");
-			console.log(JSON.stringify(schemaItems));
 			$buttonsArea = $el.find('#newactivity_buttons');
 
 			var html = '';
@@ -221,12 +204,9 @@ module.exports = function(Box) {
 		}
 
 		var getLastTenLI = function(schemaItem, isFirst) {
-			console.log("BUILDING LI FOR last 10");
-			console.log(schemaItem);
+
 			var started = beautifyTimestamp(schemaItem.start);
 			var ended   = beautifyTimestamp(schemaItem.end);
-			console.error("SCHEMA ITEM");
-			console.log(JSON.stringify(schemaItem));
 			var name = schemaItem.id ? schemaItem.name : '(poissa)'; 
 
 			var li = '<li>';
@@ -274,7 +254,6 @@ module.exports = function(Box) {
 		}
 
 		function changeShowActivity(newVal) {
-			console.error("CHANGE SHOW ACTIVITY: " + newVal);
 			var settingsUpdatedPromise = context.getService('settingsService').changeShowLeavesSettings(newVal);
 			settingsUpdatedPromise.then(function() {
 				activate();
@@ -294,7 +273,6 @@ module.exports = function(Box) {
 			var startString = beautifyTimestamp(currentNow.start);
 			var area = $el.find('#notearea');
 			area.val('');
-			console.log("EDITING TEXT AREA: " + currentNow.start);
 			area.data('eventtimestamp', currentNow.start);
 
 			$el.find('#notes_modal_title').empty().append(name + " (" + startString + " --> )");
@@ -315,12 +293,6 @@ module.exports = function(Box) {
 
 			var notes = area.val();
 
-			if (notes.length > 1024) {
-				console.error('Too long string in notes area');
-				return;
-			}
-
-
 			var es  = context.getService('eventService');
 			var prom = es.saveNotes(eventtimestamp, notes);
 
@@ -330,7 +302,6 @@ module.exports = function(Box) {
 		}
 
 		function populateQuickNoteModal(notes) {
-			console.log("POPULATING NOTE MODAL: " + notes);
 			$el.find('#quickNoteModal_text').empty().append(notes);
 
 		}
@@ -344,7 +315,7 @@ module.exports = function(Box) {
 		return {
 			messages: ['routechanged'],
 			onclick: function(event, element, elementType) {
-				console.log("CLICK IN VALIKKO");
+				console.log("CLICK IN FRONT");
 				if (elementType === 'newactivity_showleaves') {
 					changeShowActivity(true);
 				} else if (elementType === 'newactivity_showall') {

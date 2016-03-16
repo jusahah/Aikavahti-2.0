@@ -2,9 +2,7 @@ var Promise = require('bluebird');
 
 // This is the layer which should do validations!
 module.exports = function(Box) {
-	console.warn("errorService module.exports called");
 	Box.Application.addService('errorService', function(application) {
-		console.error("ERROR SERVICE OPENING");
 		var info = function(msg) {
 			application.broadcast('notificationTriggered', {type: 'info', msg: msg});
 		}
@@ -38,7 +36,7 @@ module.exports = function(Box) {
 		}
 
 		var dataLayerNotify = function(err) {
-			console.warn("MESSED UP IN DATA LAYER");
+			console.error("MESSED UP IN DATA LAYER");
 			console.log(err);
 		} 
 

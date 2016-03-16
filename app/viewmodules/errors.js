@@ -22,8 +22,7 @@ module.exports = function(Box) {
 		// Private stuff
 
 		var showNotification = function(data) {
-			console.warn("NOTIFICATION IN ERRORS VIEW");
-			console.warn(data);
+
 			var notif = alertRow.find('#aikavahti_notification');
 
 			if (data && typeof(data) === 'object') {
@@ -65,7 +64,6 @@ module.exports = function(Box) {
 				html += '<p>' + notification.msg + '</p>';
 				html += '</div>';
 			});
-			console.log("HTML: " + html);
 			historyArea.empty().append(html);
 		}
 

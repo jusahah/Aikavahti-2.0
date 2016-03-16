@@ -129,7 +129,6 @@ Box.Application.addModule('valikko', function(context) {
 	}
 
 	var loopFun = function() {
-				console.warn("LOOPING !");
 				if (!currentNow) {
 					$currentPanelWrapper.find('#currentactivityfrontname').empty().append('---');
 					return;
@@ -170,8 +169,6 @@ Box.Application.addModule('valikko', function(context) {
 		var viewDataPromise = derivedService.getDeriveds(dataNeeded);
 
 		viewDataPromise.then(function(viewData) {
-				console.log("VIEW DATA RECEIVED IN VALIKKO: ");
-				console.log(viewData);	
 
 				bindToView(viewData.frontViewData);
 				loopTimer();
@@ -191,12 +188,12 @@ Box.Application.addModule('valikko', function(context) {
 	}
 
 	var updateProgressBar = function(percentageDone) {
-		console.error("PERC DONE: " + percentageDone);
+
 		if (percentageDone !== 100) {
 			computationText.empty().append('Tilastoja lasketaan...');
 			computeProgressBar.parent().addClass('active');
 		} else {
-			console.log("Removing active");
+
 			computationText.empty().append('Tilastot valmiina!');
 			computeProgressBar.parent().removeClass('active');
 			Box.Application.broadcast('statsUpdated');
@@ -208,13 +205,10 @@ Box.Application.addModule('valikko', function(context) {
 	var updateFrontShow = function(data) {
 
 		if (_.isEqual(data, lastCurrentShowData)) {
-			console.log("Update front show - no changes, no DOM hit");
 			return;
 		}
 
 		lastCurrentShowData = Object.assign({}, data);
-		console.log(data);
-		console.log("Redrawing front show");
 		// Maybe check against local copy so no unnecessary DOM hit
 		// Although its pretty insignificant anyway
 		var panel = $el.find('#frontshowpanel');
@@ -225,7 +219,6 @@ Box.Application.addModule('valikko', function(context) {
 
 	var handleRouteChange = function(element, elementType, payload) {
 		Box.Application.broadcast('routechanged', {route: elementType, payload: payload});
-		console.log("EL TYPE: " + elementType);
 		current = elementType;
 		$el.find('#aikavahti_mainmenu').find('li').removeClass('active');
 		if (element) {
@@ -245,10 +238,11 @@ Box.Application.addModule('valikko', function(context) {
 		var adminService = context.getService('adminService');
 
 		adminService.forceSave().then(function() {
+			$el.find('#quitWithSave').click();
 			Box.Application.stopAll(document);
 			setTimeout(function() {
 				ipcRenderer.send('appShutDown');
-			}, 600);
+			}, 900);
 			
 		}).catch(function(err) {
 			$el.find('#quitNoSave').click();
@@ -266,17 +260,14 @@ Box.Application.addModule('valikko', function(context) {
 	return {
 		messages: ['cachewasflushed', 'computationprogressupdate', 'currenteventupdate', 'initFirstView', 'forceQuitAfterSaveFailure'],
 		onclick: function(event, element, elementType) {
-			console.log("CLICK IN VALIKKO: " + elementType);
 
 			if (elementType.split('-')[1] === 'route') {
-				console.log("Route change clicked");
 				var payload = $(element).data('payload');
 				// Changing a route
 				handleRouteChange(element, elementType, payload);
 
 
 			} else if (elementType === 'forceflush') {
-				console.warn("Artificial cache flush");
 				context.getService('derivedData').forceDataRecomputation();
 			} else if (elementType === 'resetrequest') {
 				Box.Application.broadcast('resetrequest');
@@ -288,11 +279,8 @@ Box.Application.addModule('valikko', function(context) {
 		},
 		onmessage: function(name, data) {
 			if (name === 'cachewasflushed') {
-				console.warn("CACHE FLUSH CAUGHT IN VALIKKO MODULE");
 				reshowCurrentView();
 			} else if (name === 'computationprogressupdate') {
-				console.warn("Progress update in valikko");
-				console.log(data);
 				updateProgressBar(data);
 			} else if (name === 'newacticity_showall') {
 				var ss = context.getService('settingsService');
@@ -315,7 +303,6 @@ Box.Application.addModule('valikko', function(context) {
 
 $(window).on('resize', function(e) {
 	console.log("GLOBAL RESIZE!");
-	console.log("Window size: " + $(window).width());
 	Box.Application.broadcast('globalresize');
 });
 

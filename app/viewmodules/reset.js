@@ -19,11 +19,7 @@ module.exports = function(Box) {
 			var adminService = context.getService('adminService');
 			var prom = adminService.resetProgram();
 
-			prom.then(function() {
-				$el.css('background-color', 'green');
-			}).catch(function() {
-				$el.css('background-color', 'red');
-			});
+
 		}
 
 		console.log("INITING INITIALIZATION VIEW MODULE");

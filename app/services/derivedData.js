@@ -26,8 +26,7 @@ module.exports = function(Box, datalayer) {
 			},
 			// Must return Promise!!!
 			getDeriveds: function(listOfTransformNames) {
-				console.log("Get deriveds");
-				console.log(listOfTransformNames);
+
 				if (listOfTransformNames.length === 0) {
 					//Return resolved promise
 					return Promise.resolve({});
@@ -44,7 +43,6 @@ module.exports = function(Box, datalayer) {
 					}
 					
 					return new Promise(function(resolve, reject) {
-						console.log("Pushing resolve to waiting list");
 						cacheWaitingList[name].push(resolve);
 					});
 				
@@ -85,19 +83,12 @@ module.exports = function(Box, datalayer) {
 			},
 			// Returns void
 			cacheComputedTransform: function(name, results, percentageDone, calcTime) {
-				console.warn("RESULTS IN: " + name);
-				console.log(results);
+
 				latestCalcTime = calcTime;
-				console.log("% done: " + percentageDone);
-				console.log("Cache computed transform in derivedData Service");
 				cache[name] = results;
-				console.log("Cache now");
-				console.log(JSON.stringify(cache));
 				if (cacheWaitingList.hasOwnProperty(name)) {
 					var waiters = cacheWaitingList[name];
 					_.each(waiters, function(waiter) {
-						console.log("Resolving waiter with results");
-						console.log(results);
 						waiter({name: name, data: results});
 					});
 				}

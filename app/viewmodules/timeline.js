@@ -43,14 +43,9 @@ module.exports = function(Box) {
 			}
 
 			viewDataPromise.then(function(viewData) {
-				console.error("TIMELINE VIEW RECEIVED SETTINGS");
 				if (isHidden) return; // User already switched to another view			
-				console.log("View data");
-				console.log(viewData);
 
 				context.getService('eventService').getCurrent().then(function(currentEvent){
-					console.warn("EVENT SERVICE THINKS CURRENT IS:" + currentEvent.name);
-					console.log(currentEvent);
 					//var dataObj = context.getService('derivedData').easify(viewData);			
 					// viewData is always object with transforNames being keys and data being values
 					$('#globalLoadingBanner').hide();
@@ -73,8 +68,6 @@ module.exports = function(Box) {
 
 
 		var setTimelineData = function(last30DaysTimelines, currentEvent) {
-			console.log("CURRENT EVENT IN TIMELINE");
-			console.log(currentEvent);
 
 			var arr = [];
 			var lastXDays = createLastX(Date.now(), numShown);
@@ -93,7 +86,6 @@ module.exports = function(Box) {
 
 			// Import that elemet is "display: block" BEFORE width is taken here!
 			var containerWidth = $el.width();
-			console.error("CONTAINER WITH NOW: " + containerWidth);
 			var timelineEl = $el.find('#timelinearea');
 			timelineEl.empty();
 
@@ -135,8 +127,6 @@ module.exports = function(Box) {
 
 		var initTimeline = function(slug, name, times, currentEvent, containerWidth) {
 
-			
-			console.error("TIMELINE WIDTH: " + containerWidth);
 			var tickInterval = 1;
 
 			if (containerWidth < 1300) {
@@ -146,8 +136,6 @@ module.exports = function(Box) {
 			}
 
 			if (currentEvent) {
-				console.warn("CURRENT EVENT IS: ");
-				console.log(JSON.stringify(currentEvent));
 				times.push({
 					starting_time: clampStartOfTheDay(name, currentEvent.t),
 					ending_time: Date.now(),
@@ -172,7 +160,7 @@ module.exports = function(Box) {
 				})
 				.itemHeight(14)
 				.mouseover(function(d, i, datum) {
-					console.log(d);
+
 					
 					div.transition()        
 					                .duration(100)      
@@ -187,7 +175,7 @@ module.exports = function(Box) {
 					div.transition().duration(200).style("opacity", 0);   
 				})
 				.click(function(d, i, datum) {
-					console.log(d);
+
 					div.transition()        
 					                .duration(200)      
 					                .style("opacity", 1);      
@@ -239,9 +227,7 @@ module.exports = function(Box) {
 			messages: ['routechanged', 'globalresize'],
 			onclick: function(event, element, elementType) {
 				event.preventDefault();
-				console.error("EVENT TARGET");
-				console.error(event.target);
-				console.log("CLICK IN SETTINGS");
+
 				if (elementType === 'show7') {
 					numShown = 7;
 					activate(true);
@@ -251,11 +237,11 @@ module.exports = function(Box) {
 				}
 			},
 			onmessage: function(name, data) {
-				console.log("ON MESSAGE IN SETTINGS");
+
 				if (name === 'routechanged') {
 					var route = data.route;
 					if (route.split('-')[0] === 'timeline') {
-						console.log("CAUGHT IN SETTINGS");
+
 
 						activate();
 					} else {

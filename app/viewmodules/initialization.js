@@ -10,12 +10,11 @@ module.exports = function(Box) {
 		
 
 		var showInitializationScreenModal = function() {
-			console.error("INITIALIZATION MODAL HERE!!!!!!!!!!!!!!!!!!!!!");
+
 			$el.find('#launchInitializationModal').click();
 		}
 
 		var changedActivityTreeSetting = function(newVal) {
-			console.warn("USE OWN ACTIVITY TREE: " + newVal);
 
 			if (newVal) {
 				$el.find('#activitytreeurl').show();
@@ -32,14 +31,11 @@ module.exports = function(Box) {
 			}			
 		}
 
-		console.log("INITING INITIALIZATION VIEW MODULE");
 		return {
 			messages: ['showInitializationScreen'],
 			onclick: function(event, element, elementType) {
-				console.log("CLICK IN Initialization: " + elementType);
 
 				if (elementType === 'ownactivitytree_change') {
-					console.log(element);
 					changedActivityTreeSetting($(element).is(':checked'));
 				} else if (elementType === 'onlinebackup_change') {
 					changedBackupSetting($(element).is(':checked'));
@@ -49,7 +45,6 @@ module.exports = function(Box) {
 			},
 			onmessage: function(name, data) {
 				if (name === 'showInitializationScreen') {
-					console.warn("INITIALIZATION SCREEN TO BE LAUNCHED");
 					showInitializationScreenModal();
 				} 
 			}

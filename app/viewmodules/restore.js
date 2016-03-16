@@ -41,7 +41,7 @@ module.exports = function(Box) {
 		}
 
 		var showRestoreModal = function() {
-			console.log("Showing restore modal");
+
 			var adminS = context.getService('adminService');
 			adminS.getRestores().then(function(fileNames) {
 				$el.find('#restorepointcount').empty().append(fileNames.length);
@@ -56,11 +56,6 @@ module.exports = function(Box) {
 			var adminService = context.getService('adminService');
 			var prom = adminService.deploy(file);
 
-			prom.then(function() {
-				$el.css('background-color', 'green');
-			}).catch(function() {
-				$el.css('background-color', 'red');
-			});
 		}
 
 		console.log("INITING INITIALIZATION VIEW MODULE");

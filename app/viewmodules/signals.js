@@ -30,8 +30,6 @@ module.exports = function(Box) {
 
 			viewDataPromise.then(function(viewData) {
 				if (isHidden) return; // User already switched to another view			
-				console.log("View data");
-				console.log(viewData);
 
 				viewDataCached = viewData;
 
@@ -89,7 +87,6 @@ module.exports = function(Box) {
 		}
 
 		var sendSignalDeleteRequest = function(signalID) {
-			console.warn("SIGNAL DELETE REQUEST FOR SIGNAL: " + signalID);
 			var ss  = context.getService('settingsService');
 
 			var prom = ss.deleteSignalItem(signalID);
@@ -97,7 +94,6 @@ module.exports = function(Box) {
 
 		var gatherAndSendSignalData = function() {
 			var goalTypes = ['lt', 'le', 'gt', 'le', 'e'];
-			console.warn("Gather and send siglan creation");
 			var signalName = $el.find('#newsignalname_el').val();
 			var signalcomp = $el.find('#signalitemcomp_el').val();
 			var signalboundary = $el.find('#signalitemboundary_el').val();
@@ -108,7 +104,6 @@ module.exports = function(Box) {
 			var prom = ss.createSignalItem(signalName, daygoalString);
 
 			prom.catch(function(err) {
-				console.error('----ERROR IN SIGNALS VIEW----');
 				console.error(err);
 			});
 
@@ -122,7 +117,6 @@ module.exports = function(Box) {
 		return {
 			messages: ['routechanged'],
 			onclick: function(event, element, elementType) {
-				console.log("CLICK IN SIGNALS");
 
 				if (elementType === 'deletesignalitem') {
 					var signalID = $(element).data('payload');

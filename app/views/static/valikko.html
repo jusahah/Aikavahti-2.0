@@ -103,14 +103,14 @@
 
 				</ul>
 			</nav>
-			<a style="display: none;" href="#" id="quitNoSave" class="btn btn-success">Open Quit Modal</a>
-
+			<a style="display: none; position: fixed; top: 0; right: 0;" href="#" id="quitNoSave" class="btn btn-success">Open Quit Problem Modal</a>
+			<a style="display: none; position: fixed; top: 0; right: 0;" href="#" id="quitWithSave" class="btn btn-success">Open Quit OK Modal</a>
 			<script>
 
 			$("#quitNoSave").click(function(e) {
 		
 				$.SmartMessageBox({
-					title : "Aineiston tallennus epäonnistui!",
+					title : "Aineiston tallennus epäonnistui! <i class='txt-color-red fa fa-times'></i>",
 					content : "Ohjelma ei onnistunut kirjoittamaan aineistoa levylle. Jos suljet ohjelman, saatat menettää ohjelman ajon aikana keräämiäsi tietoja. Haluatko silti sulkea?",
 					buttons : '[Kyllä][En]'
 				}, function(ButtonPressed) {
@@ -125,7 +125,16 @@
 		
 				e.preventDefault();
 			})
-
+			$("#quitWithSave").click(function(e) {
+		
+				$.SmartMessageBox({
+					title : "Aineisto tallennettu! <i class='txt-color-green glyphicon glyphicon-ok'></i>",
+					content : "",
+					buttons: '[Suljetaan...]'
+				});
+		
+				e.preventDefault();
+			})
 			</script>
 
 																		

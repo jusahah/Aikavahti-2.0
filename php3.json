@@ -1,0 +1,174 @@
+{
+  "aikavahtiTimestamp": 1458123107155,
+  "data": {
+    "events": [
+      {
+        "s": 11,
+        "t": 1458123092655,
+        "signal": false
+      },
+      {
+        "s": 11,
+        "t": 1458123093625,
+        "signal": false
+      },
+      {
+        "s": 11,
+        "t": 1458123094225,
+        "signal": false
+      }
+    ],
+    "schema": {
+      "_root_": [
+        {
+          "daygoal": "gt_21600000",
+          "color": "884455",
+          "name": "Työ",
+          "id": 1,
+          "children": [
+            {
+              "daygoal": "gt_21600000",
+              "color": "554488",
+              "name": "PHP",
+              "id": 11,
+              "children": []
+            },
+            {
+              "daygoal": "gt_21600000",
+              "color": "554488",
+              "name": "Javascript",
+              "id": 12,
+              "children": [
+                {
+                  "daygoal": "gt_21600000",
+                  "color": "554488",
+                  "name": "Node.js",
+                  "id": 121,
+                  "children": []
+                },
+                {
+                  "color": "554488",
+                  "name": "Browser development",
+                  "id": 122,
+                  "children": []
+                },
+                {
+                  "daygoal": "",
+                  "color": "554488",
+                  "name": "Electron App",
+                  "id": 123,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "daygoal": "gt_21600000",
+          "color": "559955",
+          "name": "Opinnot",
+          "id": 2,
+          "children": [
+            {
+              "daygoal": "gt_21600000",
+              "color": "554488",
+              "name": "Kirjallisuus",
+              "id": 21,
+              "children": []
+            }
+          ]
+        },
+        {
+          "daygoal": "gt_21600000",
+          "color": "554488",
+          "name": "Vapaa-aika",
+          "id": 3,
+          "children": [
+            {
+              "daygoal": "gt_21600000",
+              "color": "554488",
+              "name": "Tennis",
+              "id": 31,
+              "children": []
+            },
+            {
+              "daygoal": "gt_21600000",
+              "color": "554488",
+              "name": "Jalkapallo",
+              "id": 32,
+              "children": []
+            },
+            {
+              "daygoal": "gt_18000000",
+              "color": "554488",
+              "name": "Lounas",
+              "id": 33,
+              "children": [
+                {
+                  "daygoal": "gt_14400000",
+                  "color": "554488",
+                  "name": "Stockmann",
+                  "id": 331,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "daygoal": "lt_10800000",
+              "color": "554488",
+              "name": "Sählinki",
+              "id": 34,
+              "children": []
+            },
+            {
+              "daygoal": "gt_7200000",
+              "color": "554488",
+              "name": "TV:n katselu",
+              "id": 35,
+              "children": []
+            },
+            {
+              "daygoal": "gt_3600000",
+              "color": "554488",
+              "name": "Runoillat",
+              "id": 36,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "triggers": {},
+    "signals": [
+      {
+        "daygoal": "e_1",
+        "name": "Kahvi",
+        "id": 9999
+      },
+      {
+        "daygoal": "le_2",
+        "name": "Olut",
+        "id": 9998
+      },
+      {
+        "daygoal": "gt_5",
+        "name": "Punaviini",
+        "id": 9997
+      }
+    ],
+    "settings": {
+      "data": {
+        "writeToDiskAfterEveryUpdate": true,
+        "restorePoint": true
+      },
+      "internet": {
+        "onlineBackup": false
+      },
+      "view": {
+        "eventsOnlyToLeaves": false,
+        "userSelectedEventsShow": false,
+        "userSelectedEvents": []
+      }
+    }
+  }
+}
