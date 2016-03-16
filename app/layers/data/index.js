@@ -34,21 +34,20 @@ function deployRestoreFile(fileName) {
 	} catch(e) {
 		console.log(e);
 		console.error("Restore point loading failed!");
-		return;
+		return Promise.reject({msg: 'Palautuspisteen käyttö epäonnistui.', priv: e});
 	}
 	
 	console.log(data);
 	appData = data;
 	
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Palautuspiste otettu käyttöön tiedostosta: <strong>' + fileName + '</strong>');
 } 
 
 function checkRestorePoints() {
 	console.warn("Check restore points");
 
-
 	if (!appData.settings.data.restorePoint) {
-		console.log("Skipping restore point - user has disabled it");
+		console.log("INIT: Skipping restore point - user has disabled it");
 		return;
 	}
 
@@ -64,7 +63,7 @@ function checkRestorePoints() {
 		//Drop the oldest one
 		restoreFiles = restoreFiles.sort();
 		var toBeRemoved = restoreFiles[0];
-		console.warn("To be remvoed: " + restoreDir + toBeRemoved);
+		console.log("INIT: Removing old restorepoint: " + restoreDir + toBeRemoved);
 		fs.unlinkSync(restoreDir + toBeRemoved);
 
 	}
@@ -77,7 +76,7 @@ function checkRestorePoints() {
 		}
 		fs.outputJson(newFile, appData, function(err) {
 			if (err) console.error(err);
-			else console.warn("Restore point created");
+			else console.log("INIT: Restore point created at " + moment().format('DD.MM.YYYY HH:mm:ss'));
 		})
 
 	});
@@ -89,11 +88,10 @@ function listRestorePoints() {
 
 	return new Promise(function(resolve, reject) {
 		fs.readdir(restoreDir, function(err, fileNames) {
-			if (err) return reject(err);
-			console.log(fileNames);
+			if (err) return reject({msg: 'Palautuspisteiden lukeminen levyltä epäonnistui.', priv: err});
+			//console.log(fileNames);
 
 			var restoreFiles = _.filter(fileNames, function(name) {
-				console.log(restoreDir + name);
 				return _.startsWith(name, 'restore');
 			});
 
@@ -174,7 +172,7 @@ function getInitialDataObject() {
 
 function resetProgramState() {
 	appData = getInitialDataObject();
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Ohjelma palautettu tehdasasetuksiin ja tyhjennetty datasta!');
 
 }
 
@@ -184,9 +182,14 @@ function createFileIfNotExist() {
 		var stats = fs.statSync(file);
 	} catch (e) {
 		notExist = true;
-		console.warn("---Creating data file---");
-		fs.createFileSync(file);
-		fs.writeJsonSync(file, getInitialDataObject());
+		try {
+			fs.createFileSync(file);
+			fs.writeJsonSync(file, getInitialDataObject());			
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
+
 	}
 	// FFor now just write each time from fresh
 	//fs.writeJsonSync(file, getInitialDataObject());
@@ -197,11 +200,11 @@ function loadToMemory() {
 	//fs.createFileSync(file);
 	try {
 		var data = fs.readJsonSync(file);
-	} catch(e) {
-		console.log(e);
+	} catch(err) {
+		console.error(err);
+		throw err;
 	}
 	
-	console.log(data);
 	appData = data;
 	
 	if (!changeCbDisabled) {
@@ -226,7 +229,7 @@ function generateSchemaID() {
 	return parseInt(s);
 }
 
-function writeToDiskIfNeeded(noChangeCbCall) {
+function writeToDiskIfNeeded(noChangeCbCall, successMsg) {
 	console.log("APP DATA NOW");
 	//console.log(JSON.stringify(appData));
 	if (!changeCbDisabled && !noChangeCbCall) {
@@ -238,11 +241,11 @@ function writeToDiskIfNeeded(noChangeCbCall) {
 	return new Promise(function(resolve, reject) {
 		if (appData.settings.data.writeToDiskAfterEveryUpdate) {
 			pushToDB(appData, function(err) {
-				if (err) reject(err);
-				else resolve();
+				if (err) reject({type: 'danger', msg: 'Levylle kirjoittamisessa tapahtui virhe.', priv: err});
+				else resolve(successMsg);
 			});
 		} else {
-			setTimeout(resolve, 0);
+			resolve(successMsg);
 		}
 	});
 
@@ -261,7 +264,7 @@ function modifySettings(path, data) {
 	console.log("Overwriting old settings data with new!");
 	//console.log(currTraversing);
 	currTraversing[last] = data;
-	return writeToDiskIfNeeded(true);
+	return writeToDiskIfNeeded(true, "Asetukset päivitetty.");
 }
 
 function modifySchemaItem(pathParts, updatedSchemaItem) {
@@ -279,18 +282,14 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 	pathParts.shift(); // Remove first which is 'schema'
 	var currentChildren = appData.schema['_root_'];
 	var last = pathParts.pop();
-	console.log(pathParts);
+
 
 	// Hunt down the parent
 	_.each(pathParts, function(part) {
-		console.log("Current children");
-		console.log(JSON.stringify(currentChildren));
 		var found = false;
 		for(var i = 0, j = currentChildren.length; i < j; i++) {
 
-			console.log(currentChildren[i]);
 			var child = currentChildren[i];
-			console.log("Comparing in schema traversal: " + child.id + " vs. " + part);
 			if (parseInt(child.id) === parseInt(part)) {
 				// Found next level
 				currentChildren = child.children;
@@ -299,12 +298,14 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 			}
 		}
 
-		if (!found) throw 'Child not found in modifySchemaItem';
+		if (!found) {
+			console.error("Child not found in modifySchemitem");
+			throw 'Child not found in modifySchemaItem';
+		}
 
 		
 	});
 
-	console.log("CHILDREN HUNTED DOWN");
 	// Find the parent now
 	var theItem;
 	for(var i = 0, j = currentChildren.length; i < j; i++) {
@@ -314,9 +315,13 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 		}
 	}
 	
-	if (!theItem) throw 'Final child not found in modifySchemaItem';
+	if (!theItem) {
+		console.error('Final child not found in modifySchemaItem');
+		throw 'Final child not found in modifySchemaItem';
+	}
 
 	if (parseInt(theItem.id) !== parseInt(updatedSchemaItem.id)) {
+		console.error('ID Mismatch in modifySchemitem: ' + theItem.id + " vs. " + updatedSchemaItem.id)
 		throw 'ID Mismatch in modifySchemitem: ' + theItem.id + " vs. " + updatedSchemaItem.id;
 	}
 	// We dont allow mass assigment edit
@@ -326,12 +331,11 @@ function modifySchemaItem(pathParts, updatedSchemaItem) {
 
 	//console.log(JSON.stringify(appData));
 
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, "Aktiviteetin tietoja muutettu!");
 
 }
 
 function removeSignalEvents(signalID) {
-	console.warn("-----------REMOVE SIGNAL EVENTS FOR: " + signalID);
 	var events = _.filter(appData.events, function(event) {
 		return !(event.signal && event.s === signalID);
 	});
@@ -349,7 +353,7 @@ function checkSignalItemNameClash(name) {
 
 function addSignalItem(name, daygoal) {
 
-	if (checkSignalItemNameClash(name)) return Promise.reject('Signal item with provided name already exists: ' + name);
+	if (checkSignalItemNameClash(name)) return Promise.reject('Signaalin nimi on jo käytössä: ' + name);
 
 	var signalItemData = {
 		name: name,
@@ -358,7 +362,7 @@ function addSignalItem(name, daygoal) {
 	}
 
 	appData.signals.push(signalItemData);
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, "Uusi signaali luotu järjestelmään.");
 
 }
 
@@ -435,14 +439,14 @@ function addSignalEvent(eventData) {
 	eventData.t = parseInt(t + "5");
 
 	if (parseInt(eventData.s) !== 0 && !ensureSignalIDExists(parseInt(eventData.s))) {
-		return Promise.reject('New event fail! Signal ID does not exist in datalayer!');
+		return Promise.reject('Signaalitapahtuman luonti epäonnistui! Signaalia ei löytynyt.');
 	}
 
 	appData.events.push(eventData);
 
 	// If we need to inform some web API event hook this would be pretty good place to do it
 
-	return writeToDiskIfNeeded();
+	return writeToDiskIfNeeded(null, 'Uusi signaalitapahtuma lisätty aikajanalle!');
 
 }
 

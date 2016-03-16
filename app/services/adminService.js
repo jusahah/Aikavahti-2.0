@@ -6,16 +6,24 @@ module.exports = function(Box, datalayer) {
 
 		return {
 			importFile: function(file) {
-				return datalayer.dataCommandIn({opType: 'admin', op: 'import', data: file});
+				return datalayer.dataCommandIn({opType: 'admin', op: 'import', data: file})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
 			},
 			exportFile: function(file) {
-				return datalayer.dataCommandIn({opType: 'admin', op: 'export', data: file});
+				return datalayer.dataCommandIn({opType: 'admin', op: 'export', data: file})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
 			},
 			resetProgram: function() {
-				return datalayer.dataCommandIn({opType: 'admin', op: 'reset', data: null});
+				return datalayer.dataCommandIn({opType: 'admin', op: 'reset', data: null})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
 			},
 			deploy: function(file) {
-				return datalayer.dataCommandIn({opType: 'admin', op: 'deploy', data: file});
+				return datalayer.dataCommandIn({opType: 'admin', op: 'deploy', data: file})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
 			},
 			getRestores: function() {
 				return datalayer.dataQueryIn('restores');

@@ -191,7 +191,10 @@ module.exports = function(Box) {
 				es.newEventCustomDateTime(date, time, activityID);
 			} else if (addtype === 'signal') {
 				var signalID = activityID;
-				es.newSignalCustomDateTime(date, time, signalID);
+				var prom = es.newSignalCustomDateTime(date, time, signalID);
+				prom.catch(function(err) {
+					console.error("ERROR CAUGHT IN MANAGE VIEW: newSignalCustomDateTime failed");
+				});
 			}
 			
 		}

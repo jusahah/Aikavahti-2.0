@@ -107,6 +107,11 @@ module.exports = function(Box) {
 			var ss  = context.getService('settingsService');
 			var prom = ss.createSignalItem(signalName, daygoalString);
 
+			prom.catch(function(err) {
+				console.error('----ERROR IN SIGNALS VIEW----');
+				console.error(err);
+			});
+
 		}
 
 

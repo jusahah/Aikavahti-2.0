@@ -58,11 +58,14 @@ require('./viewmodules/import')(Box); // Same
 require('./viewmodules/restore')(Box); // Same
 require('./viewmodules/timeline')(Box); // Same
 require('./viewmodules/comparisons')(Box); // Same
+require('./viewmodules/errors')(Box); // Same
 // Service registrations
 require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);
 require('./services/eventService')(Box, datalayer);
 require('./services/adminService')(Box, datalayer);
+require('./services/errorService')(Box);
+
 // Too bad these fucking loads are so async that what the hell... we need to wait a bit
 
 console.log('Loaded environment variables:', env);
@@ -218,13 +221,16 @@ Box.Application.addModule('valikko', function(context) {
 		
 	}
 
-	var handleRouteChange = function(elementType, payload) {
+	var handleRouteChange = function(element, elementType, payload) {
 		Box.Application.broadcast('routechanged', {route: elementType, payload: payload});
 		console.log("EL TYPE: " + elementType);
 		current = elementType;
 		$el.find('#aikavahti_mainmenu').find('li').removeClass('active');
-		var linkEl = $(element);
-		linkEl.addClass('active');
+		if (element) {
+			var linkEl = $(element);
+			linkEl.addClass('active');			
+		}
+
 		// Start loading banner
 		// View itself is responsible of hiding it when its ready
 		$('#globalErrorBanner').hide();
@@ -241,7 +247,7 @@ Box.Application.addModule('valikko', function(context) {
 				console.log("Route change clicked");
 				var payload = $(element).data('payload');
 				// Changing a route
-				handleRouteChange(elementType, payload);
+				handleRouteChange(element, elementType, payload);
 
 
 			} else if (elementType === 'forceflush') {
@@ -266,7 +272,7 @@ Box.Application.addModule('valikko', function(context) {
 			} else if (name === 'currenteventupdate') {
 				updateFrontShow(data);
 			} else if (name === 'initFirstView') {
-				handleRouteChange('front-route', null);
+				handleRouteChange(null, 'front-route', null);
 			}
 		}
 

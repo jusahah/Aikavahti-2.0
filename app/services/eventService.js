@@ -6,7 +6,7 @@ module.exports = function(Box, datalayer) {
 
 		var parseDateAndTimeToTimestamp = function(dateString, timeString) {
 			console.warn("VALIDATING TIME STRINGS: " + dateString + ", " + timeString);
-			var m = moment(dateString + " " + timeString, "DD.MM.YYYY HH:mm");
+			var m = moment(dateString + " " + timeString, "DD.MM.YYYY HH:mm", true);
 
 			console.log("SINCE EPOCH: " + m.valueOf());
 			return m.valueOf();
@@ -26,14 +26,16 @@ module.exports = function(Box, datalayer) {
 						t: timestamp,
 						signal: true
 					}
-				});				
+				})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);					
 
 			},
 
 			newSignalCustomDateTime: function(dateString, timeString, signalID) {
 				var ts = parseDateAndTimeToTimestamp(dateString, timeString);
 				if (!ts) {
-					return Promise.reject('DateTime validation error in signal creation!');
+					return Promise.reject('Signaalitapahtuman luonti epäonnistui! Tarkista, että syöttämäsi arvot ovat asianmukaiset.').catch(application.getService('errorService').notify);
 				}
 				return datalayer.dataCommandIn({
 					opType: 'newSignal', 
@@ -42,7 +44,9 @@ module.exports = function(Box, datalayer) {
 						t: ts,
 						signal: true
 					}
-				});				
+				})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);				
 
 			},			
 			newEvent: function(schemaID) {
@@ -55,7 +59,9 @@ module.exports = function(Box, datalayer) {
 						t: timestamp,
 						signal: false
 					}
-				});
+				})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
 			},
 			newEventCustomDateTime: function(dateString, timeString, schemaID) {
 
@@ -71,7 +77,9 @@ module.exports = function(Box, datalayer) {
 						t: ts,
 						signal: false
 					}
-				});
+				})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
 
 			},
 			deleteEvent: function(timestamp, schemaID) {
@@ -83,7 +91,9 @@ module.exports = function(Box, datalayer) {
 						s: schemaID,
 						t: timestamp
 					}					
-				});
+				})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
 			},
 			saveNotes: function(timestamp, notes) {
 				return datalayer.dataCommandIn({
@@ -93,7 +103,9 @@ module.exports = function(Box, datalayer) {
 						t: timestamp,
 						notes: notes
 					}					
-				});				
+				})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);				
 			}
 		}
 
