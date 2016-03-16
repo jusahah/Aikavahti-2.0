@@ -66,6 +66,9 @@
 							</li>
 						</ul>						
 					</li>
+					<li class="aikavahtilink" data-type="exit">
+						<a><i class="fa fa-lg fa-fw fa-arrow-circle-right txt-color-yellow"></i> <span class="menu-item-parent">Sulje</span></a>
+					</li>
 					
 					<li class="hideOnLittle" style="padding: 0px; margin-top: 6px; margin-right: 6px; float: right; width: 162px; height: 56px;">
 							<div>
@@ -100,6 +103,30 @@
 
 				</ul>
 			</nav>
+			<a style="display: none;" href="#" id="quitNoSave" class="btn btn-success">Open Quit Modal</a>
+
+			<script>
+
+			$("#quitNoSave").click(function(e) {
+		
+				$.SmartMessageBox({
+					title : "Aineiston tallennus epäonnistui!",
+					content : "Ohjelma ei onnistunut kirjoittamaan aineistoa levylle. Jos suljet ohjelman, saatat menettää ohjelman ajon aikana keräämiäsi tietoja. Haluatko silti sulkea?",
+					buttons : '[Kyllä][En]'
+				}, function(ButtonPressed) {
+					if (ButtonPressed === "Kyllä") {
+						Box.Application.broadcast('forceQuitAfterSaveFailure');
+					}
+					if (ButtonPressed === "En") {
+						console.log("Ohjelman sulkeminen peruttiin.")
+					}
+		
+				});
+		
+				e.preventDefault();
+			})
+
+			</script>
 
 																		
 

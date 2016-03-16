@@ -4,6 +4,7 @@ import jetpack from 'fs-jetpack'; // module loaded from npm
 import { greet } from './hello_world/hello_world'; // code authored by you in this project
 import env from './env';
 
+var ipcRenderer = require('electron').ipcRenderer;
 var Promise = require('bluebird');
 var _ = require('lodash');
 var tinycolor = require('tinycolor2');
@@ -238,9 +239,32 @@ Box.Application.addModule('valikko', function(context) {
 		$('#globalLoadingBanner').show();		
 	}
 
+	var shutDownRequest = function() {
+		// Send shutdown request to background
+		// Make one last save
+		var adminService = context.getService('adminService');
+
+		adminService.forceSave().then(function() {
+			Box.Application.stopAll(document);
+			setTimeout(function() {
+				ipcRenderer.send('appShutDown');
+			}, 600);
+			
+		}).catch(function(err) {
+			$el.find('#quitNoSave').click();
+		});
+
+	} 
+
+	var forceShutDown = function() {
+		// Not asking again...
+		Box.Application.stopAll(document);
+		ipcRenderer.send('appShutDown');
+	}
+
 	console.log("INITING VALIKKO VIEW MODULE");
 	return {
-		messages: ['cachewasflushed', 'computationprogressupdate', 'currenteventupdate', 'initFirstView'],
+		messages: ['cachewasflushed', 'computationprogressupdate', 'currenteventupdate', 'initFirstView', 'forceQuitAfterSaveFailure'],
 		onclick: function(event, element, elementType) {
 			console.log("CLICK IN VALIKKO: " + elementType);
 
@@ -258,6 +282,8 @@ Box.Application.addModule('valikko', function(context) {
 				Box.Application.broadcast('resetrequest');
 			} else if (elementType === 'restore') {
 				Box.Application.broadcast('restoremodal');
+			} else if (elementType === 'exit') {
+				shutDownRequest();
 			}
 		},
 		onmessage: function(name, data) {
@@ -274,6 +300,8 @@ Box.Application.addModule('valikko', function(context) {
 				updateFrontShow(data);
 			} else if (name === 'initFirstView') {
 				handleRouteChange(null, 'front-route', null);
+			} else if (name === 'forceQuitAfterSaveFailure') {
+				forceShutDown();
 			}
 		}
 

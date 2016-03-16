@@ -5,12 +5,11 @@ module.exports = function(Box) {
 	console.warn("errorService module.exports called");
 	Box.Application.addService('errorService', function(application) {
 		console.error("ERROR SERVICE OPENING");
+		var info = function(msg) {
+			application.broadcast('notificationTriggered', {type: 'info', msg: msg});
+		}
 
 		var success = function(msg) {
-			setTimeout(function() {
-				console.warn("SUCCCESSS WAS REACHED");
-				console.log(msg);
-			},5000);
 			application.broadcast('notificationTriggered', {type: 'success', msg: msg});
 		}
 
@@ -44,6 +43,7 @@ module.exports = function(Box) {
 		} 
 
 		return {
+			info: info,
 			success: success,
 			notify: notify,
 			dataLayerNotify: dataLayerNotify

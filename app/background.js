@@ -17,6 +17,10 @@ ipcMain.on('computationrequest', function(event, data) {
     }
 });
 
+ipcMain.on('appShutDown', function() {
+    mainWindow.close(); // Handler below will close transformWindow too and that will close the runtime
+});
+
 ipcMain.on('computationresult', function(event, data) {
     console.log("Main process got computation results!");
     if (mainWindow) {

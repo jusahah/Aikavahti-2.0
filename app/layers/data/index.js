@@ -473,7 +473,7 @@ function addEvent(eventData, isAfter) {
 	var succText = isAfter ? 'Uusi tapahtuma lisätty jälkikäteen:' : 'Uusi aktiviteetti aloitettu:';
 	// If we need to inform some web API event hook this would be pretty good place to do it
 
-	return writeToDiskIfNeeded(null, succText + ' <strong>' + schemaItem.name + ' (' + moment(eventData.t).format('DD.MM.YYYY HH:mm') + ')</strong>');
+	return writeToDiskIfNeeded(null, succText + ' <strong>' + (schemaItem ? schemaItem.name : '(poissa)') + ' (' + moment(eventData.t).format('DD.MM.YYYY HH:mm') + ')</strong>');
 
 }
 
@@ -922,6 +922,17 @@ module.exports = {
 	broadcastChange: function() {
 		// Force change broadcast
 		changeCb(appData);
+	},
+	forceSave: function() {
+		return new Promise(function(resolve, reject) {
+			pushToDB(appData, function(err) {
+				err = 'joo';
+				return reject({type: 'danger', msg: 'Levylle kirjoittamisessa tapahtui virhe.', priv: err});
+				if (err) reject({type: 'danger', msg: 'Levylle kirjoittamisessa tapahtui virhe.', priv: err});
+				else resolve('Aineisto tallennettu levylle - suljetaan ohjelma...');
+			});
+			 
+		});		
 	}
 
 

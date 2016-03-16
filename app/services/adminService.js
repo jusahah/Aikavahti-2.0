@@ -27,6 +27,9 @@ module.exports = function(Box, datalayer) {
 			},
 			getRestores: function() {
 				return datalayer.dataQueryIn('restores');
+			},
+			forceSave: function() {
+				return datalayer.forceSave().then(application.getService('errorService').info);
 			}
 		}
 
