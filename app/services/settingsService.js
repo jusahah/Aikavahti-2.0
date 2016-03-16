@@ -10,14 +10,17 @@ module.exports = function(Box, datalayer) {
 				var settings = datalayer.fetch('settings');
 				return Promise.resolve(settings);			
 			},
+			setDefaultSettings: function() {
+				var data = {
+					writeToDiskAfterEveryUpdate: true,
+					restorePoint: true,
+				};	
+				return this.setSettings(data);			
+			},
 			setSettings: function(settings) {
 				var data = {
 					writeToDiskAfterEveryUpdate: settings.writeToDiskAfterEveryUpdate,
 					restorePoint: settings.restorePoint,
-				};
-				var internet = {
-					onlineBackup: settings.onlineBackup,
-					backupKey: settings.backupKey
 				};
 
 				var p1 = this.setDataSettings(data);

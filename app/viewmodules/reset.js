@@ -18,6 +18,9 @@ module.exports = function(Box) {
 		var resetConfirmed = function() {
 			var adminService = context.getService('adminService');
 			var prom = adminService.resetProgram();
+			prom.then(function() {
+				Box.Application.broadcast('showInitializationScreen');
+			});
 
 
 		}

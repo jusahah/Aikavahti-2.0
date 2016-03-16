@@ -30,6 +30,9 @@ module.exports = function(Box, datalayer) {
 			},
 			forceSave: function() {
 				return datalayer.forceSave().then(application.getService('errorService').info);
+			},
+			uploadTree: function(tree) {
+				return datalayer.setActivityTree(tree);
 			}
 		}
 

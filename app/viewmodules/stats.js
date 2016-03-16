@@ -211,6 +211,7 @@ module.exports = function(Box) {
 		}
 
 		var buildSignalTable = function(signalsTable, eventsAndSignalsList, dayByDayCountPerSignalId) {
+
 			var d = new Date();
 			var startTs;
 			if (currentPayload === 'today') {

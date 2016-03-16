@@ -26,7 +26,7 @@ module.exports = function(Box) {
 					console.error("INTERNAL ERROR LOG: " + err.priv);
 					console.error("---------------------------");					
 				}
-
+				application.broadcast('notificationTriggered', err.msg);
 				throw err.msg;
 
 			} else {

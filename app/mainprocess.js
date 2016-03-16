@@ -66,6 +66,7 @@ require('./services/settingsService')(Box, datalayer);
 require('./services/eventService')(Box, datalayer);
 require('./services/adminService')(Box, datalayer);
 require('./services/errorService')(Box);
+require('./services/internetService')(Box);
 
 // Too bad these fucking loads are so async that what the hell... we need to wait a bit
 
@@ -287,6 +288,7 @@ Box.Application.addModule('valikko', function(context) {
 			} else if (name === 'currenteventupdate') {
 				updateFrontShow(data);
 			} else if (name === 'initFirstView') {
+				context.getService('derivedData').forceDataRecomputation();
 				handleRouteChange(null, 'front-route', null);
 			} else if (name === 'forceQuitAfterSaveFailure') {
 				forceShutDown();

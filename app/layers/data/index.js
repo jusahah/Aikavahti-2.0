@@ -113,6 +113,7 @@ function getInitialDataObject() {
 		events: [],
 		schema: {
 			_root_: [
+			/*
 				{daygoal: 'gt_' + 3600*1000*6, color: '884455', name: 'Työ', id: 1, children: [
 					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'PHP', id: 11, children: []},	
 					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Javascript', id: 12, children: [
@@ -137,13 +138,15 @@ function getInitialDataObject() {
 					{daygoal: 'gt_' + 3600*1000*2, color: '554488', name: 'TV:n katselu', id: 35, children: []},
 					{daygoal: 'gt_' + 3600*1000*1, color: '554488', name: 'Runoillat', id: 36, children: []},
 				]}
+				*/
 			]
 		},
 		triggers: {},
-		signals: [
+		signals: [/*
 			{daygoal: 'e_' + 1, name: 'Kahvi', id: 9999},
 			{daygoal: 'le_' + 2, name: 'Olut', id: 9998},
 			{daygoal: 'gt_' + 5, name: 'Punaviini', id: 9997},
+			*/
 		],
 		settings: {
 			data: {
@@ -164,6 +167,11 @@ function getInitialDataObject() {
 }
 
 function resetProgramState() {
+	appData.events = [];
+	appData.schema = {'_root_': []};
+	appData.signals = [];
+	fs.unlinkSync(file);
+	return Promise.resolve('Ohjelma palautettu tehdasasetuksiin ja tyhjennetty datasta');
 	appData = getInitialDataObject();
 	return writeToDiskIfNeeded(null, 'Ohjelma palautettu tehdasasetuksiin ja tyhjennetty datasta!');
 
@@ -897,7 +905,7 @@ module.exports = {
 		var didExist = createFileIfNotExist();
 		loadToMemory();
 		checkRestorePoints();
-		//return true;
+
 		return didExist;
 
 	},
@@ -917,10 +925,16 @@ module.exports = {
 			pushToDB(appData, function(err) {
 				console.log("APPDATA PUSHED TO DB");
 				if (err) reject({type: 'danger', msg: 'Levylle kirjoittamisessa tapahtui virhe.', priv: err});
-				else resolve('Aineisto tallennettu levylle - suljetaan ohjelma...');
+				else resolve('Aineisto tallennettu levylle');
 			});
 			 
 		});		
+	},
+	setActivityTree: function(tree) {
+		console.warn("SET ACTIVITY TREE");
+		console.log(tree);
+		appData.schema['_root_'] = tree;
+		return this.forceSave();
 	}
 
 

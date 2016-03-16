@@ -13,7 +13,9 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 		month: {},
 		week: {}
 	};
-
+	var weekHolder = signalCounts.week;
+	var monthHolder = signalCounts.month;
+	
 	console.error("STARTING SIGNAL COUNTS");
 	console.log(signalsCountPerDate);
 
@@ -22,8 +24,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 		var month = getMonthString(dateString);
 		var week  = getWeekString(dateString);
 
-		var weekHolder = signalCounts.week;
-		var monthHolder = signalCounts.month;
+
 
 		if (!weekHolder.hasOwnProperty(week)) {
 			weekHolder[week] = {};

@@ -30,7 +30,7 @@
 													<section class="col">
 										
 													<label class="toggle label">Jatkuva datan tallennus levylle?
-														<input type="checkbox" name="writetodisk" checked="checked">
+														<input type="checkbox" name="writetodisk" id="writetodiskcheckbox" checked="checked">
 														<i data-swchon-text="Kyllä" data-swchoff-text="Ei"></i>
 													</label>
 													</section>
@@ -39,7 +39,7 @@
 													<section class="col">
 										
 													<label class="toggle label">Lataa aktiviteettipuu netistä?
-														<input type="checkbox" name="ownactivitytree" data-type="ownactivitytree_change">
+														<input type="checkbox" id="activitytreecheckbox" name="downloadactivitytree" data-type="downloadactivitytree_change">
 														<i data-swchon-text="Kyllä" data-swchoff-text="Ei"></i>
 													</label>
 													<label class="input">
@@ -56,12 +56,9 @@
 													
 													<section class="col">
 										
-													<label class="toggle label">Online-varmuuskopiointi?
-														<input type="checkbox" name="onlinebackup" data-type="onlinebackup_change">
+													<label class="toggle label">Palautuspisteen käyttö?
+														<input type="checkbox" id="restorepointcheckbox" name="restorePoint" data-type="restorepoint_change">
 														<i data-swchon-text="Kyllä" data-swchoff-text="Ei"></i>
-													</label>
-													<label class="input">
-														<input type="text" id="backupkey" placeholder="Syötä kopioavain" style="display: none;">
 													</label>
 													</section>
 												</div>
@@ -74,11 +71,13 @@
 									</div>
 
 							<div class="modal-footer">
-
-								<button type="button" class="btn btn-success" data-dismiss="modal">
+								<button type="button" id="closeInitModal" data-dismiss="modal" style="display: none;">
+									(Sulje)
+								</button>
+								<button type="button" class="btn btn-success" data-type="usecustomsettings">
 									Tallenna uudet asetukset
 								</button>
-								<button type="button" class="btn btn-danger" data-dismiss="modal">
+								<button type="button" class="btn btn-danger" data-dismiss="modal" data-type="usedefaultsettings">
 									Käytä default-asetuksia
 								</button>								
 							</div>
@@ -87,4 +86,23 @@
 					</div>
 				</div>
 				</div>
-</div>				
+
+				<a style="display: none; position: fixed; top: 0; right: 0;" href="#" id="downloadRibbon" class="btn btn-success">Open Download Activity Tree Ribbon</a>
+</div>	
+
+
+
+<script>
+
+
+			$("#downloadRibbon").click(function(e) {
+		
+				$.SmartMessageBox({
+					title : "Ladataan aktiviteettipuuta internetistä...",
+					content : "<span id='downloadStatus'>Lataus kesken...</span>",
+					buttons: '[<span id="cancelDownload">Peruuta</span>]'
+				});
+		
+				e.preventDefault();
+			})
+			</script>			
