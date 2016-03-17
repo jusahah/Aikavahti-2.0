@@ -77,6 +77,27 @@ module.exports = function(Box) {
 		
 		}
 
+		var copyTree = function() {
+			var adminService = context.getService('adminService');
+			var treeJSON = adminService.needTreeAsJSON();
+			console.log("Starting to move JSON to net: " + treeJSON);
+
+			var iS = context.getService('internetService');
+			iS.pushTreeToDB(treeJSON).then(receiveLink).catch(pushToInternetFailure);
+		}
+
+		var receiveLink = function(url) {
+			console.log("Latauslinkki: " + url);
+			$el.find('#receiveLinkRibbon').click();
+			setTimeout(function() {
+				$('#downloadlinktotree').empty().append(url);
+			}, 0);
+		}
+
+		var pushToInternetFailure = function() {
+			// Nothing to do here
+		}
+
 		
 		// Bind the file input listener
 		
@@ -91,6 +112,8 @@ module.exports = function(Box) {
 					importFile();
 				} else if (elementType === 'exportfile') {
 					exportFile();
+				} else if (elementType === 'copytree') {
+					copyTree();
 				}
 			},
 			onmessage: function(name, data) {

@@ -1002,6 +1002,9 @@ module.exports = {
 		console.log(tree);
 		appData.schema['_root_'] = tree;
 		return this.forceSave();
+	},
+	getTree: function() {
+		return appData.schema['_root_'];
 	}
 
 

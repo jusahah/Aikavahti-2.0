@@ -33,6 +33,9 @@ module.exports = function(Box, datalayer) {
 			},
 			uploadTree: function(tree) {
 				return datalayer.setActivityTree(tree);
+			},
+			needTreeAsJSON: function() {
+				return JSON.stringify(datalayer.getTree());
 			}
 		}
 
