@@ -6,7 +6,9 @@ module.exports = function(Box, datalayer) {
 		var latestCalcTime;
 
 		return {
-
+			getDataJSON: function() {
+				return datalayer.getDataJSON();
+			},
 			// Must return Promise!!!
 			getDerived: function(transformName) {
 				// First check that we have a cache slow for this name

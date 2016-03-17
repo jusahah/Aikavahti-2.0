@@ -134,7 +134,7 @@ function pushToDB(jsonObj, cb) {
 // Goal addition to application's data schema starts now
 function getInitialDataObject() {
 	return {
-		events: [],
+		
 		schema: {
 			_root_: [
 			
@@ -181,6 +181,7 @@ function getInitialDataObject() {
 				userSelectedEvents: [],
 			}
 		},
+		events: [],
 
 	};
 }
@@ -806,6 +807,9 @@ function getCurrentEventInfo() {
 
 
 module.exports = {
+	getDataJSON: function() {
+		return JSON.stringify(appData, null, 4);
+	},
 	changeCallback: function(cb) {
 		changeCb = cb;
 		/*

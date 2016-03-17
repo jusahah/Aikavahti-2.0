@@ -41,6 +41,7 @@ $('#importContainer').load('views/mainContents/import.html');
 $('#signalsContainer').load('views/mainContents/signals.html');
 $('#timelineContainer').load('views/mainContents/timeline.html');
 $('#comparisonsContainer').load('views/mainContents/comparisons.html');
+$('#rawdataContainer').load('views/mainContents/rawdata.html');
 
 $('#resetContainer').load('views/static/resetConfirm.html');
 $('#restoreContainer').load('views/static/restore.html');
@@ -60,6 +61,7 @@ require('./viewmodules/restore')(Box); // Same
 require('./viewmodules/timeline')(Box); // Same
 require('./viewmodules/comparisons')(Box); // Same
 require('./viewmodules/errors')(Box); // Same
+require('./viewmodules/rawdata')(Box); // Same
 // Service registrations
 require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);
