@@ -23,6 +23,8 @@ module.exports = function(Box) {
 		var currentDayGoal;
 		var dayGoalDisabled;
 
+		var lastFlush = Date.now();
+
 		var $currentPanelWrapper;
 
 		var resolveBarWidth = function(newDuration, oldDuration, dayGoal) {
@@ -48,7 +50,7 @@ module.exports = function(Box) {
 					return;
 				}
 				
-				var newDuration = Date.now() - currentNow.start;
+				var newDuration = Date.now() - lastFlush;
 				var timeString = beautifyDuration(newDuration);
 				if (timeString !== oldTimeString) {
 					// Avoid DOM hit when no needed
@@ -100,6 +102,7 @@ module.exports = function(Box) {
 		}
 
 		var activate = function() {
+			lastFlush =  Date.now();
 			// hide right away in case we are reactivating view that is currently visible
 			$el.hide();			
 
@@ -108,6 +111,8 @@ module.exports = function(Box) {
 			isHidden = false;
 
 			viewDataPromise.then(function(viewData) {
+
+				console.log(viewData.frontViewData.currentPlusKids);
 
 				if (isHidden) return; // User already switched to another view			
 
@@ -122,20 +127,28 @@ module.exports = function(Box) {
 
 		}
 
-		var resolveCurrentDayTotal = function(schemaID, dayByDayPerSchemaId) {
-			console.log("Resolve old duration for: " + schemaID);
+		var resolveCurrentDayTotal = function(schemaIDs, dayByDayPerSchemaId) {
+			console.log("Resolve old duration for: " + JSON.stringify(schemaIDs));
 			console.log(dayByDayPerSchemaId);
-			schemaID = parseInt(schemaID);
-			var todayString = moment().format('DD-MM-YYYY');
 
-			if (dayByDayPerSchemaId.hasOwnProperty(todayString)) {
-				var dayObj = dayByDayPerSchemaId[todayString];
-				if (dayObj.hasOwnProperty(schemaID)) {
-					return dayObj[schemaID];
+			var sum = 0;
+
+			_.each(schemaIDs, function(schemaID) {
+				schemaID = parseInt(schemaID);
+				var todayString = moment().format('DD-MM-YYYY');
+
+				if (dayByDayPerSchemaId.hasOwnProperty(todayString)) {
+					var dayObj = dayByDayPerSchemaId[todayString];
+					if (dayObj.hasOwnProperty(schemaID)) {
+						sum += dayObj[schemaID];
+					}
 				}
-			}
 
-			return 0;
+				sum += 0;
+			});
+
+			return sum;
+
 		}
 
 
@@ -144,10 +157,11 @@ module.exports = function(Box) {
 			if (!data) return;
 
 			var current = data.current;
+			var currentPlusKids = data.currentPlusKids;
 			currentNow = current;
 			var lastTen = data.lastTen;
 			console.warn(current);
-			currentDayTotalWithoutOngoing = resolveCurrentDayTotal(current.id, dayByDayPerSchemaId);
+			currentDayTotalWithoutOngoing = resolveCurrentDayTotal(currentPlusKids, dayByDayPerSchemaId);
 			console.log("Old duration is: " + currentDayTotalWithoutOngoing);
 			// Current stuff
 			$currentPanelWrapper = $el.find('#currentevent_wrapper');

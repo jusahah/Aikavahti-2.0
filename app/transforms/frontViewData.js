@@ -43,6 +43,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 
 	frontView.current = currentSchemaItemCopy;
+	frontView.currentPlusKids = resolveAllChildrenOfSchemaIdWrapper(currentSchemaItemCopy.id, normalizedSchemaTable);
 
 	// Last ten
 	frontView.lastTen = [];
@@ -113,3 +114,23 @@ function copySchemaItem(item) {
 
 	return copyO;
 }
+
+var resolveAllChildrenOfSchemaIdWrapper  = function(schemaID, schemaItems) {
+
+	var resolveAllChildrenOfSchemaId = function(schemaID) {
+
+				var schemaItem = schemaItems[schemaID];
+
+				if (schemaItem && schemaItem.hasOwnProperty('children') && schemaItem.children.length !== 0) {
+					var kids = _.map(schemaItem.children, resolveAllChildrenOfSchemaId);
+					kids.push(schemaID);
+					return _.flattenDeep(kids);
+				}
+
+				return [schemaID];
+	}
+
+	return resolveAllChildrenOfSchemaId(schemaID);
+
+}
+
