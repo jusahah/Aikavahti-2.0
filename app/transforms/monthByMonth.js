@@ -33,8 +33,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 			monthObj[schemaID] += duration;
 		});
 	});
-	console.warn("monthS TO DURATIONS");
-	console.log(JSON.stringify(monthsToDurations));
+
 
 	//return makeItSortedArray(weeksToDurations);
 	return monthsToDurations;
@@ -44,11 +43,9 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 function getMonthString(datestring) {
 
-	// datestring = DD.MM.YYYY
-	console.log("DATE STRING IN GET MONTHSTRING: " + datestring);
 
 	var m = moment(datestring, 'DD.MM.YYYY');
-	console.log("Month STRING IS: " + m.year() + "-" + (m.month()+1));
+
 	return m.year() + "-" + (m.month() + 1);
 }
 
@@ -75,8 +72,7 @@ function sumGroupTotals(results, schemaItems, schemaItemsArr) {
 			kids = _.flattenDeep(kids);
 			kids.push(schemaID); // add myself
 			kids = _.uniq(kids);
-			console.warn("KIDS FOR: " + schemaID);
-			console.log(kids);
+
 			_.each(kids, function(kid) {
 				if (origCopy.hasOwnProperty(kid)) {
 					sum += origCopy[kid];
@@ -90,8 +86,7 @@ function sumGroupTotals(results, schemaItems, schemaItemsArr) {
 
 		
 	});
-	console.error("GROUP SUMS -----------------");
-	console.log(results);
+
 	return results;
 }
 

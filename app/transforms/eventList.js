@@ -6,7 +6,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 	// Note that does not contain children property
 
-	console.error("Transformer running: eventList");
+
 
 	var eventsWithSchemaInfo = _.map(sortedEvents, function(event) {
 		var e2 = Object.assign({}, event);

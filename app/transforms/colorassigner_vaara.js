@@ -19,8 +19,7 @@ function createColorVariety(tinyColor, numOfColorsNeeded, maxDifferenceToBase) {
 		colors.push(tinyColor.toString());
 		tinyColor.spin(spinStep);
 	};
-	console.warn("COLORS CREATED");
-	console.log(colors);
+
 	return colors;
 
 }
@@ -39,7 +38,7 @@ function doColorTransform(dataTree, baseColor, settings, maxDifferenceToBase) {
 	for (var i = 0; i < branchFactor; i++) {
 		var branch = dataTree[i];
 		branch.color = variety.pop();
-		console.log("TRANSFORM FOR: " + branch.name + "with max diff: " + maxDifferenceToBase);
+
 		if (branch.children && branch.children.length !== 0) {
 			doColorTransform(branch.children, branch.color, settings, Math.round(maxDifferenceToBase/2.9));
 		}		
@@ -57,14 +56,13 @@ function doColorTransform(dataTree, baseColor, settings, maxDifferenceToBase) {
 }
 
 function useAllColorScale(dataTree, baseColor, settings, randomizer) {
-	console.log(dataTree);
-	console.log("DATA TREE LEN: " + dataTree.length);
+
 	var colors = tinycolor(baseColor).analogous(dataTree.length, 15);
 	var branchFactor = colors.length;
-	console.log("COLORS length: " + colors.length);
+
 	for (var i = 0; i < branchFactor; i++) {
 		var branch = dataTree[i];
-		console.log(randomizer);
+
 		branch.color = randomizer.randomize(tinycolor(colors.pop())).toString();
 		if (branch.children && branch.children.length !== 0) {
 			useAllColorScale(branch.children, branch.color, settings, randomizer);

@@ -12,7 +12,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 		signalsTable[signal.id] = signal;
 	});
 
-	console.error("Transformer running: eventsAndSignalsList");
+
 
 	var eventsWithSchemaInfo = _.map(sortedEventsAndSignals, function(event) {
 		var e2 = Object.assign({}, event);

@@ -13,9 +13,6 @@ module.exports = function(allData) {
 		return e1.t - e2.t;
 	});
 
-	console.log("SORTED IN THISMONTHTOTALS");
-	console.log(JSON.stringify(sortedEvents));
-
 	var totalsBySchemaID = {};
 	var curr = sortedEvents[0];
 	for (var i = 1, j = sortedEvents.length - 1; i < j; i++) {

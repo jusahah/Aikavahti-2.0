@@ -14,7 +14,7 @@ var ipcTransformer = require('electron').ipcRenderer;
 var currentBatchID;
 
 ipcTransformer.on('computationrequest', function(event, data) {
-	console.log("Computation req in transformer!");
+
 	receiveComputationRequest(data);
 });
 
@@ -90,12 +90,11 @@ function addDayChanges(events) {
 	var curr = events[0];
 	modifiedEvents.push(curr);
 	for (var i = 1, j = events.length - 1; i <= j; i++) {
-		console.log("--->" + moment(events[i].t).format('DD.MM.YYYY HH:mm:ss'));
+
 		var event = events[i];
 		event.human = moment(event.t).format('DD.MM.YYYY HH:mm:ss');
 		var dayChangeTimestamps = getDayChangeTimestamp(event.t, curr.t);
-		console.log("---Day change");
-		console.log(JSON.stringify(dayChangeTimestamps));
+
 
 		if (dayChangeTimestamps.length !== 0) {
 			var schemaID = event.s;
@@ -125,21 +124,18 @@ function addDayChanges(events) {
 		return (-1)*event.t;
 	});
 
-	console.warn("DAY CHANGES ADDED");
-	console.log(JSON.stringify(modifiedEvents));
 
 	return modifiedEvents;
 
 }
 
 function getDayChangeTimestamp(prev, next) {
-	console.log("prev " + prev + " vs. next " + next);
+
 	var d1 = new Date(prev);
 	var d2 = new Date(next);
 
 	var interDays = [];
 
-	console.log(d1.getDay() + " | " + d2.getDay());
 
 	if (d1.getDay() !== d2.getDay() || d1.getMonth() !== d2.getMonth()) {
 		var startOfDay = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
@@ -165,11 +161,11 @@ function normalizeChildrenToIDs(childrenArray) {
 function normalizeSchemaTree(schemaTree) {
 
 	var table = {};
-	console.warn("Traverse start");
+
 
 	var traverse = function(branch) {
 		_.each(branch, function(child) {
-			console.log(child.name);
+
 			table[child.id] = _.assign({}, child);
 			table[child.id].children = normalizeChildrenToIDs(child.children);
 			if (child.hasOwnProperty('children') && child.children.length > 0) {
@@ -185,8 +181,7 @@ function normalizeSchemaTree(schemaTree) {
 	
 	
 	traverse(schemaTree);
-	console.log("TABLE IS");
-	console.log(table);
+
 	return table;
 
 }
@@ -202,8 +197,6 @@ function receiveComputationRequest(data) {
 
 	var schemaNormalizedTable = normalizeSchemaTree(schemaTree);
 
-	console.warn("normalizeSchemaTable");
-	console.log(JSON.stringify(schemaNormalizedTable));
 	var settingsTree = data.data.settings;
 	console.log("Received computationrequest");
 	var batchID = data.batchID;
@@ -213,9 +206,7 @@ function receiveComputationRequest(data) {
 	var transformsList = transforms.slice();
 	var transformListLen = transformsList.length;
 	var dones = 0;
-	console.log("Start calc all");
-	console.warn("--------------- RAW EVENTS ------------");
-	console.log(JSON.stringify(data.events));
+
 
 	var calcStartTime = Date.now();
 
@@ -268,7 +259,6 @@ function receiveComputationRequest(data) {
 	function calcOne() {
 		if (batchID !== currentBatchID) {
 			// We abort current calculations and move to higher batch ID one
-			console.warn("Higher batch ID detected - stopping previous calculation");
 			return;
 		}
 		
@@ -276,19 +266,16 @@ function receiveComputationRequest(data) {
 			var transformSelected = transformsList.shift();
 			var results;	
 			try {
-				console.warn("CURREN TRANSFORMATION: " + transformSelected.name);
 				results = transformSelected.transform(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, schemaNormalizedTable, settingsTree, signalsArr, sortedSignalsAndEvents);	
 			} catch (e) {
-				console.error("-------------------__ERROR ERROR -----------------");
+				console.error("-------------------_ERROR ERROR -----------------");
 				console.log(e);
 				results = null;
 			}
 			dones++;
 			sendResults(transformSelected.name, results, batchID, percentageDone(), calcStartTime);
 			setTimeout(calcOne, 0);
-		} else {
-			console.warn("Transformations completed");
-		}
+		} 
 					
 	}
 
@@ -303,8 +290,7 @@ function receiveComputationRequest(data) {
 }
 
 function sendResults(name, results, batchID, percentageDone, calcTime) {
-	console.log("RESULTS FOR: " + name);
-	console.log(results);
+
 	ipcTransformer.send('computationresult', {calcTime: calcTime, name: name, results: results, batchID: batchID, percentageDone: percentageDone});
 	var k = 8;
 	for (var i = 0 * 1000 * 1000; i >= 0; i--) {

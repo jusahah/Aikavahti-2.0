@@ -11,7 +11,6 @@ const ipcMain = require('electron').ipcMain;
 
 // These simply forward data between main renderer and transform process
 ipcMain.on('computationrequest', function(event, data) {
-    console.log("Main process got computation req");
     if (transformWindow) {
         transformWindow.send('computationrequest', data); // Just forward it
     }
@@ -22,14 +21,12 @@ ipcMain.on('appShutDown', function() {
 });
 
 ipcMain.on('computationresult', function(event, data) {
-    console.log("Main process got computation results!");
     if (mainWindow) {
         mainWindow.send('computationresult', data);
     }
 });
 
 ipcMain.on('computationfailure', function(event, data) {
-    console.log("Main process got computation failure.");
     if (mainWindow) {
         mainWindow.send('computationfailure', data);
     }

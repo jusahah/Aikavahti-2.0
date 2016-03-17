@@ -1,7 +1,7 @@
 var _ = require('lodash');
 
 module.exports = function(allData) {
-	console.warn("Events in to onlyThisMonth: " + allData.events.length);
+
 	var events = allData.events;
 	var startOfMonth = getStartOfMonthTimestamp();
 
@@ -10,7 +10,7 @@ module.exports = function(allData) {
 	});
 
 	allData.events = filtered;
-	console.warn("This month so far # of events: " + allData.events.length);
+
 
 	return allData;
 

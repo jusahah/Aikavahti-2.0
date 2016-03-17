@@ -3,7 +3,7 @@ var _ = require('lodash');
 module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, normalizedSchemaTable, settingsTree, signalsArray) {
 
 	// Arguments should not be modified!!
-
+/*
 	console.error("Transformer running: frontViewData");
 	console.log("DATA RECEIVED IN TRANSFORMER");
 	console.warn("RAW EVENTS SORTED");
@@ -15,7 +15,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 	console.log(JSON.stringify(schemaTree));
 	console.log(normalizedSchemaTable);
 	console.log(JSON.stringify(settingsTree));
-
+*/
 	var frontView = {};
 
 	// Current
@@ -51,8 +51,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 	for (var i = 0, j = sortedDurations.length; i < j; i++) {
 		if (i >= limit) break;
 		var e = sortedDurations[i];
-		console.log("E");
-		console.log(e);
+
 		var current = getCopyOfSchemaItem(e.s, normalizedSchemaTable);
 		current.start = e.start;
 		current.end   = e.end;

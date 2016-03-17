@@ -33,10 +33,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 			weekObj[schemaID] += duration;
 		});
 	});
-	console.warn("WEEKS TO DURATIONS");
-	console.log(JSON.stringify(weeksToDurations));
 
-	//return makeItSortedArray(weeksToDurations);
 	return weeksToDurations;
 
 }
@@ -44,11 +41,8 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 function getWeekString(datestring) {
 
-	// datestring = DD.MM.YYYY
-	console.log("DATE STRING IN GETWEEKSTRING: " + datestring);
 
 	var m = moment(datestring, 'DD.MM.YYYY');
-	console.log("WEEK STRING IS: " + m.isoWeekYear() + "-" + m.isoWeeks());
 	return m.isoWeekYear() + "-" + m.isoWeeks();
 }
 
@@ -75,8 +69,7 @@ function sumGroupTotals(results, schemaItems, schemaItemsArr) {
 			kids = _.flattenDeep(kids);
 			kids.push(schemaID); // add myself
 			kids = _.uniq(kids);
-			console.warn("KIDS FOR: " + schemaID);
-			console.log(kids);
+
 			_.each(kids, function(kid) {
 				if (origCopy.hasOwnProperty(kid)) {
 					sum += origCopy[kid];
@@ -90,8 +83,7 @@ function sumGroupTotals(results, schemaItems, schemaItemsArr) {
 
 		
 	});
-	console.error("GROUP SUMS -----------------");
-	console.log(results);
+
 	return results;
 }
 

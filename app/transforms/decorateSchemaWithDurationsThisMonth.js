@@ -25,8 +25,6 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 	var monthStartTimestamp = getStartOfMonthTimestamp();
 	var totalsInThisMonth = totalTimePerSchemaIDSinceTimestamp(sortedDurations, monthStartTimestamp);
 
-	console.error("TOTALS THIS MON TH");
-	console.log(totalsInThisMonth);
 
 	var copyOfSchemaTree = JSON.parse(JSON.stringify(schemaTree)); // Make copy to be decorated -> okay as only primitve data in schemaTree
 	decorateSchemaTree(totalsInThisMonth, copyOfSchemaTree); // Decorates by ref although returns it too
@@ -51,7 +49,7 @@ function decorateSchemaTree(decorations, schemaTree) {
 				sum += decorateChild(decorations, subChild);
 			});
 		}
-		console.log("CHILD " + child.id + " GETS: " + sum);
+
 		child.totalTime = sum;
 		return sum;
 
@@ -101,7 +99,5 @@ function getStartOfMonthTimestamp() {
 	var d = new Date();
 
 	var dStart = new Date(d.getFullYear(), d.getMonth());
-	console.error("Month start timestamp");
-	console.log(dStart);
 	return dStart.getTime();
 }

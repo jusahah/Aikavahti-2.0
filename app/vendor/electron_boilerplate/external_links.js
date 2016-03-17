@@ -26,6 +26,7 @@
             if (element.nodeName === 'A') {
                 href = element.getAttribute('href');
             }
+            // Note that class name that must be present in a link if it leads to external page
             if (element.classList.contains('js-external-link')) {
                 isExternal = true;
             }
@@ -39,6 +40,6 @@
 
         checkDomElement(e.target);
     }
-
-    document.addEventListener('click', supportExternalLinks, false);
+    // Uncomment here if want to support external links
+    //document.addEventListener('click', supportExternalLinks, false);
 }());
