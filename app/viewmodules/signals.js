@@ -70,6 +70,7 @@ module.exports = function(Box) {
 				html += '<tr>';
 				html += '<td>' + signalItem.name + '</td>';
 				html += '<td>' + resolveDayGoalForTable(signalItem.daygoal) + '</td>';
+				html += '<td><a data-toggle="modal" data-target="#editSignalItemModal" data-type="editsignalitem" data-payload="' + signalItem.id + '" class="btn btn-primary">Muokkaa</a></td>';
 				html += '<td><a data-toggle="modal" data-target="#deletesignalModal" data-type="deletesignalitem" data-payload="' + signalItem.id + '" class="btn btn-danger">Poista</a></td>';
 				html += '</tr>';
 			});
@@ -109,6 +110,53 @@ module.exports = function(Box) {
 
 		}
 
+		function populateEditNameModal(signalID) {
+			console.warn("Populating edit modal for signal");
+			if (!signalID || signalID == '0') return;
+
+			var item = viewDataCached.signalsTable[signalID];
+			if (item.daygoal && item.daygoal !== '' && item.daygoal !== '0') {
+				var parts = item.daygoal.split('_');
+				console.error("PARTS: ");
+				console.log(parts);
+				console.log($el.find('#signalitemcompedit_el'));
+				$el.find('#signalitemcompedit_el').val(parts[0]);
+				$el.find('#signalitemboundaryedit_el').val(parseInt(parts[1]));			
+			} else {
+				$el.find('#signalitemcompedit_el').val('dd');
+				$el.find('#signalitemboundaryedit_el').val(0);	
+					
+			}
+
+			$el.find('#newsignalnameedit_el').val(item.name);
+			$el.find('#editSignalItemModal').data('signalid', signalID);
+			
+		}
+
+		function gatherAndSendSignalEdit() {
+			var signalID = $el.find('#editSignalItemModal').data('signalid');
+			if (!signalID || signalID == '0') {
+				return;
+			}
+
+			var goalTypes = ['lt', 'le', 'gt', 'le', 'e'];
+			var signalName = $el.find('#newsignalnameedit_el').val();
+			var signalcomp = $el.find('#signalitemcompedit_el').val();
+			var signalboundary = $el.find('#signalitemboundaryedit_el').val();
+
+			var daygoalString = goalTypes.indexOf(signalcomp) === -1 || isNaN(parseInt(signalboundary)) ? '0' : signalcomp + '_' + signalboundary;
+
+			var ss  = context.getService('settingsService');
+			var prom = ss.updateSignalItem(signalID, {
+				name: signalName,
+				daygoal: daygoalString
+			});
+
+			prom.catch(function(err) {
+				console.error(err);
+			});
+
+		}
 
 
 		
@@ -128,6 +176,10 @@ module.exports = function(Box) {
 					}
 				} else if (elementType === 'submitNewSignal') {
 					gatherAndSendSignalData();
+				} else if (elementType === 'editsignalitem') {
+					populateEditNameModal($(element).data('payload'));
+				} else if (elementType === 'submitEditSignalItem') {
+					gatherAndSendSignalEdit();
 				}
 			},
 			onmessage: function(name, data) {

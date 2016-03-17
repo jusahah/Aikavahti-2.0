@@ -40,27 +40,30 @@
 
 
 							<fieldset>
+
 								<div class="row">
-									<section class="col">
+									<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12">
 									<label class="label">Jatkuva datan tallennus levylle?</label>
 										<label class="select">
 											<select name="writeToDiskAfterEveryUpdate" id="writeToDiskAfterEveryUpdate_el">
 												<option value="0">Ei</option>
-												<option value="1">Kyllä</option>
+												<option value="1">Kyllä (suositus)</option>
 											</select> <i></i> 
 										</label>
+										<span style="font-size: 11px; color: #222;">Jos vastaat "Kyllä", Aikavahti tallentaa aineistosi levylle jokaisen muutoksen yhteydessä. Jos vastaat "Ei", Aikavahti tallentaa aineistosi levylle vasta sulkiessasi ohjelman. <strong>HUOM!</strong> Mahdollinen ohjelman ennenaikainen sulkeutuminen saattaa johtaa keräämiesi tietojen häviämiseen jos olet valinnut "Ei"!</span>										
 									</section>
 								</div>	
+
 								<div class="row">	
-									<section class="col">
+									<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12">
 									<label class="label">Palautuspisteen käyttö?</label>
 										<label class="select">
 											<select name="restorePoint" id="restorePoint_el">
 												<option value="0">Ei</option>
-												<option value="1">Kyllä</option>
+												<option value="1">Kyllä (suositus)</option>
 											</select> <i></i> 
 										</label>
-										<span style="font-size: 11px; color: red;">Jos vastaat "Kyllä", Aikavahti ottaa varmuuskopion datastasi aina avatessasi ohjelman. Mikäli ohjelman käytön aikana tapahtuu datan korruptoitumista, voit palauttaa datan ennalleen varmuuskopion avulla.</span>
+										<span style="font-size: 11px; color: #222;">Jos vastaat "Kyllä", Aikavahti ottaa varmuuskopion datastasi aina avatessasi ohjelman. Mikäli ohjelman käytön aikana tapahtuu datan korruptoitumista, voit palauttaa datan ennalleen varmuuskopion avulla.</span>
 									</section>									
 								</div>
 

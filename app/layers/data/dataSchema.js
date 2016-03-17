@@ -22,6 +22,7 @@ var schemaItem = Joi.object().keys({
 var signalItem = Joi.object().keys({
 	id: Joi.number().integer(),
 	name: Joi.string().required().min(1).max(32),
+	daygoal: Joi.string().optional()
 });
 
 var settingsItem = {

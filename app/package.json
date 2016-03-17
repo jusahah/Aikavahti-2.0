@@ -1,11 +1,11 @@
 {
-  "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
+  "name": "aikavahti",
+  "productName": "Aikavahti 2",
   "identifier": "com.example.electron-boilerplate",
-  "description": "Starter for your Electron application. Out of the box ready for serious stuff.",
-  "version": "0.1.0",
-  "author": "Mr Gumby",
-  "copyright": "© 2016, your company here",
+  "description": "Aikavahti-ohjelman avulla pidät tarkasti kirjaa päivittäisestä ajankäytöstäsi.",
+  "version": "2.0.1",
+  "author": "Nollaversio IT",
+  "copyright": "© 2016, Nollaversio IT",
   "main": "background.js",
   "dependencies": {
     "bluebird": "^3.3.3",

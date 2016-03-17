@@ -74,6 +74,8 @@ console.log('Loaded environment variables:', env);
 
 var app = remote.app;
 var appDir = jetpack.cwd(app.getAppPath());
+console.log("App dir is");
+console.log(app.getPath('userData'));
 
 
 document.addEventListener('DOMContentLoaded', function () {

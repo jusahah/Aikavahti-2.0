@@ -58,6 +58,14 @@ module.exports = function(Box, datalayer) {
 				.then(application.getService('errorService').success)
 				.catch(application.getService('errorService').notify);				
 			},
+			updateSignalItem: function(signalID, signalUpdatedFields) {
+				return datalayer.dataCommandIn({opType: 'changeSignalItem', data: {
+					id: signalID,
+					fields: signalUpdatedFields
+				}})
+				.then(application.getService('errorService').success)
+				.catch(application.getService('errorService').notify);	
+			},
 			createSchemaItem: function(parentID, name, dayGoal) {
 				return datalayer.dataCommandIn({opType: 'newSchemaItem', data: {
 					parent: parentID,

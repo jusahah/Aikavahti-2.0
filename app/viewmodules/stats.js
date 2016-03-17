@@ -336,7 +336,7 @@ module.exports = function(Box) {
 			html += "</tr>";
 			return html;
 		}
-
+		// To be moved to utility module
 		function beautifyTime(timeInMs) {
 			if (timeInMs === 0) return "---";
 			var secs = Math.floor(timeInMs / 1000);

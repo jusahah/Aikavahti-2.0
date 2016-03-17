@@ -18,11 +18,6 @@
 								data-widget-sortable="false"
 				
 								-->
-								<header>
-									<span class="widget-icon"> <i class="fa fa-comments"></i> </span>
-									<h2>Default Tabs with border </h2>
-				
-								</header>
 				
 								<!-- widget div-->
 								<div>
@@ -36,10 +31,21 @@
 				
 									<!-- widget content -->
 									<div class="widget-body" id="currentevent_wrapper">
+
+										<div id="daygoalfrontholder" style="text-align: center; font-style: italic; margin-bottom: 2px;"><span id="daygoalfront">Päivätavoite: 6 tuntia 4 minuuttia </span><span id="daygoalperc"> | Kulunut: 19%</span></div>
+
 				
-										<p>
-											 Aloitettu: <span id="currentevent_started" style="font-weight: bold;">---</span> <span style="float: right;">Kesto: <span id="currentevent_duration" style="font-weight: bold;"> 6 tuntia 25 minuuttia 13 sekuntia </span></span>
-										</p>
+										<div>
+											 <span id="currentevent_started" style="float: left; width: 20%;">---</span>
+
+											<div style="display: inline-block; width: 60%;" class="progress progress-sm progress-striped active" id="daygoalbarholder">
+													<div id="daygoalbar" class="progress-bar" role="progressbar" style="width: 45%; font-size: 9px;"></div>
+											</div>
+
+											  <span style="float: right; width: 20%;"><span id="currentevent_duration" style="float: right;">---</span></span>
+										</div>
+						
+
 										<hr class="simple">
 				
 										<div id="myTabContent1" class="tab-content">
@@ -100,6 +106,7 @@
 										<button href="javascript:void(0);" class="btn">Default</button>
 
 									</div>
+
 									<!-- end widget content -->
 
 								</div>

@@ -3,13 +3,22 @@ var util = require('util');
 var _ = require('lodash');
 var moment = require('moment');
 
+var remote = require('remote'); 
+var app = remote.require('app');
+var path = require('path');
+
+var userDataDir = path.join(app.getPath('appData'), 'aikavahti2');
+
 var dataSchema = require('./dataSchema');
 
 // Coloring
 var colorAssigner = require('./colorassigner');
  
-var file = __dirname + '/appdata.json';
-var restoreDir = __dirname + '/restorepoints/';
+var file = path.join(userDataDir, 'aikavahtidata.json');
+var restoreDir = path.join(userDataDir, 'restorepoints/');
+
+console.log(file);
+console.log(restoreDir);
 
 var appData = [1,2,3,4,5];
 var changeCb;
@@ -48,8 +57,23 @@ function checkRestorePoints() {
 		console.log("INIT: Skipping restore point - user has disabled it");
 		return;
 	}
+	try {
+		var fileNames = fs.readdirSync(restoreDir);
+	} catch (err) {
+		if (err.code === 'ENOENT') {
+			console.log("INIT: Setup restore points directory");
+			fs.mkdirsSync(restoreDir);
 
-	var fileNames = fs.readdirSync(restoreDir);
+		} else {
+			console.error("INIT: Error in restore points fetching")
+			console.error(err);	
+			console.error("Disabling restorepoint functionality");
+			appData.settings.data.restorepoint = false;
+			return;		
+		}
+
+	}
+	
 
 	var restoreFiles = _.filter(fileNames, function(name) {
 		return _.startsWith(name, 'restore');
@@ -572,6 +596,41 @@ function recolorSchema() {
 
 }
 
+function updateSignalItem(data) {
+
+	console.warn("UPDATING SIGNAL");
+	console.log(data);
+
+	var id = data.id;
+	var fields = data.fields;
+
+	var name = fields.name;
+	var daygoal = fields.daygoal;
+
+	var item = getSignalItemIfExists(id);
+
+	if (!item) {
+		return Promise.reject('Signaalia ei löytynyt identifikaatiotunnuksella: ' + id);
+	}
+
+	var clonedItem = _.assign({}, item);
+	clonedItem.name = name ? name : clonedItem.name;
+	clonedItem.daygoal = daygoal ? daygoal : clonedItem.daygoal;
+
+	var err = dataSchema.validateSignalItem(clonedItem);
+	console.log(err);
+
+	if (err) {
+		return Promise.reject('Signaalin päivitys epäonnistui. Tarkista syöttämäsi tiedot.');
+	}
+	// No errors so update real schema object
+	item.name  = name ? name : item.name;
+	item.daygoal = daygoal ? daygoal : item.daygoal;
+
+	return writeToDiskIfNeeded(null, 'Signaalin tiedot päivitetty.');
+
+}
+
 function updateSchemaItem(data) {
 
 	var id = data.id;
@@ -827,7 +886,7 @@ module.exports = {
 		// do changes etc. whatever is need
 
 		// Note that for event timestamp is already inserted!
-		if (dataCommand.opType !== 'changeOne' && dataCommand.opType !== 'general' && dataCommand.opType !== 'changeSchemaItem') {
+		if (dataCommand.opType !== 'changeOne' && dataCommand.opType !== 'general' && dataCommand.opType !== 'changeSchemaItem' && dataCommand.opType !== 'changeSignalItem') {
 			var pathParts = dataCommand.treePath.split('.');
 			var firstPath = pathParts[0];
 			var err = dataSchema.validate(dataCommand.treePath, dataCommand.data);
@@ -843,6 +902,9 @@ module.exports = {
 		if (dataCommand.opType === 'changeSchemaItem') {
 			return updateSchemaItem(dataCommand.data);
 
+		}
+		else if (dataCommand.opType === 'changeSignalItem') {
+			return updateSignalItem(dataCommand.data);
 		}
 		else if (dataCommand.opType === 'general') {
 			if (dataCommand.data === 'recolor') {

@@ -46,7 +46,7 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 
 	// Last ten
 	frontView.lastTen = [];
-	var limit = 10;
+	var limit = 11;
 	for (var i = 0, j = sortedDurations.length; i < j; i++) {
 		if (i >= limit) break;
 		var e = sortedDurations[i];
