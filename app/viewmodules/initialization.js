@@ -12,7 +12,7 @@ module.exports = function(Box) {
 		var statusText;
 
 		var internetProm;
-		var treeReceived = false;
+		var isTreeReceived = false;
 		
 
 		var showInitializationScreenModal = function() {
@@ -74,10 +74,12 @@ module.exports = function(Box) {
 		}
 
 		var treeReceived = function(activityTree) {
+			console.log("Behold - the tree from the nets");
+			console.log(activityTree);
 			var adminService = Box.Application.getService('adminService');
 			adminService.uploadTree(activityTree).then(function() {
 				console.log("TREE RECEIVED FROM ONLINE");
-				treeReceived = true;
+				isTreeReceived = true;
 				statusText.empty().append("<span class='txt-color-green'><i class='fa fa-check'></i></span> Lataus onnistui! Valmistellaan ohjelmaa...");
 				initializationDone();
 			}).catch(downloadFailure);
@@ -110,7 +112,7 @@ module.exports = function(Box) {
 
 		var downloadCancelled = function() {
 			
-			if (treeReceived) return;
+			if (isTreeReceived) return;
 			console.warn("CANCEL DOWNLOAD");
 			if (internetProm) internetProm.reject('Lataus peruutettu.');
 		}
