@@ -137,40 +137,34 @@ function getInitialDataObject() {
 		events: [],
 		schema: {
 			_root_: [
-			/*
-				{daygoal: 'gt_' + 3600*1000*6, color: '884455', name: 'Työ', id: 1, children: [
-					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'PHP', id: 11, children: []},	
-					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Javascript', id: 12, children: [
-						{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Node.js', id: 121, children: []},	
-						{color: '554488', name: 'Browser development', id: 122, children: []},	
-						{daygoal: '', color: '554488', name: 'Electron App', id: 123, children: []},	
+			
+				{daygoal: 'gt_' + 3600*1000*10+900*1000, color: '884455', name: 'Työ', id: 1, children: [
+					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Myyntityö', id: 11, children: []},	
+					{daygoal: 'gt_' + 3600*1000*4, color: '554488', name: 'Ohjelmointi', id: 12, children: [
+						{daygoal: 'gt_' + 3600*1000*2, color: '554488', name: 'Web-ohjelmointi', id: 121, children: []},	
+						{color: '554488', name: 'Palvelinohjelmointi', id: 122, children: []},	
+						{daygoal: '0', color: '554488', name: 'Laiteohjelmointi', id: 123, children: []},	
 
-					]},	
+					]},
+					{daygoal: 'le_' + 3600*1000*1+1800*1000, color: '554488', name: 'Toimistotehtävät', id: 1177, children: []},		
 
 				]},
 				{daygoal: 'gt_' + 3600*1000*6, color: '559955', name: 'Opinnot', id: 2, children: [
-					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Kirjallisuus', id: 21, children: []},
-				]},
-				{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Vapaa-aika', id: 3, children: [
-					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Tennis', id: 31, children: []},		
-					{daygoal: 'gt_' + 3600*1000*6, color: '554488', name: 'Jalkapallo', id: 32, children: []},	
-					{daygoal: 'gt_' + 3600*1000*5, color: '554488', name: 'Lounas', id: 33, children: [
-						{daygoal: 'gt_' + 3600*1000*4, color: '554488', name: 'Stockmann', id: 331, children: []},	
+					{daygoal: 'gt_' + 3600*1000*1, color: '554488', name: 'Kirjanpito & Talous', id: 21, children: []},
+					{daygoal: 'gt_' + 3600*1000*2, color: '554488', name: 'Tietotekniikka', id: 22, children: []},
+					{daygoal: 'gt_' + 3600*1000*2, color: '554488', name: 'Muu opiskelu', id: 23, children: []},
 
-					]},		
-					{daygoal: 'lt_' + 3600*1000*3, color: '554488', name: 'Sählinki', id: 34, children: []},	
-					{daygoal: 'gt_' + 3600*1000*2, color: '554488', name: 'TV:n katselu', id: 35, children: []},
-					{daygoal: 'gt_' + 3600*1000*1, color: '554488', name: 'Runoillat', id: 36, children: []},
+				]},
+				{daygoal: 'le_' + 3600*1000*4, color: '554488', name: 'Vapaa-aika', id: 3, children: [
 				]}
-				*/
+				
 			]
 		},
 		triggers: {},
-		signals: [/*
-			{daygoal: 'e_' + 1, name: 'Kahvi', id: 9999},
-			{daygoal: 'le_' + 2, name: 'Olut', id: 9998},
-			{daygoal: 'gt_' + 5, name: 'Punaviini', id: 9997},
-			*/
+		signals: [
+			{daygoal: 'gt_' + 10, name: 'Myyntipuhelu', id: 9999},
+			{daygoal: 'gt_' + 20, name: 'Myyntisähköposti', id: 9998},
+			
 		],
 		settings: {
 			data: {
@@ -486,7 +480,7 @@ function addEvent(eventData, isAfter) {
 	eventData.t = parseInt(t + "5");
 	var schemaItem = getSchemaItemIfExists(eventData.s);
 	if (parseInt(eventData.s) !== 0 && !schemaItem) {
-		return Promise.reject('Tapahtuman luonti epäonnistui! Aktiviteettia ei löytynyt.');
+		return Promise.reject('Tapahtuman luonti epäonnistui! Aktiviteettia ei löytynyt:' + eventData.s);
 	}
 
 	appData.events.push(eventData);

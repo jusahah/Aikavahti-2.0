@@ -378,27 +378,28 @@ var dates = [
 
 /*
 setTimeout(function() {
+	return;
 	datalayer.disableChangeCb();
-	var ids = [0,11,121,122,123,21,31,32,331,34,35,36];
-	for (var i = 330; i >= 0; i--) {
-		console.group();
+	var ids = [0,11,121,122,123,21,22,23,1177,1177,3,3];
+	for (var i = 1300; i >= 0; i--) {
+
 		var id = ids[Math.floor(ids.length*Math.random())];
 		datalayer.dataCommandIn({
 			opType: 'new',
 			treePath: 'events',
 			data: {
-				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 88),
+				t: Date.now() - Math.floor(Math.random()* 1000 * 3600 * 24 * 180),
 				//t: moment(dates.pop()).valueOf(),
 				s: id
 			}
 		});
-		console.groupEnd();		
+	
 	};
 
 	datalayer.enableChangeCb();
 	//datalayer.broadcastChange();
 
-}, 1500);
+}, 2500);
 /*
 setTimeout(function() {
 	datalayer.broadcastChange();
