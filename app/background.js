@@ -75,7 +75,7 @@ app.on('ready', function () {
         mainWindow.loadURL('file://' + __dirname + '/index.html');
     }
 
-    if (true || env.name !== 'production') {
+    if (env.name !== 'production') {
         devHelper.setDevMenu();
         mainWindow.openDevTools();
     }
@@ -96,12 +96,12 @@ app.on('ready', function () {
         y: mainWindowState.y,
         width: mainWindowState.width,
         height: mainWindowState.height,
-        show: true
+        show: false
     });
 
     transformWindow.loadURL('file://' + __dirname + '/transform.html');
 
-    transformWindow.openDevTools();
+    //transformWindow.openDevTools();
 
 });
 

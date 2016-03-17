@@ -74,13 +74,16 @@ console.log('Loaded environment variables:', env);
 
 var app = remote.app;
 var appDir = jetpack.cwd(app.getAppPath());
-console.log("App dir is");
+console.log("App user dir is");
 console.log(app.getPath('userData'));
 
 
 document.addEventListener('DOMContentLoaded', function () {
+
 	setTimeout(function() {
 		// Setting up modules
+		$('#loadingText').empty().hide();
+		$('#appScreen').show();		
 		console.log("INITING BOX CONTAINER");
 		// Note that modules and all other stuff must registered by this moment
 		Box.Application.init({
@@ -96,7 +99,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			Box.Application.broadcast('initFirstView');
 		}
 
-	}, 200);
+
+	}, 1000);
 
 });
 
@@ -220,7 +224,7 @@ Box.Application.addModule('valikko', function(context) {
 		
 	}
 
-	var handleRouteChange = function(element, elementType, payload) {
+	var handleRouteChange = function(element, elementType, payload, firstEver) {
 		Box.Application.broadcast('routechanged', {route: elementType, payload: payload});
 		current = elementType;
 		$el.find('#aikavahti_mainmenu').find('li').removeClass('active');
@@ -232,7 +236,7 @@ Box.Application.addModule('valikko', function(context) {
 		// Start loading banner
 		// View itself is responsible of hiding it when its ready
 		$('#globalErrorBanner').hide();
-		$('#globalLoadingBanner').show();		
+		if (!firstEver) $('#globalLoadingBanner').show();		
 	}
 
 	var shutDownRequest = function() {
@@ -291,7 +295,7 @@ Box.Application.addModule('valikko', function(context) {
 				updateFrontShow(data);
 			} else if (name === 'initFirstView') {
 				context.getService('derivedData').forceDataRecomputation();
-				handleRouteChange(null, 'front-route', null);
+				handleRouteChange(null, 'front-route', null, true);
 			} else if (name === 'forceQuitAfterSaveFailure') {
 				forceShutDown();
 			}
