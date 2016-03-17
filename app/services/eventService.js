@@ -64,7 +64,9 @@ module.exports = function(Box, datalayer) {
 				.then(application.getService('errorService').success)
 				.catch(application.getService('errorService').notify);	
 			},
-			newEventCustomDateTime: function(dateString, timeString, schemaID) {
+			newEventCustomDateTime: function(dateString, timeString, schemaID, notes) {
+
+				notes = _.trim(notes) === '' ? undefined : notes;
 
 				var ts = parseDateAndTimeToTimestamp(dateString, timeString);
 				if (!ts) {
@@ -77,7 +79,8 @@ module.exports = function(Box, datalayer) {
 					data: {
 						s: schemaID,
 						t: ts,
-						signal: false
+						signal: false,
+						notes: notes
 					}
 				})
 				.then(application.getService('errorService').success)

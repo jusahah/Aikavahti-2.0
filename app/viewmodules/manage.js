@@ -95,8 +95,11 @@ module.exports = function(Box) {
 			$select = $el.find('#activitytoadd');
 			if (typeOfEvent === 'activity') {
 				$select.empty().append(buildHTMLFromTree(schemaTree));
+				$el.find('#edititem_notes_wrapper').show();
 			} else if (typeOfEvent === 'signal') {
 				$select.empty().append(buildHTMLFromSignalTable(signalsTable));
+				$el.find('#edititem_notes_wrapper').hide();
+
 			}
 			
 
@@ -183,9 +186,11 @@ module.exports = function(Box) {
 			var activityID = $el.find('#activitytoadd').val();
 			var addtype = $el.find('#typetoadd').val();
 
+			var notes = $el.find('#edititem_notes').val();
+
 			var es = context.getService('eventService');
 			if (addtype === 'activity') {
-				es.newEventCustomDateTime(date, time, activityID);
+				es.newEventCustomDateTime(date, time, activityID, notes);
 			} else if (addtype === 'signal') {
 				var signalID = activityID;
 				var prom = es.newSignalCustomDateTime(date, time, signalID);

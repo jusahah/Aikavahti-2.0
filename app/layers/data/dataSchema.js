@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 var eventItem = Joi.object().keys({
     s: Joi.number().integer(), // Schema item id
     t: Joi.number().integer(), // Timestamp
-    notes: Joi.string().max(1024),
+    notes: Joi.string().max(1024).optional(),
     signal: Joi.boolean()
 }); // Validate against Joi schema here
 

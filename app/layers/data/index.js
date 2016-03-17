@@ -180,7 +180,8 @@ function getInitialDataObject() {
 				userSelectedEventsShow: false,
 				userSelectedEvents: [],
 			}
-		}
+		},
+
 	};
 }
 
@@ -462,7 +463,7 @@ function addSignalEvent(eventData) {
 	if (parseInt(eventData.s) !== 0 && !signalItem) {
 		return Promise.reject('Signaalitapahtuman luonti epäonnistui! Signaalia ei löytynyt.');
 	}
-
+	eventData.s = parseInt(eventData.s);
 	appData.events.push(eventData);
 
 	// If we need to inform some web API event hook this would be pretty good place to do it
@@ -474,7 +475,13 @@ function addSignalEvent(eventData) {
 function addEvent(eventData, isAfter) {
 	// Here we do the "fivecation"
 	// This is done because allows easier adding of "artificial events" in transforms
-	// For example, overlapping can not happen as long as artificials use 0 and 9 as last digit.
+	// For example, Overwritlapping can not happen as long as artificials use 0 and 9 as last digit.
+
+	if (eventData.notes) {
+		eventData.notes = _.escape(eventData.notes);
+		eventData.notes = _.truncate(eventData.notes, {length: 512});
+	}
+
 	var t = eventData.t + "";
 	t = t.substring(0, t.length-1);
 	eventData.t = parseInt(t + "5");
@@ -482,7 +489,7 @@ function addEvent(eventData, isAfter) {
 	if (parseInt(eventData.s) !== 0 && !schemaItem) {
 		return Promise.reject('Tapahtuman luonti epäonnistui! Aktiviteettia ei löytynyt:' + eventData.s);
 	}
-
+	eventData.s = parseInt(eventData.s);
 	appData.events.push(eventData);
 	var succText = isAfter ? 'Uusi tapahtuma lisätty jälkikäteen:' : 'Uusi aktiviteetti aloitettu:';
 	// If we need to inform some web API event hook this would be pretty good place to do it
