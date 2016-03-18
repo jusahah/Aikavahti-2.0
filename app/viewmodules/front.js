@@ -49,15 +49,19 @@ module.exports = function(Box) {
 					$currentPanelWrapper.find('#daygoalbar').css('width', '0%');
 					return;
 				}
-				
+				// We need two calculations: one for duration clock and one for goal percentage update
 				var newDuration = Date.now() - lastFlush;
+				var newDurationKesto = Date.now() - currentNow.start;
+				console.log("NEW duration in front loopFun: " + newDurationKesto);
 				var timeString = beautifyDuration(newDuration);
-				if (timeString !== oldTimeString) {
+				var timeStringKesto = beautifyDuration(newDurationKesto);
+				console.log(timeStringKesto + " vs. " + oldTimeString);
+				if (timeStringKesto !== oldTimeString) {
 					// Avoid DOM hit when no needed
 					console.log("Changing duration in front");
-					$currentPanelWrapper.find('#currentevent_duration').empty().append("Kesto: <strong>" + timeString + "</strong>");
+					$currentPanelWrapper.find('#currentevent_duration').empty().append("Kesto: <strong>" + timeStringKesto + "</strong>");
 				}
-				oldTimeString = timeString;
+				oldTimeString = timeStringKesto;
 
 				// Day goal updating
 				if (!dayGoalDisabled) {
@@ -102,7 +106,7 @@ module.exports = function(Box) {
 		}
 
 		var activate = function() {
-			lastFlush =  Date.now();
+			
 			// hide right away in case we are reactivating view that is currently visible
 			$el.hide();			
 
@@ -444,7 +448,7 @@ module.exports = function(Box) {
 
 		// Public API
 		return {
-			messages: ['routechanged'],
+			messages: ['cachewasflushed', 'routechanged'],
 			onclick: function(event, element, elementType) {
 				console.log("CLICK IN FRONT");
 				if (elementType === 'newactivity_showleaves') {
@@ -466,7 +470,7 @@ module.exports = function(Box) {
 				} else if (elementType === 'triggersignal') {
 					var id = $(element).data('payload');
 					triggerSignal(id);
-				}
+				} 
 			},
 			onmessage: function(name, data) {
 				if (name === 'routechanged') {
@@ -476,6 +480,9 @@ module.exports = function(Box) {
 					} else {
 						deactivate();
 					}
+				} else if(name === 'cachewasflushed') {
+					// We need to update lastFlush so that goal percentage can calculate correct
+					lastFlush =  Date.now();
 				}
 			}
 
