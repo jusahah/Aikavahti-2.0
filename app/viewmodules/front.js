@@ -404,7 +404,7 @@ module.exports = function(Box) {
 		
 		function populateAddNotesModal() {
 			$el.find('#tagsArea').empty();
-			
+
 			var name = currentNow.name;
 			var startString = beautifyTimestamp(currentNow.start);
 			var area = $el.find('#notearea');
@@ -416,6 +416,8 @@ module.exports = function(Box) {
 				area.val(currentNow.notes);
 				
 			}
+
+			changeInNoteArea();
 		}
 
 		function saveNotes() {
@@ -460,6 +462,7 @@ module.exports = function(Box) {
 
 		function populateQuickNoteModal(notes) {
 			$el.find('#quickNoteModal_text').empty().append(notes);
+
 
 		}
 

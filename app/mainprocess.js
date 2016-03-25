@@ -39,6 +39,8 @@ $('#statsContainer').load('views/mainContents/stats.html');
 $('#initializationContainer').load('views/static/initialization.html');
 $('#importContainer').load('views/mainContents/import.html');
 $('#signalsContainer').load('views/mainContents/signals.html');
+$('#tagsContainer').load('views/mainContents/tags.html');
+
 $('#timelineContainer').load('views/mainContents/timeline.html');
 $('#comparisonsContainer').load('views/mainContents/comparisons.html');
 $('#rawdataContainer').load('views/mainContents/rawdata.html');
@@ -62,6 +64,7 @@ require('./viewmodules/timeline')(Box); // Same
 require('./viewmodules/comparisons')(Box); // Same
 require('./viewmodules/errors')(Box); // Same
 require('./viewmodules/rawdata')(Box); // Same
+require('./viewmodules/tags')(Box); // Same
 // Service registrations
 require('./services/derivedData')(Box, datalayer);
 require('./services/settingsService')(Box, datalayer);

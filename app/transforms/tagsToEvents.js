@@ -5,8 +5,9 @@ var moment = require('moment');
 module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schemaTree, normalizedSchemaTable, settingsTree, signalsArr, sortedSignalsAndEvents) {
 
 	var tagsToEventsTable = {}; // tag string -> array of event timestamps
+	var eventList = eventListCreation(sortedEvents, normalizedSchemaTable);
 
-	_.each(sortedEvents, function(event) {
+	_.each(eventList, function(event) {
 		if (event.hasOwnProperty('notes')) {
 			var tagsFound = resolveTags(event.notes);
 			_.each(tagsFound, function(tag) {
@@ -14,7 +15,12 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 					tagsToEventsTable[tag] = [];
 				}
 
-				tagsToEventsTable[tag].push(event.t);
+				tagsToEventsTable[tag].push({
+					color: event.color,
+					t: event.t,
+					notes: event.notes,
+					name: event.name
+				});
 
 			});
 		}
@@ -34,5 +40,19 @@ function resolveTags(notes) {
 	return _.filter(words, function(word) {
 		return word.charAt(0) === '#' && word.length > 1; // Check it has # and that its not only letter
 	});
+}
+
+function eventListCreation(sortedEvents, normalizedSchemaTable) {
+	var eventsWithSchemaInfo = _.map(sortedEvents, function(event) {
+		var e2 = Object.assign({}, event);
+		if (normalizedSchemaTable.hasOwnProperty(event.s)) {
+			Object.assign(e2, normalizedSchemaTable[event.s]);
+			// Delete children property
+			delete e2.children;
+		}
+		return e2;
+	});
+
+	return eventsWithSchemaInfo;
 }
 
