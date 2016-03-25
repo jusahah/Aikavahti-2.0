@@ -403,7 +403,8 @@ module.exports = function(Box) {
 		}
 		
 		function populateAddNotesModal() {
-
+			$el.find('#tagsArea').empty();
+			
 			var name = currentNow.name;
 			var startString = beautifyTimestamp(currentNow.start);
 			var area = $el.find('#notearea');
@@ -431,7 +432,28 @@ module.exports = function(Box) {
 			var es  = context.getService('eventService');
 			var prom = es.saveNotes(eventtimestamp, notes);
 
+		}
 
+		function changeInNoteArea() {
+			console.log("CHANGE IN NOTE AREA");
+			// refresh tags
+			var tagsArea = $el.find('#tagsArea');
+			var noteArea = $el.find('#notearea');
+
+			var note = noteArea.val();
+			var words = note.split(' ');
+			var foundTags = _.filter(words, function(word) {
+				return word.charAt(0) === '#' && word.length > 1;
+			});
+			console.log("Found following tags:");
+			console.log(foundTags);
+
+			var html = '';
+			_.each(foundTags, function(tag) {
+				html += '<span class="label label-primary" style="margin-right: 2px; display: inline-block;">' + tag + '</span>';
+			});
+
+			tagsArea.empty().append(html);
 
 
 		}
@@ -445,6 +467,8 @@ module.exports = function(Box) {
 			var es  = context.getService('eventService');
 			var prom = es.newSignal(signalID);			
 		}
+
+		$el.find('#notearea').on('change keyup paste', changeInNoteArea);
 
 		// Public API
 		return {

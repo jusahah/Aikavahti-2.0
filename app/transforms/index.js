@@ -31,6 +31,7 @@ module.exports = {
 		{name: 'weekByWeekTable', transform: require('./weekByWeekTable'), prerequisite: null},
 		{name: 'monthByMonthTable', transform: require('./monthByMonth'), prerequisite: null},
 		{name: 'signalsPerWeekAndMonth', transform: require('./signalsPerWeekAndMonth'), prerequisite: null},
+		{name: 'tagsToEvents', transform: require('./tagsToEvents'), prerequisite: null},
 	]
 
 };
