@@ -1,6 +1,7 @@
 // Admin page module
 var _ = require('lodash');
 var moment = require('moment');
+var tinycolor = require('tinycolor2');
 var hljs = require('highlight.js');
 
 module.exports = function(Box) {
@@ -79,12 +80,20 @@ module.exports = function(Box) {
 			});
 
 			var html = '';
+			console.warn("Noted events");
 			_.each(eventsArr, function(notedEvent) {
+				console.log(notedEvent);
+				var color = parseInt(notedEvent.s) === 0 ? '554455' : notedEvent.color;
+				var name  = parseInt(notedEvent.s) === 0 ? '(poissa)' : notedEvent.name;
+				var tc = tinycolor(color);
+				var textcolor = tc.isDark() ? 'fff' : '222'; 
+
 				html += '<li style="min-height: 80px;">';
 				html += '<div class="smart-timeline-time">';
 				html += '<small>' + timeStringToNote(notedEvent.t) + '</small>';
 				html += '</div>'
 				html += '<div class="smart-timeline-content">';
+				html += '<span class="label" style="color: #' + textcolor + '; position: absolute; top: 0px; right: 2px; font-size: 10px; background-color: #' + color + ';">' + name + '</span>';
 				html += '<p>' + notedEvent.notes + '</p>';
 				html += '</div>';
 				html += '</li>';				

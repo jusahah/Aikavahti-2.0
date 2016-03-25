@@ -19,7 +19,8 @@ module.exports = function(sortedEvents, dayChangesAdded, sortedDurations, schema
 					color: event.color,
 					t: event.t,
 					notes: event.notes,
-					name: event.name
+					name: event.name,
+					s: event.s
 				});
 
 			});
